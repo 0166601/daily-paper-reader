@@ -189,6 +189,22 @@ def load_paper_pool(path: str) -> List[Paper]:
   return papers
 
 
+def _format_supabase_window_for_log(
+  start_dt: datetime | None,
+  end_dt: datetime | None,
+  time_fields: tuple[str, ...],
+) -> tuple[str, str, str]:
+  safe_fields = {str(f).strip() for f in (time_fields or ()) if str(f).strip()}
+  if start_dt is None or end_dt is None:
+    published = "N/A"
+    updated = "N/A"
+  else:
+    window = f"{start_dt.isoformat()} ~ {end_dt.isoformat()}"
+    published = window if "published" in safe_fields else "N/A"
+    updated = window if "updated_at" in safe_fields else "N/A"
+  return published, updated, ",".join(sorted(safe_fields))
+
+
 def parse_embedding_value(value: Any) -> Optional[np.ndarray]:
   if isinstance(value, np.ndarray):
     vec = value.astype(np.float32)
@@ -365,6 +381,20 @@ def rank_papers_for_queries_via_supabase(
     paper_tag = str(q.get("paper_tag") or "").strip()
     if not q_text:
       continue
+
+    published_window, updated_window, window_fields = _format_supabase_window_for_log(
+      start_dt=start_dt,
+      end_dt=end_dt,
+      time_fields=time_fields,
+    )
+    log(
+      "[Supabase Vector] "
+      f"batch={idx + 1} tag={q.get('tag') or ''} "
+      f"type={q.get('type') or ''} "
+      f"published_window={published_window} "
+      f"updated_window={updated_window} "
+      f"time_fields={window_fields}"
+    )
 
     q_vec = q_embs[idx]
     rows, msg = match_papers_by_embedding(

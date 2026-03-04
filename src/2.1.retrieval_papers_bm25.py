@@ -226,6 +226,22 @@ def _query_text_for_supabase_bm25(q: dict) -> str:
   return q_text
 
 
+def _format_supabase_window_for_log(
+  start_dt: datetime | None,
+  end_dt: datetime | None,
+  time_fields: tuple[str, ...],
+) -> tuple[str, str, str]:
+  safe_fields = {str(f).strip() for f in (time_fields or ()) if str(f).strip()}
+  if start_dt is None or end_dt is None:
+    published = "N/A"
+    updated = "N/A"
+  else:
+    window = f"{start_dt.isoformat()} ~ {end_dt.isoformat()}"
+    published = window if "published" in safe_fields else "N/A"
+    updated = window if "updated_at" in safe_fields else "N/A"
+  return published, updated, ",".join(sorted(safe_fields))
+
+
 def load_paper_pool(path: str) -> List[Paper]:
   """
   读取 arxiv_fetch_raw.py 生成的 JSON：
@@ -289,11 +305,25 @@ def rank_papers_for_queries_via_supabase(
   results_per_query: List[dict] = []
   total_hits = 0
 
-  for q in queries:
+  for q_idx, q in enumerate(queries, start=1):
     q_text = _query_text_for_supabase_bm25(q)
     paper_tag = str(q.get("paper_tag") or "").strip()
     if not q_text:
       continue
+
+    published_window, updated_window, window_fields = _format_supabase_window_for_log(
+      start_dt=start_dt,
+      end_dt=end_dt,
+      time_fields=time_fields,
+    )
+    log(
+      "[Supabase BM25] "
+      f"batch={q_idx} tag={q.get('tag') or ''} "
+      f"type={q.get('type') or ''} "
+      f"published_window={published_window} "
+      f"updated_window={updated_window} "
+      f"time_fields={window_fields}"
+    )
 
     rows, msg = match_papers_by_bm25(
       url=url,
