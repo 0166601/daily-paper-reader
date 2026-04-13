@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-001.webp",
+      "caption": "Fig. 4: DS and GTR example with one agent (a1) and two shelves (s1 and s2). Agent a1 carries s2 first. When s2 is constrained by s1 at location (2, 3), DS reverses the corresponding Type-2 dependencies to allow s2 to proceed first, whereas GTR replans the unexecuted portion of s1’s path to free the route for s2.",
+      "page": 6,
+      "index": 1,
+      "width": 529,
+      "height": 242
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-002.webp",
+      "caption": "Fig. 5: Distributions of shelf pickup (top) and delivery (bottom) cells (brown) and agent initial cells (blue) across three layouts.",
+      "page": 6,
+      "index": 2,
+      "width": 523,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-003.webp",
+      "caption": "Fig. 7: Cost breakdown for three methods on medium layouts.",
+      "page": 7,
+      "index": 3,
+      "width": 522,
+      "height": 469
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-004.webp",
+      "caption": "TABLE II: Results for the MAPF-DECOMP baseline and CREST without overhead. Percentages indicate reductions relative to the baseline. ‘N ’ denotes the number of agents.",
+      "page": 7,
+      "index": 4,
+      "width": 481,
+      "height": 269
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-005.webp",
+      "caption": "TABLE V: Results for the baseline and all CREST variants with overhead (∆ = 1). Values are reported as mean ± standard deviation over 25 instances for normalized metrics (Norm. Cost and Norm. Mksp); other metrics are reported as mean. Percentages denote reductions relative to the baseline. ‘N ’ denotes the number of agents in the setting.",
+      "page": 10,
+      "index": 5,
+      "width": 1076,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-006.webp",
+      "caption": "Fig. 2: CREST running example with two agents (a1, a2) and four shelves (s1–s4). (a) shows the initial T and D at t = 0. Each shelf trajectory in T is an ordered waypoint sequence, and D is a precedence graph defined over these waypoints; solid arrows denote Type-1 arcs and dashed arrows denote Type-2 arcs. (b) shows the simplified T and D at t = 0, obtained by merging consecutive waypoints for each shelf. (c) shows the final execution produced by CREST from t = 0 to t = 7.",
+      "page": 4,
+      "index": 6,
+      "width": 523,
+      "height": 438
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-007.webp",
+      "caption": "TABLE IV: Results for the baseline and all CREST variants without overhead. Values are reported as mean ± standard deviation over 25 instances for normalized metrics (Norm. Cost and Norm. Mksp); other metrics are reported as mean. Percentages denote reductions relative to the baseline. ‘N ’ denotes the number of agents in the setting.",
+      "page": 9,
+      "index": 7,
+      "width": 1076,
+      "height": 546
+    },
+    {
+      "url": "assets/figures/arxiv/2603.28803v1/fig-008.webp",
+      "caption": "Fig. 3: STR example with one agent (a1) and three shelves (s1, s2, s3). With a1 assigned to s3, the baseline detours to avoid s1 and s2 (left). STR replans the remaining path of s3 to shorten the unexecuted segment and avoid being blocked at (3, 1) (right).",
+      "page": 5,
+      "index": 8,
+      "width": 501,
+      "height": 313
+    }
+  ]
+}

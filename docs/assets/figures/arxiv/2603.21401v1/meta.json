@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-001.webp",
+      "caption": "Figure 2: Visualization of the construction phase for the same sample instance. The process starts from the final proxy circle obtained in the clustering phase (top left) and iteratively expands proxy circles into their generating circles while updating the tour. Newly inserted circles and tour points are highlighted, while removed proxy elements are shown in a faded, dashed style. Note that we do not show point optimizations here.",
+      "page": 6,
+      "index": 1,
+      "width": 943,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-002.webp",
+      "caption": "Figure 6: Comparison of the benchmark and our solver’s tour for the rotatingDiamonds5 instance. The benchmark achieves a better traversal order across the concentric diamond layers, whereas our solver generates a worse traversal primarily due to suboptimal TSP ordering inherited from the base heuristic of Formella (2024). Additional inefficiency arises from locally optimized point selections rather than globally coordinated second-order cone programming (SOCP) refinements.",
+      "page": 15,
+      "index": 2,
+      "width": 943,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-003.webp",
+      "caption": "Figure 7: Runtime scaling on random CETSP instances. Runtime grows slower than O(n log n) due to sublinear growth of the tour size.",
+      "page": 15,
+      "index": 3,
+      "width": 756,
+      "height": 318
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-004.webp",
+      "caption": "Figure 3: Approximate solution to the Alhazen problem for placing a new tour point within a circle. The bisection of angle ∠AOB is used as a fast approximation of the optimal insertion point (Lei and Hao 2024).",
+      "page": 7,
+      "index": 4,
+      "width": 569,
+      "height": 567
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-005.webp",
+      "caption": "Figure 5: Comparison of the benchmark and our solver’s tour for the bubbles9 instance. The benchmark exhibits a highly structured, spiral traversal through the concentric layers of circles, whereas our solver’s path shows local inefficiencies and incomplete alignment along the optimal spiral pattern. This case highlights the solver’s difficulty escaping local minima in structured overlapping geometries.",
+      "page": 14,
+      "index": 5,
+      "width": 943,
+      "height": 379
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-006.webp",
+      "caption": "Figure 4: Illustration of the point reoptimization step. The new position P ⋆ is obtained by projecting the current point P toward the gradient direction of decreasing tour cost, constrained to remain within all corresponding circles.",
+      "page": 8,
+      "index": 6,
+      "width": 569,
+      "height": 444
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-007.webp",
+      "caption": "Figure 1: Visualization of the clustering phase for a sample instance with n = 9 disks. Each subfigure shows one merge step, where the two closest circles (highlighted) are replaced by their proxy circle (dashed blue outline). The final frame (bottom right) shows the single remaining cluster.",
+      "page": 4,
+      "index": 7,
+      "width": 943,
+      "height": 1018
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-008.webp",
+      "caption": "Table 1: Comparison of benchmark vs output values for all instances",
+      "page": 19,
+      "index": 8,
+      "width": 827,
+      "height": 1327
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-009.webp",
+      "caption": "Table 2: Runtime comparison: benchmark vs our run (adjusted)",
+      "page": 20,
+      "index": 9,
+      "width": 969,
+      "height": 822
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21401v1/fig-010.webp",
+      "caption": "Figure 8: Runtime scaling on structured CETSP instances with linear tour size. The O(n log n) trend fits the measured data closely.",
+      "page": 16,
+      "index": 10,
+      "width": 756,
+      "height": 318
+    }
+  ]
+}

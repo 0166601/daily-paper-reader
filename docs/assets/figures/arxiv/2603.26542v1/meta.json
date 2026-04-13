@@ -1,0 +1,110 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-001.webp",
+      "caption": "Figure 3: Logical decomposition of the storage area. (a) The continuous floor is discretized into slots. (b) These slots are grouped into Static Lanes (colored), where each lane acts as a LIFO stack accessible from the perimeter. The grey numbered rectangles represent the unit loads",
+      "page": 11,
+      "index": 1,
+      "width": 943,
+      "height": 365
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-002.webp",
+      "caption": "Table 6: Sensitivity Analysis: feasibility by unit load to slot ratio and access directions. The table displays the success rate as a fraction (Solved/Generated) for various layouts.",
+      "page": 38,
+      "index": 2,
+      "width": 663,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-003.webp",
+      "caption": "Table 3: Notation and parameters used in the heuristic approach",
+      "page": 21,
+      "index": 3,
+      "width": 944,
+      "height": 1309
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-004.webp",
+      "caption": "Figure 6: Visualization of a solution in a high-density 8×3 layout (21 unit loads) with 4 AMRs. The bottom-left of each sub-figure indicates the corresponding decision variable from the EF (also visualized with the dotted arrows; white for empty drives; black for transportation of an UL), while T denotes the discrete time step of the event.",
+      "page": 34,
+      "index": 4,
+      "width": 943,
+      "height": 1181
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-005.webp",
+      "caption": "Table 7: Sets, indices, and general notation for the Integer Programming model",
+      "page": 46,
+      "index": 5,
+      "width": 867,
+      "height": 785
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-006.webp",
+      "caption": "Table 2: Sets, indices, and parameters",
+      "page": 13,
+      "index": 6,
+      "width": 791,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-007.webp",
+      "caption": "Figure 2: Conceptual comparison of buffer accessibility: a) Access from the Perimeter, as defined in the BSRRP. a) In-Grid Access, typical for Robotic Mobile Fulfillment Systems (RMFS) where agents navigate within the grid; In the former, AMRs are restricted to the exterior aisles, necessitating strategic reshuffling of obstructing unit loads to access deep LIFO slots.",
+      "page": 8,
+      "index": 7,
+      "width": 589,
+      "height": 297
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-008.webp",
+      "caption": "Figure 7: Real-world use case (surface coating). This brownfield scenario demonstrates the conversion of dead floor space into an autonomous buffer. Unlike open grids, the layout is dictated by the footprint of the machinery. The visualization highlights the heuristic’s capability to assign inventory to separated zones (depth 1 vs. depth 2) to optimize storage utilization within the irregular boundaries.",
+      "page": 36,
+      "index": 8,
+      "width": 943,
+      "height": 912
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-009.webp",
+      "caption": "Figure 5: Performance comparison between the EF and the proposed Heuristic. Top panels: Runtime distributions (logarithmic scale) across 3× 3 and 4× 4 layouts. Bottom panels: Optimality gaps relative to the exact lower bound, categorized by unit-load-to-slot-ratio.",
+      "page": 32,
+      "index": 9,
+      "width": 943,
+      "height": 614
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-010.webp",
+      "caption": "Table 1: Comparison of related literature in the field of Block Relocation and Buffer Reshuffling.",
+      "page": 9,
+      "index": 10,
+      "width": 943,
+      "height": 610
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-011.webp",
+      "caption": "Figure 8: Algorithmic storage location assignment in the brownfield scenario. The heatmaps contrast buffer duration (a) with traffic flow (b), highlighting the differentiation between highdensity storage and transfer zones.",
+      "page": 37,
+      "index": 11,
+      "width": 943,
+      "height": 632
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-012.webp",
+      "caption": "Table 4: Composition of the Benchmark Reference Set: 810 high-quality instances filtered from a pool of 6,903 generated small-scale scenarios.",
+      "page": 31,
+      "index": 12,
+      "width": 663,
+      "height": 259
+    },
+    {
+      "url": "assets/figures/arxiv/2603.26542v1/fig-013.webp",
+      "caption": "Figure 4: Overview of the hierarchical heuristic. The sequential stages transform the input from a linearized task sequence into strict precedence constraints, then into timed assignments, and finally into collision-free trajectories.",
+      "page": 20,
+      "index": 13,
+      "width": 936,
+      "height": 202
+    }
+  ]
+}

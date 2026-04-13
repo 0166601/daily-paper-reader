@@ -1,0 +1,78 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-001.webp",
+      "caption": "Table 1: Studies on competitive ratio analysis for drone routing applications",
+      "page": 6,
+      "index": 1,
+      "width": 900,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-002.webp",
+      "caption": "Table 2: Overview of main results",
+      "page": 11,
+      "index": 2,
+      "width": 983,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-003.webp",
+      "caption": "Figure 5: Observed competitive ratios σ̂ for Optimistic and Regretless on LARGE Note. The red line indicates analytical competitive ratios σ from Section 5.",
+      "page": 26,
+      "index": 3,
+      "width": 833,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-004.webp",
+      "caption": "Figure 6: Competitive ratios σ̂ for Optimistic and Regretless for several trucks and drones on SMALL Note. The red line indicates analytical competitive ratios σ from Section 5. The red line for α = 2 for Regretless depicts value 3 and is not visible in the figure.",
+      "page": 30,
+      "index": 4,
+      "width": 816,
+      "height": 581
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-005.webp",
+      "caption": "Figure 7: Observed drone-impact ratios for Optimistic and Regretless on LARGE Note. The red lines indicates analytical drone-impact ratios ω̄ and ω from Section 5.",
+      "page": 30,
+      "index": 5,
+      "width": 833,
+      "height": 299
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-006.webp",
+      "caption": "Figure 4: Examples of star graphs",
+      "page": 14,
+      "index": 6,
+      "width": 996,
+      "height": 256
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-007.webp",
+      "caption": "Figure 2: Example of an RDP∗ instance (full-information counterpart) Note. Left figure: An instance with α = 2, i.e., the drone is two times faster than the truck; damaged nodes D = {v1, v2, v3}, 1 truck, and 1 drone. Right figure: An optimal solution for this instance with makespan 17: the truck travels (v0, v1, v3, v2, v1, v0), the drone travels (v0, v1, v3, v5, v4, v1, v0).",
+      "page": 3,
+      "index": 7,
+      "width": 1084,
+      "height": 498
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-008.webp",
+      "caption": "Table 4: Comparison of Optimistic and Regretless to alternative policies on LARGE",
+      "page": 28,
+      "index": 8,
+      "width": 786,
+      "height": 182
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23135v1/fig-009.webp",
+      "caption": "Table 3: Worst-observed and median competitive ratios for Optimistic and Regretless on LARGE",
+      "page": 28,
+      "index": 9,
+      "width": 1431,
+      "height": 493
+    }
+  ]
+}

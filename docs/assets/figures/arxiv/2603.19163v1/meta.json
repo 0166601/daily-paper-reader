@@ -1,0 +1,158 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-001.webp",
+      "caption": "Table 7: cuGenOpt vs. OR-Tools Routing (gap%, 60 s, Tesla T4).",
+      "page": 15,
+      "index": 1,
+      "width": 546,
+      "height": 227
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-002.webp",
+      "caption": "Table 5: Experimental environment.",
+      "page": 15,
+      "index": 2,
+      "width": 673,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-003.webp",
+      "caption": "Figure 9: Cumulative optimization impact on pcb442 (Tesla T4, 30s). Heuristic initialization provides the largest improvement (-82% gap). AOS update frequency optimization boosts throughput by 240%. Profile-driven weights and population adaptation further refine solution quality and throughput. Final configuration achieves 6.15% gap at 625 gens/s.",
+      "page": 21,
+      "index": 3,
+      "width": 902,
+      "height": 541
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-004.webp",
+      "caption": "Figure 2: GPU parallel execution model. The population is distributed across CUDA blocks (P blocks = population size). Within each block, 128 threads sample candidate moves in parallel, perform block-level reduction to find the best move, and thread 0 executes accept/reject decision. Shared memory holds current solution, operator weights, and reduction buffer.",
+      "page": 7,
+      "index": 4,
+      "width": 902,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-005.webp",
+      "caption": "Figure 3: Adaptive Operator Selection (AOS) mechanism. Each CUDA block maintains local statistics (usage count and improvement count) for each operator. Every 10 batches, weights are updated via EMA based on observed effectiveness. The two-level structure controls both K-step (number of operators per iteration) and sequence-level (specific operator) selection probabilities.",
+      "page": 10,
+      "index": 5,
+      "width": 902,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-006.webp",
+      "caption": "Table 11: Multi-GPU comparison (2×V100S, 5000 generations, mean of 3 runs).",
+      "page": 18,
+      "index": 6,
+      "width": 702,
+      "height": 238
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-007.webp",
+      "caption": "Figure 7: Cross-hardware solution quality comparison (30s, gap%). Three memory regimes emerge: (1) Shared memory regime (n ≤ 100): A800’s 164KB shared memory enables best quality. (2) L2 cache regime (n=150-225): A800’s adaptive large population (P=128) hurts convergence despite ample L2. (3) DRAM regime (n ≥ 318): A800’s 40MB L2 and 2TB/s bandwidth achieve best quality at large scale.",
+      "page": 18,
+      "index": 7,
+      "width": 902,
+      "height": 529
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-008.webp",
+      "caption": "Table 21: Multi-GPU compatibility verification for multi-objective modes (A-n32-k5, 2×V100S).",
+      "page": 23,
+      "index": 8,
+      "width": 715,
+      "height": 204
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-009.webp",
+      "caption": "Figure 5: JIT compilation pipeline. User-provided CUDA code snippets (objective and constraints) are injected into a template, compiled via nvcc, and executed as a subprocess. SHA-256 hashing enables compilation caching. The entire process is transparent to users, appearing as a standard Python function call.",
+      "page": 13,
+      "index": 9,
+      "width": 902,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-010.webp",
+      "caption": "Table 2: Search operator hierarchy.",
+      "page": 8,
+      "index": 10,
+      "width": 763,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-011.webp",
+      "caption": "Table 1: Feature comparison of cuGenOpt with existing approaches.",
+      "page": 4,
+      "index": 11,
+      "width": 881,
+      "height": 239
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-012.webp",
+      "caption": "Figure 8: Multi-GPU improvement across problem scales. TSP shows increasing benefit with scale, reaching 3.51% at n=1000 (CUDA Graph enabled). CUDA Graph configuration significantly affects effectiveness (3.51% vs 0.66%). VRP effectiveness depends on both scale and problem feasibility.",
+      "page": 19,
+      "index": 12,
+      "width": 902,
+      "height": 544
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-013.webp",
+      "caption": "Table 9: Three-GPU TSP comparison (mean gap%, 30 s, 5 seeds).",
+      "page": 17,
+      "index": 13,
+      "width": 733,
+      "height": 203
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-014.webp",
+      "caption": "Figure 4: L2 cache-aware population sizing. The framework automatically adjusts population size to fit the working set into L2 cache, preventing cache thrashing. For TSP n=1000 (working set 3.8 MB), V100 (L2=6 MB) selects pop=32, while A800 (L2=40 MB) can support larger populations.",
+      "page": 12,
+      "index": 14,
+      "width": 902,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-015.webp",
+      "caption": "Table 13: Generality validation (12 problems, 5 encodings, 2000 generations).",
+      "page": 20,
+      "index": 15,
+      "width": 631,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-016.webp",
+      "caption": "Table 15: Cumulative optimization ablation on pcb442.",
+      "page": 20,
+      "index": 16,
+      "width": 846,
+      "height": 239
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-017.webp",
+      "caption": "Table 14: Standard benchmark results (mean gap%, 30 s, 5 seeds).",
+      "page": 20,
+      "index": 17,
+      "width": 796,
+      "height": 252
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-018.webp",
+      "caption": "Figure 1: cuGenOpt system architecture. The framework provides three-layer abstraction: user interface (Python API and CUDA problem definition), core components (adaptive search and operator management), and GPU execution engine (L2-aware memory management and CUDA kernels).",
+      "page": 5,
+      "index": 18,
+      "width": 902,
+      "height": 494
+    },
+    {
+      "url": "assets/figures/arxiv/2603.19163v1/fig-019.webp",
+      "caption": "Figure 6: Baseline comparison across TSP instances. cuGenOpt dominates general MIP solvers (SCIP/CBC) across all scales, with gaps 100-2000× smaller. Against specialized routing solvers (OR-Tools Routing with GLS metaheuristic), cuGenOpt is competitive at small-medium scale (n ≤ 150) but trails at large scale (n > 200).",
+      "page": 16,
+      "index": 19,
+      "width": 902,
+      "height": 544
+    }
+  ]
+}

@@ -1,0 +1,190 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-001.webp",
+      "caption": "Figure C.6: Scatterplot and correlation plot for VTOL models.",
+      "page": 43,
+      "index": 1,
+      "width": 897,
+      "height": 826
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-002.webp",
+      "caption": "Figure 1: Prior predictive distribution on total number of active sites for NHS GGC (left) for θ0 = −1 and for NHS Grampian (right) for θ0 = −2.",
+      "page": 25,
+      "index": 2,
+      "width": 934,
+      "height": 372
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-003.webp",
+      "caption": "Figure C.4: Scatterplot and correlation plot for the ambulance response time dataset.",
+      "page": 38,
+      "index": 3,
+      "width": 897,
+      "height": 869
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-004.webp",
+      "caption": "Table 3: Summary of linear model fits for cruise time (left section) and cruise battery consumption (right section).",
+      "page": 15,
+      "index": 4,
+      "width": 665,
+      "height": 385
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-005.webp",
+      "caption": "Table 2: Summary of linear model fits for take-off time (left section); landing time (middle section); and VTOL battery consumption (right section).",
+      "page": 15,
+      "index": 5,
+      "width": 912,
+      "height": 261
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-006.webp",
+      "caption": "Figure D.8: Summary of our analyses with NHS GGC. The upper left panel shows number of sites and QALY gain against β; the upper right panel shows cost-effectiveness of the designs; the bottom right panel shows the final network design; bottom left panel shows the reliability of the designs",
+      "page": 47,
+      "index": 6,
+      "width": 944,
+      "height": 870
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-007.webp",
+      "caption": "Figure 3: Summary of our analyses with NHS Grampian. The upper-left panel shows number of sites and QALY gain against β; the upper-right panel shows mean drone response time and number of cases covered in 6 and 8 mins; the middle-left panel shows the number of cases where drone reaches before ambulance; the middle-right panel shows the final network design; the lower-left panel shows the cost-effectiveness of the designs; and the lower-right panel shows the coverage reliability of the designs",
+      "page": 30,
+      "index": 7,
+      "width": 928,
+      "height": 868
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-008.webp",
+      "caption": "Table 1: Summary of linear model fit for the ambulance response time",
+      "page": 7,
+      "index": 8,
+      "width": 546,
+      "height": 429
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-009.webp",
+      "caption": "Table 5: Seasonal variability in site selection and average wind speed for NHS GGC and NHS Grampian for the best network design.",
+      "page": 29,
+      "index": 9,
+      "width": 941,
+      "height": 183
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-010.webp",
+      "caption": "Figure C.5: Scatterplot and correlation plot for wind models.",
+      "page": 39,
+      "index": 10,
+      "width": 897,
+      "height": 826
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-011.webp",
+      "caption": "Table C.9: Ten-fold cross-validation results for wind direction models.",
+      "page": 42,
+      "index": 11,
+      "width": 804,
+      "height": 409
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-012.webp",
+      "caption": "Table C.10: Ten-fold cross-validation results for take-off time surrogate models.",
+      "page": 42,
+      "index": 12,
+      "width": 804,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-013.webp",
+      "caption": "Table C.14: Ten-fold cross-validation results for cruise battery surrogate models.",
+      "page": 46,
+      "index": 13,
+      "width": 867,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-014.webp",
+      "caption": "Table C.13: Ten-fold cross-validation results for cruise time surrogate models.",
+      "page": 46,
+      "index": 14,
+      "width": 804,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-015.webp",
+      "caption": "Figure C.7: Scatterplot and correlation plot for cruise models.",
+      "page": 45,
+      "index": 15,
+      "width": 897,
+      "height": 826
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-016.webp",
+      "caption": "Figure 2: Summary of our analyses with NHS GGC. The upper-left panel shows number of sites and QALY gain against β; the upper-right panel shows mean drone response time and number of cases covered in 6 and 8 mins; the middle-left panel shows the number of cases where drone reaches before ambulance; the middle-right panel shows the final network design; the lower-left panel shows the cost-effectiveness of the designs; and the lower-right panel shows the coverage reliability of the designs",
+      "page": 28,
+      "index": 16,
+      "width": 928,
+      "height": 868
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-017.webp",
+      "caption": "Table C.7: Ten-fold cross-validation results for log wind speed models.",
+      "page": 40,
+      "index": 17,
+      "width": 804,
+      "height": 409
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-018.webp",
+      "caption": "Table C.12: Ten-fold cross-validation results for VTOL battery surrogate models.",
+      "page": 44,
+      "index": 18,
+      "width": 804,
+      "height": 325
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-019.webp",
+      "caption": "Table C.11: Ten-fold cross-validation results for landing time surrogate models.",
+      "page": 44,
+      "index": 19,
+      "width": 804,
+      "height": 324
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-020.webp",
+      "caption": "Table C.8: Ten-fold cross-validation results for log wind direction models.",
+      "page": 41,
+      "index": 20,
+      "width": 804,
+      "height": 409
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-021.webp",
+      "caption": "Table 4: Coverage statistics comparing recorded SAS response times and drone-assisted response for NHS GGC and NHS Grampian for the best network design. Mean response times are reported in minutes.",
+      "page": 27,
+      "index": 21,
+      "width": 923,
+      "height": 186
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-022.webp",
+      "caption": "Table C.6: Three-fold cross-validation results for log-transformed ambulance response time models.",
+      "page": 37,
+      "index": 22,
+      "width": 804,
+      "height": 408
+    },
+    {
+      "url": "assets/figures/arxiv/2603.23134v1/fig-023.webp",
+      "caption": "Figure D.9: Summary of our analyses with NHS Grampian. The upper left panel shows number of sites and QALY gain against β; the upper right panel shows cost-effectiveness of the designs; the bottom right panel shows the final network design; bottom left panel shows the reliability of the designs",
+      "page": 48,
+      "index": 23,
+      "width": 944,
+      "height": 870
+    }
+  ]
+}

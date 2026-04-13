@@ -1,0 +1,391 @@
+Title: Cooperative Detour Planning for Dual-Task Drone Fleets
+
+URL Source: https://arxiv.org/pdf/2604.02471v1
+
+Published Time: Mon, 06 Apr 2026 00:10:08 GMT
+
+Number of Pages: 8
+
+Markdown Content:
+# Cooperative Detour Planning for Dual-Task Drone Fleets 
+
+Pengbo Zhu 1, Meng Xu 2, Andreas A. Malikopoulos 3, and Nikolas Geroliminis 2
+
+Abstract — As Urban air mobility scales, commercial drone fleets offer a compelling, yet underexplored opportunity to function as mobile sensor networks for real-time urban traf-fic monitoring. In this paper, we propose a decentralized framework that enables drone fleets to simultaneously execute delivery tasks and observe network traffic conditions. We model the urban environment with dynamic information values asso-ciated with road segments, which accumulate traffic condition uncertainty over time and are reset upon drone visitation. This problem is formulated as a mixed-integer linear programming problem where drones maximize the traffic information reward while respecting the maximum detour for each delivery and the battery budget of each drone. Unlike centralized approaches that are computationally heavy for large fleets, our method focuses on dynamic local clustering. When drones enter com-munication range, they exchange their belief in traffic status and transition from isolated path planning to a local joint optimization mode, resolving coupled constraints to obtain replanned paths for each drone, respectively. Simulation results built on the real city network of Barcelona, Spain, demonstrate that, compared to a shortest-path policy that ignores the traffic monitoring task, our proposed method better utilizes the battery and detour budget to explore the city area and obtain adequate traffic information; and, thanks to its decentralized manner, this “meet-and-merge” strategy achieves near-global optimality in network coverage with significantly reduced computation overhead compared to the centralized baseline. 
+
+I. I NTRODUCTION 
+
+A. Background: Urban Air Mobility 
+
+Urban Air Mobility (UAM) envisions the use of unmanned aerial vehicles (UAVs) and other low-altitude aircraft to sup-port transportation and logistics in dense urban environments [1]. Among the various UAM applications, delivery drones have attracted particular attention for last-mile operations, where they can shorten delivery times, reduce operational costs, and complement ground-based logistics networks [2]. With the maturing of regulatory frameworks such as the Eu-ropean civil aviation concept “U-Space” [3] and the Federal Aviation Administration’s Unmanned Aircraft System Traffic Management initiative “Beyond” [4], routine commercial                         
+
+> This research was supported in part by NSF under Grants CNS-2401007, CMMI-2348381, IIS-2415478, in part by MathWorks, and in part by Swiss National Science Foundation (SNSF) through project P500-2 235379 and as a part of NCCR Automation, a National Centre of Competence in Research, funded by SNSF under Grant 51NF40 225155).
+> 1Pengbo Zhu is with the School of Civil & Environmental Engineering, Cornell University, Ithaca, NY, USA. (email: pz283@cornell.edu )
+> 2Meng Xu and Nikolas Geroliminis are with Urban Trans-port Systems Laboratory, ´Ecole Polytechnique F´ ed´ erale de Lau-sanne, 1015 Lausanne, Switzerland, (email: meng.xu@epfl.ch, nikolas.geroliminis@epfl.ch )
+> 3Andreas A. Malikopoulos is with the Applied Mathematics, Systems Engineering, Mechanical Engineering, Electrical & Computer Engineering, and School of Civil & Environmental Engineering, Cornell University, Ithaca, NY, USA. (email: amaliko@cornell.edu )
+
+drone delivery in populated areas is becoming increasingly feasible. At the same time, drones offer unique advantages as mobile monitoring platforms. Unlike fixed roadside sensors, they can flexibly reposition in space, rapidly cover conges-tion hotspots, and collect aerial traffic data over wide urban areas. Large-scale aerial experiments, such as the pNEUMA campaign [5], have demonstrated that drone footage can provide rich, network-level traffic information that is difficult to obtain from sparse ground-based infrastructure alone. Subsequent work has further shown that coordinated drone fleets can actively improve traffic observability across urban road networks [6]. These two capabilities, delivery and monitoring, suggest an important opportunity. Delivery drones that routinely tra-verse city airspace need not be viewed as single-purpose lo-gistics agents; when properly routed, they can simultaneously contribute to traffic monitoring and network observability while completing their primary delivery missions. This dual use is especially attractive when flight resources are limited, and monitoring needs are spatially and temporally dynamic. However, realizing it requires routing and coordination meth-ods that explicitly balance delivery efficiency against the value of traffic information collected en route, rather than treating monitoring as an incidental by-product of flight. This trade-off, and the algorithmic challenges it poses, motivate the present work. 
+
+B. Related Work 1) Routing and Path Planning for Delivery Drones: The routing of delivery drones is rooted in the broader family of vehicle routing problems (VRPs), where the objective is to determine efficient routes for serving spatially distributed customers under operational constraints [7]. Early studies extended classical VRP formulations to aerial operations, giving rise to problems like the Flying Sidekick traveling salesman problem [8] and the VRP with drones [9]. These foundational models are typically cast as mixed-integer linear programs (MILPs) that address path feasibility, delivery assignment, and minimization of travel distance or task completion time [10]. As the field of UAV systems grew and developed, the literature expanded into a rich family of variants incorporating the distinctive operational features of UAV systems. Since then, numerous variants have been proposed to capture diverse operational constraints, including energy and battery limitations [11], delivery time windows [12], no-fly zones [12], and multi-trip dispatching with recharging [13]. Despite the breadth of constraints considered, none of these 
+
+> arXiv:2604.02471v1 [eess.SY] 2 Apr 2026
+
+variants treats the monitoring value of the route as a factor in path selection: the route is optimized solely for logistics performance. In practice, multi-drone delivery operations also face com-munication constraints: drones can only exchange informa-tion with peers within a limited wireless range, and the communication network topology changes continuously as vehicles move [14]. This makes centralized coordination, where a single controller batches all requests and computes globally optimal routes, difficult to sustain in real time, espe-cially as fleet size grows. At the same time, the operational environment is inherently stochastic and dynamic: delivery requests arrive sequentially, and the information available to each drone is local and incomplete. Our work builds directly on this motivation: we propose a dynamic local clustering mechanism in which drones within communication range jointly re-optimize their routes in real time, without requiring global information or centralized batch processing. 
+
+2) Drone-Based Traffic Monitoring: A separate body of work has investigated drones as tools for traffic monitor-ing. This literature emphasizes spatial coverage, observa-tion scheduling, and the information value of aerial data, rather than delivery optimization. Drone-based monitoring has been applied to the ground-vehicle trajectory collection [15], traffic state estimation [16], and anomaly detection [17], particularly where the fixed sensor infrastructure, such as loop detectors, is sparse or absent. An important distinction in this literature is between 
+
+dedicated and opportunistic monitoring. Works in drone monitoring typically assume that drones are deployed as ded-icated sensing agents whose sole mission is data collection [18]. Their results motivate a natural follow-up question: can delivery drones, already airborne for logistics purposes, serve as opportunistic contributors to urban traffic monitoring, and if so, how should their routes be designed to make this dual use effective? Therefore, despite the maturity of drone-based monitoring as a standalone application, the literature has overlooked the scenario in which monitoring is performed by drones that are simultaneously carrying out delivery missions and are therefore subject to delivery-oriented constraints such as maximum allowable detour and limited battery budget. 
+
+3) Dual-Function Drone Operations: A limited but grow-ing body of literature has begun to jointly consider delivery and monitoring within a single UAV framework. The most common approach formulates this integration as a VRP-type extension, where monitoring is abstracted as servicing a set of pre-specified task locations or points of interest (POIs). For example, Rottondi et al. [19] treat monitoring as node-visit requirements within a multi-service VRP, while Chen et al. [20] augment delivery routing with hovering-time allocation at monitoring POIs. Along a related direction, Sun et al. [21] propose a collaborative truck–drone framework for post-disaster operations in which drones execute both delivery and monitoring at discrete locations. Despite differ-ences in mathematical structure, these works largely share an offline, static planning premise and a node-centric abstraction of monitoring. This perspective differs from road-network-based monitoring, where the objective is to maintain up-to-date information over road segments and requires segment-level information refresh. Beyond VRP-based formulations, Xiang et al. [22] study the reuse of delivery drones for urban monitoring by se-lecting among pre-specified candidate routes and allocating hovering effort at discrete sensing locations under energy and deadline constraints. Similarly, Gao et al. [23] investigate sharing instant-delivery UAVs for monitoring fixed POIs and stochastic events. In all these cases, monitoring objectives are represented as visiting discrete locations. Across these studies, several gaps persist that our work aims to address: (i) monitoring is almost universally ab-stracted as discrete node/POI visits rather than fine-grained, road-segment-level monitoring; (ii) decentralized, real-time replanning under limited communication has received little attention in this integrated setting. Addressing this combina-tion of challenges is the focus of this study. 
+
+C. Contributions 
+
+The main contribution of this work is a novel detour planning algorithm for dual-task delivery drones, where each drone completes its delivery task while respecting its budget constraints and, at the same time, monitors traffic conditions. Unlike centralized control algorithms, we propose a “meet-and-merge” decentralized scheme that performs dynamic local clustering, allowing drones to coordinate with neighbor-ing drones. Joint optimization for multiple drones in the same cluster is performed. This decentralized structure makes the proposed method both computationally scalable and practical under real-world communication limitations. The remainder of this paper is organized as follows: In Section II-A, the motivation for the cooperative planning problem for delivery drones is provided. In Section II-B, we model the traffic knowledge gain as a linear model considering the traffic information density and the length of each road segment. We then formulate the objective function as maximizing the jointly collected traffic knowledge for a multi-drone cluster as a mixed-integer linear programming problem in Section II-C. The proposed algorithm is tested on an agent-based simulator using the real city road network of Barcelona, Spain, in Section III. Finally, we conclude the work and present future research directions in Section IV. II. P ROBLEM FORMULATION 
+
+A. Motivation 
+
+Commercial drones mounted with cameras are able to provide a bird’s-eye view of traffic conditions while carrying out delivery tasks and flying over urban areas. In this context, drones can accomplish two tasks: 1) parcel delivery and 2) traffic monitoring, by following a single cooperative route. For the purpose of collecting traffic information on road segments, we assume all drones will fly following the urban road network, which is modeled as a directed graph G =(V, E, ω ), where V represents the set of intersections, E
+
+represents the set of road segments, and ω is the length of the road segment. Drone C       
+
+> Orig C
+> Dest C
+> Orig B
+> Drone B
+> Dest B
+> Drone A
+> Orig A
+> Dest A
+> Path C Path B
+> Path A (a) Shortest Paths Drone C Drone B Drone A
+> Path C’
+> Path B’
+> Path A’
+> (b) Cooperative Detour Paths
+
+Fig. 1: The testing scenario with 3 drones operat-ing in a 1:25 scaled smart city testbed (IDS 3C, see [24], [25] for more information). The demo video is available on https://sites.google.com/view/ cdc2025-drone-with-a-mission/home .As illustrated in Fig. 1a, when a drone k is assigned a logistics task, it picks up the parcel at its origin Ok and delivers it to its destination Dk following a path determined by the operational strategy. If Drone A and Drone B follow the shortest path in terms of travel distance to deliver their parcels, they will visit the exact same road segments within a very short time. Similarly, Drone C will also visit the same intersection in the middle of the scaled city. However, with efficient path planning for this cluster of multiple drones as illustrated in Fig. 1b, the agents differentiate their paths to cover a larger urban area, obtaining better knowledge of the traffic information. Even though Drones A and C take longer paths involving detours, this approach effectively balances delivery efficiency with the traffic surveillance task. This example demonstrates that, in a dual-objective con-text for joint logistics and traffic monitoring, the shortest path is not necessarily the optimal choice; instead, an efficient path-planning algorithm for a multi-drone fleet is essential to the system’s operation. Rather than solving the route planning for all drones, which is computationally heavy, in this study, our proposed method is implemented within a cluster of drones that are within local communication range, where they share a synchronized traffic knowledge belief matrix and jointly plan their paths to their respective destinations. In the following subsections, we first model the traffic information reward considering the last visit timestamp, and subsequently maximize the total cooperative information collected by the drone cluster, subject to battery and detour constraints. 
+
+B. Traffic Information Reward 
+
+The knowledge of the traffic status for each edge (i, j )
+
+is affected by its uncertainty growth rate (i.e., how fast the traffic status changes on this road) and its monitoring history (i.e., when the road segment was last visited). The information reward Rij is 
+
+Rij = min  βij ωij (tscan ij − T last ij ), R max ij 
+
+ , (1) where T last ij represents the true global timestamp when edge 
+
+(i, j ) was last visited, and tscan ij ∈ R≥0 is the continuous decision variable representing the planned effective scan time. However, in a decentralized multi-agent system, the true global monitoring history T last ij is partially observable. Therefore, during the cooperative replanning phase, the drone cluster relies on its synchronized belief matrix B as the local estimator for the environment’s state. The MILP formulation substitutes the ground truth with the shared belief, evaluating the expected information gain using ˆT last ij = Bij .The total uncertainty growth rate for the entire edge is the uncertainty growth density βij multiplied by the length of the edge ωij . This expected information gain is bounded by a saturation limit Rmax ij , which prevents infinite reward accumulation for unvisited edges. 
+
+C. MILP for cooperative detour planning 
+
+We consider a cluster of drones K that have established local communication. For each drone k ∈ K , we define a binary decision variable xijk as: 
+
+xijk =
+
+(
+
+1, if drone k traverses edge (i, j ) ∈ E ,
+
+0, otherwise . (2) The cooperative edge coverage variable yij is defined as: 
+
+yij =
+
+(
+
+1, if any drone k ∈ K traverses edge (i, j ) ∈ E ,
+
+0, otherwise .
+
+(3) Finally, ti,k ≥ 0 is a continuous variable representing the relative arrival time of drone k at node i.The cooperative information path planning (IPP) problem is formulated as an asynchronous joint optimization subject to detour budget and battery constraints. The objective is to maximize the total time-dependent information gain col-lected by drones within the local cluster, given by: Maximize J = X
+
+> (i,j )∈E
+
+Rij ,
+
+subject to 
+
+X 
+
+> j∈δ+(O′
+> k)
+
+xO′  
+
+> kjk
+
+− X 
+
+> j∈δ−(O′
+> k)
+
+xjO ′  
+
+> kk
+
+= 1 , ∀k ∈ K , (4a) 
+
+X 
+
+> j∈δ+(Dk)
+
+xDk jk − X 
+
+> j∈δ−(Dk)
+
+xjD k k = −1 ∀k ∈ K , (4b) 
+
+X
+
+> j∈δ+(i)
+
+xijk − X
+
+> j∈δ−(i)
+
+xjik = 0 ∀k ∈ K , ∀i ∈ V \ { O′
+
+> k
+
+, D k},
+
+(4c) 
+
+tO′  
+
+> k,k
+
+= ∆ tk, ∀k ∈ K , (4d) 
+
+tj,k ≥ ti,k + τs(i, j ) − M (1 − xijk ) ∀k ∈ K , ∀(i, j ) ∈ E ,
+
+(4e) 
+
+tDk ,k ≤ Bef f,k + ∆ tk, ∀k ∈ K , (4f) 
+
+X
+
+> k∈K
+
+xijk ≥ yij , ∀(i, j ) ∈ E , (4g) 
+
+tscan ij ≤ tj,k + M (1 − xijk ), ∀k ∈ K , ∀(i, j ) ∈ E , (4h) 
+
+Rij ≤ βij ωij 
+
+ Tcurr + tscan ij − B ij 
+
+ , ∀(i, j ) ∈ E , (4i) 
+
+Rij ≤ Rmax,ij · yij , ∀(i, j ) ∈ E , (4j) where τs(i, j ) is the shortest travel time of the edge (i, j ),calculated as the length of the edge divided by the flying speed of the drone. To ensure continuous-time physical feasibility during discrete-time route planning, let Tcurr be the global time when a new event triggers the planning cycle (e.g., the start of one parcel delivery, or the appearance of a new drone in the current cluster). At time Tcurr , drone 
+
+k is actively executing its previously planned trajectory. We assume it must finish traversing its current road segment. Let the drone be traveling along edge (uk, v k) at time Tcurr . We define vk as the new planning origin O′ 
+
+> k
+
+for the upcoming optimization cycle: O′ 
+
+> k
+
+= vk. Constraints (4a) and (4b) guarantee that the route begins at node O′ 
+
+> k
+
+and ends at node Dk (the unchanged delivery destination of drone k). Constraint (4c) ensures flow continuity at all nodes except the start and end nodes, maintaining a continuous path. The drone will arrive at O′ 
+
+> k
+
+at some time tarr (vk) ≥ Tcurr .We calculate the exact time offset ∆tk, representing the mandatory period before the new joint plan can actually commence for drone k as ∆tk = tarr (vk) − Tcurr .Instead of starting at t = 0 , the arrival time variable at the new origin is initialized to the offset, as shown in Constraint (4d). Constraint (4e) governs the temporal evolution of the system. If edge (i, j ) is traversed, the arrival time at j is strictly linked to the arrival time at i.
+
+Bef f,k denotes the effective remaining travel budget for drone k (unit: seconds). This is calculated as the minimum of the remaining battery budget and the maximum allowable delivery detour delay: 
+
+Bef f,k = min ((1 + α)τs(Ok, D k) − (Tcurr − TOk ,k ), B b,k ) ,
+
+(5) where α ≥ 0 is the allowed detour factor, τs(Ok, D k) is the theoretical shortest path time from the initial pickup to the destination, and TOk ,k is the time the parcel was originally picked up. The remaining battery budget Bb,k is computed by dividing the drone energy Ek by the average energy consumption rate ce to get the remaining flight time. Constraint (4f) bounds the final arrival time at the destination, that the drone should retain sufficient budget to reach its global destination. Constraints (4g) and (4h) govern the earliest scan time among all cooperative drones in the cluster to prevent redun-dant reward accumulation. Finally, Constraint (4i) computes the reward based on the age of information bridging the global simulation time Tcurr and the relative planned scan time tscan ij , bounded by a saturation limit as shown in Constraint (4j). Solving this MILP problem provides the optimal set of edges, which maximizes the total collected traffic informa-tion while adhering to constraints. The route of each drone k
+
+is then constructed by sequentially connecting these selected edges x∗
+
+> ijk
+
+, forming a continuous path from their current path start node O′ 
+
+> k
+
+to the destination Dk.
+
+D. Decentralized Event-Triggered Cooperative Detour Path Planning 
+
+To implement the proposed method in real-time, we propose a decentralized, event-triggered algorithm equipped with edge pruning. 
+
+1) Event-Trigger and Traffic Information Synchronization: 
+
+When a drone picks up a parcel, it calculates an initial path by solving (4) as a single agent, respecting its maximum detour and battery budgets. In this decentralized multi-agent system, rather than relying on a central controller, each drone maintains its own local map of the world—more specifically, a matrix B that records its local belief regarding the last visit time of all edges in the network. As drones fly their assigned parcels to their destinations, they continuously broadcast their locations within their prox-imity. If two or more drones encounter each other within a communication radius Rc, they form a cooperative cluster K.They then synchronize their traffic knowledge by taking the element-wise maximum of their individual belief matrices: 
+
+Bij = max  
+
+> k∈K
+
+Bk,ij ∀(i, j ) ∈ E . (6) Leveraging the shared belief matrix B, the drones formu-late and solve the MILP defined in (4). The solver evaluates the cluster’s combined state to identify high-value, long-unvisited road segments. 
+
+2) Edge Pruning: In order to maintain computational tractability in real-time, an ellipsoid bounding technique is applied to the graph. The shared routing graph of the cluster is reduced such that it only contains nodes v reachable by at least one drone k ∈ K , given its effective remaining budget: 
+
+d(O′
+
+> k
+
+, v ) + d(v, D k) ≤ Bef f,k . (7) 
+
+3) Implementation of the algorithm: The implementation is summarized in Algorithm 1. Algorithm 1 Decentralized Event-Triggered Cooperative Detour Path Planning  
+
+> 1:
+
+Input Urban road network G(V, E, ω ), Local belief matrices Bk, Global time Tcurr  
+
+> 2:
+
+Event Trigger: Drones approach within communication range Rc to form cluster K. 
+
+> 3:
+
+Belief Synchronization: Form the shared belief matrix by adopting the most recent observation timestamps from all agents: 
+
+Bij ← max k∈K Bk,ij ∀(i, j ) ∈ E  
+
+> 4:
+
+for each drone k ∈ K do  
+
+> 5:
+
+Extract current trajectory edge (uk, v k) 
+
+> 6:
+
+Set new planning origin: O′ 
+
+> k
+
+← vk 
+
+> 7:
+
+Calculate expected arrival offset: ∆tk 
+
+> 8:
+
+Calculate effective remaining Budget Bef f,k  
+
+> 9:
+
+Update local belief: Bk ← B  
+
+> 10:
+
+end for  
+
+> 11:
+
+Apply Ellipsoid Pruning to G using Bef f,k  
+
+> 12:
+
+x∗, t∗ ← SolveMILP ()  
+
+> 13:
+
+if Solution is optimal then  
+
+> 14:
+
+for each drone k ∈ K do  
+
+> 15:
+
+Extract optimal path P∗ 
+
+> k
+
+from x∗ 
+
+> 16:
+
+Update drone trajectory to P∗ 
+
+> k
+> 17:
+
+end for  
+
+> 18:
+
+else  
+
+> 19:
+
+return Default to shortest paths to prevent delivery failure  
+
+> 20:
+
+end if 
+
+III. C ASE STUDY 
+
+A. Numerical Experimental Setup 
+
+We evaluate the proposed framework on a real-world urban road network from the Eixample district in Barcelona, Spain. The network consists of 805 intersection nodes and 1,397 road segments spanning approximately 7.6 km 2. Since UAVs operate above the road network and are not restricted by one-way regulations, all segments are treated as bidirectional, yielding a dense topology with an average node degree of 6.9. The traffic uncertainty growth density βij is estimated from real traffic data related to the average traffic volume and the temporal variability of vehicle kilometers traveled, where a higher βij value reflects a higher rate of traffic uncertainty accumulation. A homogeneous fleet of UAVs is deployed, each flying at a constant speed 8.0 m/s. Energy is modeled via abattery system: initial charge levels are randomized between 30% and 90%; the consumption rate is ce = 1 .68% /min 
+
+(approximately one hour of flight when fully charged); and the charging rate is γc = 4 .8% /min (full recharge in roughly 20 minutes). Two charging stations are available within the network. Initial UAV positions are generated randomly across the network. The maximum allowable detour factor is set as α = 30% of the original shortest trip. And the communication range of drones is Rc = 300 m. Delivery tasks arrive dynamically according to a Poisson 
+
+Fig. 2: Snapshot of the Barcelona network with delivery drones whose communication range is shown as the blue circular disk. The origins of parcels are marked as green circles, while destinations are in blue. The color of the trajectories: a drone actively delivering a parcel is colored in blue, and the path is designed by our proposed method; a purple trajectory indicates that the drone is empty and en route to pick up a parcel; an orange trajectory indicates that the drone is returning to the closest charging station to charge its battery. The demo video of the proposed method is available on https://sites.google.com/view/ cdc2025-drone-with-a-mission/home .process at a rate of 0.8 orders per second. We model OD pairs using calibrated human mobility patterns from Aimsun [26]. This modular design allows seamless replacement with actual parcel data once available. For the sake of simplicity, once a drone finishes its last delivery task and becomes available, we assign it a new parcel that is closest to it and that it can complete within its battery budget. If the remaining budget is not sufficient to complete any delivery task, the drone will fly to the nearest charging station to recharge. Fig. 2 shows a snapshot of the simulator. 
+
+B. Result and Analysis 
+
+To evaluate system efficiency, we consider the following key performance metrics: 1) total system information gain ,defined as the sum of the reward collected over the entire simulation horizon; 2) spatial coverage , measured as the percentage of the total city edges visited at least once during the simulation; 3) average age of information (AoI) , which is the average time since the last visit for all edges in the city at the end of the simulation horizon; 4) average parcel delivery delay , representing the average percentage increase in delivery time compared to the strict shortest path; 5) total MILP calls , representing how many time the replanning scheme is triggered during the simulation horizon; 6) average CPU time per MILP call , which measures the computational latency of a single solver execution. For comparison, we evaluate our proposed method against TABLE I: Performance Comparison of Path Planning Strategies                               
+
+> Method Total info gain Spatial coverage ( %)Avg. AoI ( %)Avg. delivery delay ( %)Total MILP Calls Avg. CPU time ( s)
+> Shortest 350,214 46.92 68.71 ---Distributed 711,301 76.54 50.30 21.46 175 3.12 Centralized 831,278 84.10 46.30 25.11 1655 4.44
+> Decentralized (Proposed) 789,091 80.67 46.46 22.15 609 3.99
+
+three benchmark strategies. The first is the Shortest strat-egy, where all drones lack communication and follow their shortest paths (computed using the Floyd–Warshall algorithm [27]) to deliver the parcels, regardless of the traffic mon-itoring objective. The second is the Distributed strategy, in which all drones plan their paths according to their individual local beliefs, but they do not exchange information nor synchronize their belief matrices with one another. Finally, the Centralized strategy considers the whole fleet as a single cluster (i.e., the communication range is infinite), keeping the shared belief matrix perfectly synchronized with the true global visit time matrix at all times. 0 200 400 600 800 1000 
+
+> Simulation Time (seconds)
+> 0
+> 100000
+> 200000
+> 300000
+> 400000
+> 500000
+> 600000
+> 700000
+> 800000
+> Total Information Gain
+> 768s
+> 930s
+> 1004s
+> 955s
+> Shortest
+> Distributed
+> Centralized
+> Proposed Method
+
+Fig. 3: The evolution of total information gain over time for different planning strategies Table I presents the performance metrics of the four path planning strategies for a fleet of 30 drones delivering 150 parcels. As expected, the Shortest path baseline yields the lowest spatial coverage (46.92%) and total information gain. By strictly minimizing delivery time and ignoring the traffic monitoring objective, drones repeatedly traverse the same central routes without exploring the broader network. In contrast, the proposed Decentralized method successfully utilizes the allowable 30% detour budget (incurring an av-erage delay of 22.15%) to actively explore the environ-ment, significantly outperforming the Distributed scheme in total information gain. This performance gap highlights the effectiveness of our designed “meet-and-merge” belief synchronization policy. Because the Distributed baseline isolates each drone’s belief state throughout its trip, agents frequently overestimate the available reward on previously visited edges, leading to redundant explorations. The pro-posed method resolves this by dynamically sharing infor-mation, achieving a higher spatial coverage (80.67%) than the Distributed approach. Furthermore, the normalized Av-erage Age of Information (AoI), designed to evaluate the freshness of the collected data, shows that the proposed method (46.46%) substantially improves data freshness over the Distributed method and performs nearly on par with the 
+
+Centralized upper bound. While the Centralized baseline provides the theoretical bound for spatial coverage and information gain, it suffers from severe computational load. Because the Centralized 
+
+baseline assumes an infinite communication range, any single localized event, such as a drone picking up a new order, forces a globally coupled replanning of the entire active fleet. To ensure the MILP solver remained computationally tractable for routing all 30 drones simultaneously, these global updates had to be processed using batched optimiza-tion, solving the fleet in sequential chunks of up to three drones. Consequently, the Centralized approach triggered 1,655 MILP calls, which is 2.7 times more than the proposed method with the highest average CPU time per call, leading to massive accumulated computational delays that make it impractical for reality. In contrast, the proposed method naturally bounds computational complexity by leveraging localized communication to form small, dynamic clusters. It resulted in a 63% reduction in replanning calls compared to the Centralized method, proving that our proposed method maintains highly competitive coverage and information gain while remaining highly scalable for real-time implementa-tion. In addition, as illustrated in Fig. 3, which shows the accumulated knowledge gain over time for all methods, the 
+
+Shortest policy finishes all parcel delivery tasks the fastest but results in low traffic knowledge collection due to redun-dant visits to the same city areas. In contrast, our proposed method achieves almost the same level of knowledge as the Centralized method, and a higher total reward than the 
+
+Distributed scheme. It is noticeable that the proposed and centralized methods have the steepest slopes compared to the distributed and shortest methods, indicating that their knowledge collection speed is faster. To clearly visualize the proposed “meet-and-merge” be-havior, Fig. 4 illustrates the spatiotemporal trajectories of a dynamically formed drone cluster. For visual clarity, the figure isolates three interacting drones and focuses on their specific localized region within the Barcelona road network. The baseline shortest paths are denoted by dashed lines, while the trajectories generated by the proposed cooperative routing algorithm are shown as solid lines. If the drones (a) Initial Planning v.s. Shortest Paths 
+
+(b) Replanning when Drone 3 joints 
+
+Fig. 4: Spatiotemporal cooperative routing of a multi-drone cluster follow their shortest paths, their trajectories would exhibit se-vere spatiotemporal overlap. Consequently, the agents would repeatedly visit the same sequence of edges within a short time window, resulting in redundant observations and a lower collection of fresh traffic information. In contrast, the initial planned paths demonstrate that the proposed method actively forces the drones to detour and explore a broader set of edges, maximizing the aggregate information reward while satisfying individual flight budgets. When a third drone ap-proaches the communication radius, they form a new cluster and trigger an event-based replanning phase, denoted by the red horizontal plane. Upon triggering, the proposed algorithm formulates a joint optimization problem for all three drones. As seen in the adjusted trajectories above the red plane, the paths are dynamically replanned. The updated routing suc-cessfully accommodates the introduction of the third drone, collaboratively redistributing the remaining exploration tasks to ensure optimal coverage of the road network. IV. C ONCLUSION 
+
+In this paper, we addressed cooperative path planning for delivery drones in urban air mobility systems. In addition to performing logistics tasks, the drones are equipped with cameras, enabling them to monitor traffic conditions while flying over the urban road network. Our proposed framework explicitly considers this dual-task mission for multi-drone fleets and introduces a detour planning algorithm that aims to maximize traffic information gain along planned delivery routes. First, we model the traffic information state as a linear function that evolves; then, we formulate the cooperative path planning problem as an MILP that accounts for battery limitations and maximum allowable detours. To reduce the computational burden, we developed a decentralized scheme with dynamic clustering, in which drones with communica-tion constraints exchange their beliefs about traffic conditions with neighboring drones. We compared the performance of the proposed method with several benchmark approaches and demonstrated its clear advantage in balancing delivery efficiency with traffic surveillance effectiveness. The traffic information function is estimated from histor-ical data; however, traffic conditions are strongly influenced by exogenous factors such as accidents and weather events, which can exhibit pronounced spatiotemporal variability. Future research should focus on integrating online learning of traffic conditions and belief updating. In addition, incor-porating charging-scheduling decisions into the framework is a promising direction that is expected to further improve overall system efficiency. Finally, exploring aerial-ground operation by coordinating the drone fleet with connected and automated vehicles (CAVs) presents an exciting avenue for multimodal data fusion. To empirically validate these coop-erative strategies, future work will also focus on interfacing the current simulator directly with the physical 1:25 scaled city testbed [24] via an API, bridging the gap between digital simulation and real-world deployment. ACKNOWLEDGMENT 
+
+The authors would like to thank Weihao Sun and Zachary Wu for their strong support in deploying the experiments on IDS Lab’s scaled smart city (IDS 3C) testbed. REFERENCES [1] A. Straubinger, R. Rothfeld, M. Shamiyeh, K.-D. B¨ uchter, J. Kaiser, and K. O. Pl¨ otner, “An overview of current research and developments in urban air mobility–setting the scene for uam introduction,” Journal of Air Transport Management , vol. 87, p. 101852, 2020. [2] X. Li, J. Tupayachi, A. Sharmin, and M. Martinez Ferguson, “Drone-aided delivery methods, challenge, and the future: A methodological review,” Drones , vol. 7, no. 3, p. 191, 2023. [3] M. Huttunen, “The u-space concept,” Air and Space Law ,2019. [Online]. Available: https://api.semanticscholar.org/CorpusID: 116722262 [4] Federal Aviation Administration (FAA), “BEYOND: Advanc-ing UAS Integration,” https://www.faa.gov/uas/programs partnerships/ beyond, 2020. [5] E. Barmpounakis and N. Geroliminis, “On the new era of urban traffic monitoring with massive drone data: The pneuma large-scale field experiment,” Transportation research part C: emerging technologies ,vol. 111, pp. 50–71, 2020. [6] J. Espadaler-Clap´ es, R. Fonod, E. Barmpounakis, and N. Geroliminis, “An accurate safety and congestion monitoring framework with a swarm of drones,” Transportation Research Interdisciplinary Perspec-tives , vol. 32, p. 101490, 2025. [7] P. Toth and D. Vigo, Vehicle routing: problems, methods, and appli-cations . SIAM, 2014. [8] C. C. Murray and A. G. Chu, “The flying sidekick traveling salesman problem: Optimization of drone-assisted parcel delivery,” Transporta-tion Research Part C: Emerging Technologies , vol. 54, pp. 86–109, 2015. [9] X. Wang, S. Poikonen, and B. Golden, “The vehicle routing problem with drones: Several worst-case results,” Optimization Letters , vol. 11, no. 4, pp. 679–697, 2017. [10] N. Agatz, P. Bouman, and M. Schmidt, “Optimization approaches for the traveling salesman problem with drone,” Transportation Science ,vol. 52, no. 4, pp. 965–981, 2018. [11] K. Dorling, J. Heinrichs, G. G. Messier, and S. Magierowski, “Vehicle routing problems for drone delivery,” IEEE Transactions on Systems, Man, and Cybernetics: Systems , vol. 47, no. 1, pp. 70–85, 2016. [12] H. Y. Jeong, B. D. Song, and S. Lee, “Truck-drone hybrid delivery routing: Payload-energy dependency and no-fly zones,” International Journal of Production Economics , vol. 214, pp. 220–233, 2019. [13] Y. Jiang, M. Liu, X. Jia, and Q. Xue, “The multi-visit vehicle routing problem with multiple heterogeneous drones,” Transportation Research Part C: Emerging Technologies , vol. 172, p. 105026, 2025. [14] S.-J. Chung, A. A. Paranjape, P. Dames, S. Shen, and V. Kumar, “A survey on aerial swarm robotics,” IEEE Transactions on robotics ,vol. 34, no. 4, pp. 837–855, 2018. [15] R. Krajewski, J. Bock, L. Kloeker, and L. Eckstein, “The highd dataset: A drone dataset of naturalistic vehicle trajectories on german highways for validation of highly automated driving systems,” in 2018 21st international conference on intelligent transportation systems (ITSC) .IEEE, 2018, pp. 2118–2125. [16] R. Ke, Z. Li, S. Kim, J. Ash, Z. Cui, and Y. Wang, “Real-time bidirectional traffic flow parameter estimation from aerial videos,” 
+
+IEEE Transactions on Intelligent Transportation Systems , vol. 18, no. 4, pp. 890–901, 2016. [17] T. M. Tran, T. N. Vu, T. V. Nguyen, and K. Nguyen, “Uit-adrone: A novel drone dataset for traffic anomaly detection,” IEEE Journal of Selected Topics in Applied Earth Observations and Remote Sensing ,vol. 16, pp. 5590–5601, 2023. [18] E. V. Butil˘ a and R. G. Boboc, “Urban traffic monitoring and analysis using unmanned aerial vehicles (uavs): A systematic literature review,” 
+
+Remote Sensing , vol. 14, no. 3, p. 620, 2022. [19] C. Rottondi, F. Malandrino, A. Bianco, C. F. Chiasserini, and I. Stavrakakis, “Scheduling of emergency tasks for multiservice uavs in post-disaster scenarios,” Computer Networks , vol. 184, p. 107644, 2021. [20] X. Chen, H. Wang, Y. Cheng, H. Fu, Y. Liu, F. Dang, Y. Liu, J. Cui, and X. Chen, “Ddl: Empowering delivery drones with large-scale urban sensing capability,” IEEE Journal of Selected Topics in Signal Processing , 2024. [21] W. Sun, L. Wu, and F. Zhang, “Robust optimization for truck-and-drone collaboration with travel time uncertainties,” Transportation Research Part B: Methodological , vol. 204, p. 103378, 2026. [22] C. Xiang, Y. Zhou, H. Dai, Y. Qu, S. He, C. Chen, and P. Yang, “Reusing delivery drones for urban crowdsensing,” IEEE Transactions on Mobile Computing , vol. 22, no. 5, pp. 2972–2988, 2021. [23] J. Gao, Y. Pan, X. Zhang, Q. Han, and Y. Hu, “Sharing instant delivery uavs for crowdsensing: A data-driven performance study,” Computers & Industrial Engineering , vol. 191, p. 110100, 2024. [24] B. Chalaki, L. E. Beaver, A. M. I. Mahbub, H. Bang, and A. A. Malikopoulos, “A research and educational robotic testbed for real-time control of emerging mobility systems: From theory to scaled experiments,” IEEE Control Systems Magazine , vol. 42, no. 6, pp. 20–34, 2022. [25] B. Remer and A. A. Malikopoulos, “The multi-objective dynamic traveling salesman problem: Last mile delivery with unmanned aerial vehicles assistance,” in 2019 American Control Conference (ACC) .IEEE, 2019, pp. 5304–5309. [26] J. Casas, J. L. Ferrer, D. Garcia, J. Perarnau, and A. Torday, “Traf-fic simulation with aimsun,” in Fundamentals of traffic simulation .Springer, 2010, pp. 173–232. [27] R. W. Floyd, “Algorithm 97: Shortest path,” Commun. ACM , vol. 5, no. 6, p. 345, Jun. 1962.

@@ -1,0 +1,70 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-001.webp",
+      "caption": "Figure 1 Overview of the platform marketplace. Aggregate demand Dt is allocated across sellers, who choose between FBM and FBP and manage their inventory stocks using state-dependent base-stock policies.",
+      "page": 6,
+      "index": 1,
+      "width": 736,
+      "height": 394
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-002.webp",
+      "caption": "Figure 2 Partition of sellers (dots) in the (∆K,∆F ) plane under a neutral policy π. Sellers above ∆F = Nσπ µ ∆K adopt FBP (shaded region), while sellers below prefer FBM.",
+      "page": 11,
+      "index": 2,
+      "width": 412,
+      "height": 315
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-003.webp",
+      "caption": "Figure 6 Sellers in the (∆K,∆F ) plane. The shaded cone corresponds to feasible values σ ∈ [σL, σU], defined by the boundaries ∆F = (NσL/µ)∆K and ∆F = (NσU/µ)∆K.",
+      "page": 26,
+      "index": 3,
+      "width": 554,
+      "height": 383
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-004.webp",
+      "caption": "Figure 7 Number of FBP adopters (left) and platform payoff V (σ) (right) as functions of σ. The shaded area corresponds to the feasible region σ ∈ [σL, σU], with σL = 0.5 and σU = 33.",
+      "page": 26,
+      "index": 4,
+      "width": 794,
+      "height": 388
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-005.webp",
+      "caption": "Figure 4 Demand sample paths: Left: equal MSFE, different variances; Right: equal variances, different MSFE.",
+      "page": 13,
+      "index": 5,
+      "width": 1021,
+      "height": 425
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-006.webp",
+      "caption": "Figure 3 Left: number of FBP adopters |N FBP(π)|. Right: cumulative safety stock of FBP adopters, ΓFBP(π).",
+      "page": 12,
+      "index": 6,
+      "width": 812,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-007.webp",
+      "caption": "Table 1 Outcomes under the uniform allocation σ= σL and the platform-optimal choice σ= σ⋆.",
+      "page": 27,
+      "index": 7,
+      "width": 832,
+      "height": 272
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07312v1/fig-008.webp",
+      "caption": "Figure 5 Geographic trade-off between holding and fulfillment costs (left) and seller cost parameters with safety-stock coefficients (right). Each seller n is located at holding cost hn and fulfillment cost fn; sellers nearer the city face higher hn but lower fn. The shaded region highlights the urban area containing sellers 8, 9, and 10, who switch from FBP to FBM in the optimal policy.",
+      "page": 24,
+      "index": 8,
+      "width": 992,
+      "height": 462
+    }
+  ]
+}

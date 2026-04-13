@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.08296v1/fig-001.webp",
+      "caption": "Figure 6: Three-dimensional Pareto front obtained by the different mutation operators.",
+      "page": 7,
+      "index": 1,
+      "width": 382,
+      "height": 332
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08296v1/fig-002.webp",
+      "caption": "Figure 2: Diagram showing the operation of the AB2 operator. The red arrows indicate the step sequence.",
+      "page": 4,
+      "index": 2,
+      "width": 506,
+      "height": 281
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08296v1/fig-003.webp",
+      "caption": "Figure 3: BB1-MAX operator diagram. The red arrows indicate the step sequence.",
+      "page": 4,
+      "index": 3,
+      "width": 506,
+      "height": 336
+    },
+    {
+      "url": "assets/figures/arxiv/2604.08296v1/fig-004.webp",
+      "caption": "Figure 4: Diagram of the Station Rebalancing using RouletteWheel Selection operator (BB2-MIN/MAX).",
+      "page": 5,
+      "index": 4,
+      "width": 506,
+      "height": 388
+    }
+  ]
+}

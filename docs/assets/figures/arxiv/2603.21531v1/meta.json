@@ -1,0 +1,102 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-001.webp",
+      "caption": "Figure 8 State transition diagram for the BA protocol with U = 3.",
+      "page": 25,
+      "index": 1,
+      "width": 985,
+      "height": 510
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-002.webp",
+      "caption": "Figure 2 ED vs NED with optimal packing (U = 3, θ = 0) under FA/BA; The panels report the histogram of average match score, average rider match time, and total number of finalized matches across sampled instances. (iii) Match count: The total number of successful rider-driver pairings throughout the dispatching horizon determined by our dataset (around 20 minutes).",
+      "page": 15,
+      "index": 2,
+      "width": 996,
+      "height": 528
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-003.webp",
+      "caption": "Figure 11 Convergence trajectory of optimal NED policies and ED to their respective equilibria. Starting from a common initial state, the paths trace the iterative evolution of ((R0,D0)) market sizes under different algorithmic configurations (U ∈ {3,5}, FA vs. BA). The markers denote the state at each iteration of the fixed-point computation.",
+      "page": 30,
+      "index": 3,
+      "width": 996,
+      "height": 722
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-004.webp",
+      "caption": "Figure 10 Spatial distribution of 10 riders and 20 drivers in the stylized simulation setup.",
+      "page": 29,
+      "index": 4,
+      "width": 996,
+      "height": 437
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-005.webp",
+      "caption": "Figure 7 State transition diagram for the FA protocol with U = 3.",
+      "page": 22,
+      "index": 5,
+      "width": 767,
+      "height": 498
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-006.webp",
+      "caption": "Figure 1 Flowchart illustrating the simulation lifecycle from a rider’s perspective. (Note: Under BA if the highest-ranked driver accepts prior to the 7th cycle, the match is finalized immediately.)",
+      "page": 14,
+      "index": 6,
+      "width": 941,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-007.webp",
+      "caption": "Figure 5 Performance metrics (average score, average match time, match count) for the optimal algorithm, i.e., NED OPT, under k-accept strategies with U = 5, θ = 0, for k ∈ {1,2, . . . ,5}.",
+      "page": 18,
+      "index": 7,
+      "width": 898,
+      "height": 273
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-008.webp",
+      "caption": "Figure 6 Performance impact of the driver AR-GAP on optimal NED policies. An AR-GAP of x scales the baseline ED acceptance probability p to (1−x)p under NED. While an AR-GAP of ≈ 0.4 largely neutralizes NED’s advantages, its gains are fully realized as the acceptance rates converge (around AR-GAP ≤ 0.2).",
+      "page": 19,
+      "index": 8,
+      "width": 948,
+      "height": 288
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-009.webp",
+      "caption": "Figure 4 Performance landscape of our algorithms in Appendix EC.2.1 across different configurations. Left: average score vs. average match time. Right: total match count vs. average match time. Each point corresponds to a unique combination of packing algorithm (marker), contention rule (FA vs. BA), U ∈ {2,3,4,5}, and θ ∈ {0, . . . ,0.5}. The exclusive-dispatch baseline (U = 1) is highlighted in red.",
+      "page": 17,
+      "index": 9,
+      "width": 948,
+      "height": 358
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-010.webp",
+      "caption": "Figure 3 Sensitivity analysis of the proposed algorithms. The red markers (U = 1) correspond to the exclusive-dispatch baseline and serve as a common starting point for FA (blue) and BA (green) strategies. Notably, the ED+ and the rejection-aware heuristic exhibit minimal variance with respect to θ and U , because ED+ is limited to notifying at most two drivers per request and the heuristic rarely selects more than two drivers.",
+      "page": 17,
+      "index": 10,
+      "width": 995,
+      "height": 701
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-011.webp",
+      "caption": "Figure 9 Schematic representation of the iterative process used to find the equilibrium in the stylized model.",
+      "page": 27,
+      "index": 11,
+      "width": 985,
+      "height": 259
+    },
+    {
+      "url": "assets/figures/arxiv/2603.21531v1/fig-012.webp",
+      "caption": "Figure 12 Equilibrium outcome of {OPT NED, Greedy, ED+} under different parameters and contention-resolution protocols. Note that Rejection-aware will be ED as p> 0.2. Parameters: η̃N = 0, η̃I = η = 0.01, p= 0.4, µ= 0.1, and λ= 1.2, λ̃= 1.",
+      "page": 31,
+      "index": 12,
+      "width": 996,
+      "height": 439
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.02471v1/fig-001.webp",
+      "caption": "Fig. 3: The evolution of total information gain over time for different planning strategies",
+      "page": 6,
+      "index": 1,
+      "width": 495,
+      "height": 323
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02471v1/fig-002.webp",
+      "caption": "Fig. 2: Snapshot of the Barcelona network with delivery drones whose communication range is shown as the blue circular disk. The origins of parcels are marked as green circles, while destinations are in blue. The color of the trajectories: a drone actively delivering a parcel is colored in blue, and the path is designed by our proposed method; a purple trajectory indicates that the drone is empty and en route to pick up a parcel; an orange trajectory indicates that the drone is returning to the closest charging station to charge its battery. The demo video of the proposed method is available on https://sites.google.com/view/ cdc2025-drone-with-a-mission/home.",
+      "page": 5,
+      "index": 2,
+      "width": 512,
+      "height": 410
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02471v1/fig-003.webp",
+      "caption": "Fig. 1: The testing scenario with 3 drones operating in a 1:25 scaled smart city testbed (IDS3C, see [24], [25] for more information). The demo video is available on https://sites.google.com/view/ cdc2025-drone-with-a-mission/home.",
+      "page": 3,
+      "index": 3,
+      "width": 508,
+      "height": 634
+    },
+    {
+      "url": "assets/figures/arxiv/2604.02471v1/fig-004.webp",
+      "caption": "Fig. 4: Spatiotemporal cooperative routing of a multi-drone cluster",
+      "page": 7,
+      "index": 4,
+      "width": 475,
+      "height": 931
+    }
+  ]
+}
