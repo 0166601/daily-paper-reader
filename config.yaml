@@ -25,3 +25,65 @@ subscriptions:
     stage: A
     diff_threshold_pct: 15
   keyword_recall_mode: or
+  intent_profiles:
+    - tag: 物流调度
+      description: 互联网工业界即时配送与随机路径规划的智能调度算法研究
+      enabled: true
+      paper_sources:
+        - arxiv
+      keywords:
+        - keyword: machine learning
+          keyword_cn: 机器学习
+          query: m
+        - keyword: delivery
+          keyword_cn: 配送
+          query: Meituan instant delivery dispatching system and algorithms
+        - keyword: Order Assignment
+          keyword_cn: 订单分配问题
+          query: real-time order assignment problem in logistics
+        - keyword: Pick-up and Delivery Problem
+          keyword_cn: 取送问题
+          query: dynamic pick-up and delivery problem optimization
+        - keyword: VRP
+          keyword_cn: 车辆路径问题
+          query: vehicle routing problem with stochastic requests
+        - keyword: Multi-objective optimization
+          keyword_cn: 多目标优化
+          query: multi-objective optimization for rider experience and consumer satisfaction
+      intent_queries:
+        - query: industrial applications of machine learning in instant delivery scheduling
+          query_cn: 机器学习在即时配送调度中的工业应用
+          enabled: true
+          source: manual
+          note: ''
+        - query: deep reinforcement learning for real time vehicle routing problems
+          query_cn: 深度强化学习解决实时车辆路径问题
+          enabled: true
+          source: manual
+          note: ''
+        - query: multi objective optimization for balancing efficiency and user experience in logistics
+          query_cn: 物流中平衡效率与用户体验的多目标优化
+          enabled: true
+          source: manual
+          note: ''
+        - query: stochastic and dynamic optimization for on demand delivery networks
+          query_cn: 即时配送网络中的随机与动态优化
+          enabled: true
+          source: manual
+          note: ''
+      updated_at: '2026-04-13T14:26:47.205Z'
+source_backends:
+  arxiv:
+    papers_table: arxiv_papers
+    use_vector_rpc: true
+    vector_rpc: match_arxiv_papers
+    vector_rpc_exact: match_arxiv_papers_exact
+    use_bm25_rpc: true
+    bm25_rpc: match_arxiv_papers_bm25
+    sync_table: arxiv_sync_status
+    sync_success_value: success
+    schema: public
+    kind: supabase
+    enabled: true
+    url: https://lyucdwgefyfbmaiopjbk.supabase.co
+    anon_key: sb_publishable_lX-oi64Uxyd7SIVv3_w2Uw_MTOojeKq
