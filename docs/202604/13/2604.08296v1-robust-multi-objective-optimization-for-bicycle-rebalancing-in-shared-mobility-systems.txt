@@ -1,0 +1,726 @@
+Title: Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems
+
+URL Source: https://arxiv.org/pdf/2604.08296v1
+
+Published Time: Fri, 10 Apr 2026 01:28:44 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+# Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems 
+
+# Diego Daniel Pedroza-Perez ∗† 
+
+ITIS Software, University of Malaga, Spain pedroza@uma.es 
+
+# Gabriel Luque 
+
+ITIS Software, University of Malaga, Spain gluque@uma.es 
+
+# Sergio Nesmachnow 
+
+Universidad de la República, Uruguay sergion@fing.edu.uy 
+
+# Jamal Toutouh 
+
+ITIS Software, University of Malaga, Spain jamal@uma.es 
+
+## Abstract 
+
+Dock-based bike-sharing systems exhibit spatial imbalances be-tween bicycle supply and user demand, often addressed through overnight truck-based rebalancing. This work studies static overnight rebalancing under demand uncertainty modeled as a tri-objective optimization problem. The objectives minimize total travel distance, expected unmet demand, and a robustness-oriented unmet demand measure over high-demand scenarios. Route plans are evaluated via a recourse simulation that enforces truck loads and station ca-pacity constraints across multiple demand realizations. The robust-ness objective supports selecting plans that reduce peak-demand service degradation. Trade-off solutions are approximated with Non-dominated Sorting Genetic Algorithm II using a permutation– partition encoding and domain-specific relocation operators, in-cluding a biased best-improvement move for station relocation. Experiments on the real Barcelona Bicing system with 460 stations show well-distributed Pareto sets and substantial contributions to the reference non-dominated set. Greedy constructive baselines mainly yield extreme solutions and are often dominated. 
+
+## CCS Concepts 
+
+• Computing methodologies → Bio-inspired approaches ; •
+
+Applied computing → Transportation .
+
+## Keywords 
+
+micromobility, bike-sharing systems, rebalancing, multi-objective optimization 
+
+ACM Reference Format: 
+
+Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh. 2026. Robust Multi-Objective Optimization for Bicycle Rebalancing  
+
+> ∗Corresponding authors.
+> †All authors contributed equally to this research. Permission to make digital or hard copies of all or part of this work for personal or classroom use is granted without fee provided that copies are not made or distributed for profit or commercial advantage and that copies bear this notice and the full citation on the first page. Copyrights for components of this work owned by others than the author(s) must be honored. Abstracting with credit is permitted. To copy otherwise, or republish, to post on servers or to redistribute to lists, requires prior specific permission and/or a fee. Request permissions from permissions@acm.org.
+> GECCO ’26, San José, Costa Rica
+> ©2026 Copyright held by the owner/author(s). Publication rights licensed to ACM. ACM ISBN XXXXXX https://doi.org/XXXXXXX
+
+in Shared Mobility Systems. In Genetic and Evolutionary Computation Con-ference (GECCO ’26), July 13-17, 2026. ACM, New York, NY, USA, 12 pages. https://doi.org/XXXXXXX 
+
+## 1 Introduction 
+
+Dock-based bike-sharing systems play an essential role in sustain-able urban mobility strategies. A recurring operational challenge in these systems is spatial imbalance: user movements can exhaust bicycles at some stations while saturating docks at others, reduced service quality and user satisfaction [ 17 ]. Operators address this through overnight truck-based rebalancing, where a static plan specifies routes, pickup and delivery quantities, and enforces vehi-cle capacity constraints. The problem is interdependent since early pickups affect the feasibility of later deliveries [16]. Bicycle and dock demand varies across stations and time peri-ods, involving uncertainty that forecasting cannot fully capture. Deterministic plans may perform well under typical conditions but fail under atypical demand [ 8]. A scenario-based framework offers greater realism by evaluating rebalancing plans across multiple demand realizations from historical data. The static rebalancing task is modeled as a vehicle routing prob-lem (VRP) with load-dependent feasibility constraints and service-oriented objectives. Given the large number of stations and stochas-tic demand in real systems, optimization methods must efficiently approximate the Pareto front across conflicting goals. Existing stud-ies propose exact, heuristic, and metaheuristic approaches for vari-ous problem variants [ 14 , 15 , 19 ], including multiobjective models balancing operational effort and service quality [9, 11]. This study addresses the overnight static rebalancing problem in large-scale dock-based bike-sharing systems under scenario-based demand uncertainty. A tri-objective model is proposed to minimize travel distance, expected unmet demand, and performance degradation under high-demand conditions. To explore trade-offs among the three objectives, a multiobjective evolutionary algorithm (MOEA), the Non-dominated Sorting Genetic Algorithm II (NSGA-II) [ 7 ], is employed. NSGA-II is a well-established method in multi-objective optimization, widely recognized for its accuracy [ 6, 13 ,18 ]. The proposed method includes: (i) a permutation–partition encoding for route sequencing and segmentation, (ii) relocate-based mutation operators for inter-route station transfers, and (iii) a biased relocation operator, that balances exploratory diversity with route efficiency. Computational experiments on the Barcelona Bicing system (460 stations) evaluate algorithmic performance and analyze representative trade-offs through spatial summaries.  
+
+> arXiv:2604.08296v1 [cs.NE] 9 Apr 2026 GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh
+
+The main contributions of this paper are: (a) a tri-objective for-mulation of static overnight bike rebalancing that specifically con-siders robustness as an objective defined as unmet demand over high-demand scenarios; (b) a permutation–partition encoding for multi-truck route sets with an explicit unvisited-station segment that supports permutation operators without feasibility repair; (c) domain-specific inter-route relocate mutation operators, includ-ing a deterministic best-improvement diversification variant and a roulette-biased stochastic variant; and (d) an empirical evalua-tion on the real-world Barcelona Bicing scenario that compares mutation operators against greedy baselines and an ablated variant. The article is organized as follows. Section 2 describes the prob-lem formulation. Section 3 describes the proposed approach. Later, Section 4 describes the case study data and experimental design, and Section 5 reports the experimental analysis. Section 6 presents the conclusions and formulates the main lines for future work. 
+
+## 2 Problem Description 
+
+This work considers a static (single-period) overnight rebalancing plan for a docked bike-sharing system. A fleet of identical trucks departs from a single depot, visits a subset of stations, and returns to the depot within the period. Each station is visited at most once and served by at most one truck. Decision variables define truck routes, while station-level pickup and delivery quantities are computed by a deterministic recourse policy during scenario evaluation. 
+
+## 2.1 Sets and parameters 
+
+Let T denote the set of trucks, with |T | = 𝑇 . Let S denote the set of stations, with |S| = 𝑆 , and let node 0 denote the depot. The set of all locations is V = S ∪ { 0}. For any 𝑖, 𝑗 ∈ V , parameter 𝑑 𝑖 𝑗 ≥ 0
+
+denotes the travel distance from 𝑖 to 𝑗 . Each truck has capacity 𝐶 
+
+(bikes). Each station 𝑖 ∈ S has docking capacity 𝐿 𝑖 (bikes) and initial inventory 𝑂 𝑖 at the start of the planning period, with 0 ≤ 𝑂 𝑖 ≤ 𝐿 𝑖 .Demand uncertainty is represented by a finite scenario set H ,with |H | = 𝑁 . Parameter 𝐷 𝑖,ℎ denotes the net desired inventory change at station 𝑖 ∈ S under scenario ℎ ∈ H . A positive value 
+
+𝐷 𝑖,ℎ > 0 indicates a desired delivery of 𝐷 𝑖,ℎ bikes to station 𝑖 ,whereas a negative value 𝐷 𝑖,ℎ < 0 indicates a desired pickup of |𝐷 𝑖,ℎ |
+
+bikes from station 𝑖 . Parameter 𝑝 ℎ denotes the nonnegative weight of scenario ℎ ∈ H , with Íℎ∈ H 𝑝 ℎ = 1. When calibrated probabilities are unavailable, uniform weights 𝑝 ℎ = 1/|H | is adopted. A target inventory 𝜏 𝑖,ℎ (Eq. (1) ) is obtained by projecting the requested inventory 𝑂 𝑖 + 𝐷 𝑖,ℎ into the feasible station range: 
+
+𝜏 𝑖,ℎ = min {𝐿 𝑖 , max {0, 𝑂 𝑖 + 𝐷 𝑖,ℎ }} , ∀𝑖 ∈ S , ℎ ∈ H . (1) This work defines the demand intensity of a scenario as the total magnitude of requested inventory changes: 
+
+Φℎ =∑︁  
+
+> 𝑖 ∈ S
+
+|𝐷 𝑖,ℎ |, ∀ℎ ∈ H . (2) Let 𝜅 0.90 denote the empirical 90 th percentile of {Φℎ }ℎ∈ H . The subset of high-demand scenarios is 
+
+H 0.90 = {ℎ ∈ H : Φℎ ≥ 𝜅 0.90 }. (3) For aggregation within H 0.90 , this work uses normalized weights 
+
+˜𝑝 ℎ = 𝑝 ℎ
+
+Íℎ′ ∈ H 0.90 𝑝 ℎ′
+
+, ∀ℎ ∈ H 0.90 . (4) 
+
+## 2.2 Representation and route feasibility 
+
+A solution is represented by a set of truck routes R = {𝑅 𝑡 }𝑡 ∈ T .Each route 𝑅 𝑡 is an ordered sequence of stations assigned to truck 𝑡 .Eq. (5) defines the representation, where 𝑘 𝑡 denotes the number of stations visited by truck 𝑡 . A non-empty route starts at the depot, visits stations in order, and returns to the depot. The empty route (i.e., 𝑘 𝑡 = 0) represents an unused truck. 
+
+𝑅 𝑡 = (𝑟 𝑡, 1, 𝑟 𝑡, 2, . . . , 𝑟 𝑡,𝑘 𝑡 ), 𝑟 𝑡,𝑗 ∈ S , 𝑘 𝑡 ≥ 0. (5) Two feasibility restrictions are imposed on the route structure. Eq. (6) enforces that each station is served by at most one truck. Eq. (7) enforces that a truck does not visit the same station more than once. The indicator function I(·) takes value 1 if its argument is true and value 0 otherwise. ∑︁  
+
+> 𝑡 ∈ T
+> 𝑘 𝑡
+
+∑︁ 
+
+> 𝑗 =1
+
+I(𝑟 𝑡,𝑗 = 𝑖 ) ≤ 1, ∀𝑖 ∈ S . (6) 
+
+I(𝑟 𝑡,𝑗 = 𝑟 𝑡,ℓ ) = 0, ∀𝑡 ∈ T , ∀𝑗 ≠ ℓ, 𝑗, ℓ ∈ { 1, . . . , 𝑘 𝑡 }. (7) 
+
+## 2.3 Objective functions 
+
+The optimization problem is tri-objective. The first objective mini-mizes total travel distance by the truck fleet (Eq. (8) ). The second objective minimizes scenario-weighted unmet demand over all sce-narios (Eq. (10) ). The third objective minimizes unmet demand under high-demand scenarios (Eq. (11) ), which explicitly targets robustness in the upper tail of scenario demand intensity. 
+
+𝑓 1 (R) = 𝑓 dist (R) =∑︁  
+
+> 𝑡 ∈ T
+
+𝛿 (𝑅 𝑡 ). (8) 
+
+𝛿 (𝑅 𝑡 ) =
+
+
+
+𝑑 0,𝑟 𝑡, 1 + Í𝑘 𝑡 −1 
+
+> 𝑗 =1
+
+𝑑 𝑟 𝑡,𝑗 ,𝑟 𝑡,𝑗 +1 + 𝑑 𝑟 𝑡,𝑘𝑡 ,0, 𝑘 𝑡 ≥ 1,
+
+0, 𝑘 𝑡 = 0.
+
+(9) For each scenario ℎ ∈ H , the evaluation procedure com-putes the station-level unmet demand 𝑈 𝑖,ℎ (R) after executing the route set R under the deterministic recourse policy in Section 2.4. The scenario-level unmet demand is 𝑈 ℎ (R) = Í𝑖 ∈ S 𝑈 𝑖,ℎ (R). The scenario-weighted unmet demand objective is 
+
+𝑓 2 (R) = 𝑓 ud (R) =∑︁ 
+
+> ℎ∈ H
+
+𝑝 ℎ 𝑈 ℎ (R) =∑︁ 
+
+> ℎ∈ H
+
+𝑝 ℎ∑︁  
+
+> 𝑖 ∈ S
+
+𝑈 𝑖,ℎ (R). (10) The high-demand robustness objective aggregates unmet de-mand only over H 0.90 :
+
+𝑓 3 (R) = 𝑓 0.90 ud (R) =∑︁ 
+
+> ℎ∈ H 0.90
+
+˜𝑝 ℎ 𝑈 ℎ (R) =∑︁ 
+
+> ℎ∈ H 0.90
+
+˜𝑝 ℎ∑︁  
+
+> 𝑖 ∈ S
+
+𝑈 𝑖,ℎ (R). (11) Eq. (12) states the tri-objective rebalancing problem. The solution set consists of Pareto-non-dominated feasible route sets. 
+
+min 
+
+> R
+
+
+
+𝑓 1 (R), 𝑓 2 (R), 𝑓 3 (R)
+
+
+
+subject to Eqs. (5)–(7). (12) 
+
+## 2.4 Scenario evaluation under a deterministic recourse policy 
+
+A route set R is evaluated on each scenario ℎ ∈ H through a simulation that enforces truck and station capacity constraints, obtaining as resutl the unmet demand values 𝑈 𝑖,ℎ (R) for all stations. Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems GECCO ’26, July 13-17, 2026, San José, Costa Rica 
+
+Variable 𝑠 𝑖,ℎ denotes the station inventory at station 𝑖 ∈ S during the simulation. Variable 𝑞 𝑡,ℎ denotes the truck load of truck 𝑡 ∈ T 
+
+during the simulation. Eq. (13) defines the initial state. At a visit of truck 𝑡 ∈ T to station 𝑖 = 𝑟 𝑡,𝑗 , the desired inventory change is defined by Eq. (14). 
+
+𝑠 𝑖,ℎ ← 𝑂 𝑖 , ∀𝑖 ∈ S , 𝑞 𝑡,ℎ ← 0, ∀𝑡 ∈ T . (13) 
+
+Δ𝑖,ℎ = 𝜏 𝑖,ℎ − 𝑠 𝑖,ℎ . (14) Variable 𝑦 𝑡,𝑖,ℎ denotes the executed transfer at station 𝑖 by truck 
+
+𝑡 under scenario ℎ. A positive value of 𝑦 𝑡,𝑖,ℎ denotes a delivery to the station, and a negative value of 𝑦 𝑡,𝑖,ℎ indicates a pickup from the station. Eq. (15) defines the feasible transfer interval induced by truck capacity and station capacity. 
+
+− min {𝐶 − 𝑞 𝑡,ℎ , 𝑠 𝑖,ℎ } ≤ 𝑦 𝑡,𝑖,ℎ ≤ min {𝑞 𝑡,ℎ , 𝐿 𝑖 − 𝑠 𝑖,ℎ }. (15) The recourse policy applies a projection rule that selects the feasible transfer closest to the desired change. Eq. (16) defines the rule, where Π[𝑎,𝑏 ] (𝑥 ) = min {𝑏, max {𝑎, 𝑥 }} and where [𝑦 𝑡,𝑖,ℎ , 𝑦 𝑡,𝑖,ℎ ]
+
+denotes the interval in Eq. (15). 
+
+𝑦 𝑡,𝑖,ℎ = Π[𝑦 𝑡,𝑖,ℎ , 𝑦 𝑡,𝑖,ℎ ]
+
+ Δ𝑖,ℎ 
+
+ . (16) Eq. (17) defines the state updates after executing the transfer. Eq. (18) defines the unmet demand at a visited station as the residual between the desired change and the executed transfer. If station 
+
+𝑖 ∈ S is not visited by any truck in R, then the station inventory remains equal to 𝑂 𝑖 , i.e., 𝑈 𝑖,ℎ (R) = 𝜏 𝑖,ℎ − 𝑂 𝑖 .
+
+𝑠 𝑖,ℎ ← 𝑠 𝑖,ℎ + 𝑦 𝑡,𝑖,ℎ , 𝑞 𝑡,ℎ ← 𝑞 𝑡,ℎ − 𝑦 𝑡,𝑖,ℎ . (17) 
+
+𝑈 𝑖,ℎ (R) ← Δ𝑖,ℎ − 𝑦 𝑡,𝑖,ℎ . (18) 
+
+## 3 Method 
+
+This section describes the proposed solution approach for the tri-objective rebalancing problem. The optimization backbone is a parallel MOEA (pMOEA) based on standard NSGA-II [ 7]. The re-mainder of the section focuses on the problem-specific components: the permutation–partition encoding ( R,®𝒕 ), the standard permutation operators applied to R, and the proposed domain-specific relocation mutations that exploit structural properties of the problem to guide the search toward high-quality trade-offs. 
+
+## 3.1 Operators and parallel implementation 
+
+Initialization and Solution encoding. The initial population is generated by random initialization. Each solution is encoded by two integer vectors: R with |S| elements and ®𝒕 with |T | + 1 entries. 
+
+R encodes a permutation of the stations, determining their visiting order. The vector ®𝒕 partitions R into |T | routes, one for each truck, and one additional segment that collects unvisited stations. Figure 1 illustrates the encoding. In the example, encoding R
+
+and ®𝒕 yields R = {𝑅 𝑡 }𝑡 ∈ T : stations 3, 7, and 4 to truck 1; stations 1 and 6 to truck 2; and stations 2, 5, and 8 to truck 3; with remain-ing stations unvisited. This encoding enables permutation-based crossovers/mutations on R and partition operators on ®𝒕 , avoiding feasibility repairs since R is a permutation. Relocation moves trans-fer a station 𝑠 between truck segments in ( R,®𝒕 ), updating ®𝒕 while preserving the partition structure—equivalent to classical VRP 1–0 relocate without repair. 
+
+Figure 1: Example of solution encoding of a scenario with 9 stations and 3 trucks. 
+
+Selection, replacement, and fitness assignment. NSGA-II uses the (𝜇 +𝜆 ) evolution model. The selection process is based on dominance through crowding distance selection for NSGA-II. Fitness assign-ment is performed by considering Pareto dominance rank, valid results, and crowding distance value. 
+
+Parallel master-slave implementation. The parallel NSGA-II pro-posed in this work aligns with the master-slave model [ 1]. The pMOEA proposed in this study is structured hierarchically into a master-slave framework, with a master process responsible for evolutionary search and oversight of a group of slave processes that compute the fitness function evaluations. 
+
+Standard recombination and mutation operators. The applied crossover operators are standard permutation methods selected for their complementarity strengths. Order Crossover (OX) per-forms especially well in permutation-based problems involving graphs or routes. Likewise, Edge Recombination Crossover (ERX) and Enhanced Edge Recombination Crossover (EERX) preserve adjacency information between edges, thereby maintaining essen-tial structural relationships in the offspring. Although Partially Mapped Crossover (PMX) is less effective in retaining edge infor-mation, it preserves the relative order of elements, which suits the characteristics of the problem [5]. Four standard mutation operators that modify the route permuta-tion are applied in this paper: Block-Move (BMM), which relocates a contiguous block of 𝑛 elements to another position; Block-Swap (BSM), which exchanges two contiguous blocks of 𝑛 elements; Swap (SM), a special case of BSM with 𝑛 = 1; and Inversion (IM), which reverses the subsequence between two selected positions. 
+
+## 3.2 Domain-specific mutation operators 
+
+This work defines domain-specific mutation operators that modify the route partition by relocating a single station between two routes with probability 𝑃𝑀 𝑇 . Mutations act on the encoding (R,®𝒕 ) and preserve the station permutation in R, except for the relocated element. Each station is assigned to at most one truck route or remains unvisited. The operators differ in the rule used to select the relocated station and its insertion position. 
+
+Random relocation. The Random Station Rebalancing Between Routes (AB2) operator implements an unbiased 1–0 relocate move between two routes. The operator randomly selects two distinct routes, designates one as the source and the other as the destina-tion, samples one station from the source route, and inserts it at a GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh 
+
+Algorithm 1 Random Station Rebalancing Between Routes  
+
+> 1:
+
+Randomly select two distinct routes.  
+
+> 2:
+
+Select one route as the source and set the other as the destination.  
+
+> 3:
+
+Randomly choose a station from the source route.  
+
+> 4:
+
+Insert the station into a random position in the destination route.  
+
+> 5:
+
+Update the solution encoding ( R,®𝒕 ) accordingly. 
+
+uniformly random position in the destination route. Algorithm 1 and Figure 2 summarize the procedure. 
+
+Figure 2: Diagram showing the operation of the AB2 operator. The red arrows indicate the step sequence. 
+
+Best-improvement relocation. The Deterministic Station Rebal-ancing with Minimum/Maximum Difference (BB1-MIN and BB1-MAX) operator evaluates the 1–0 relocate neighborhood induced by a randomly selected pair of distinct routes. The operator sets one route as the source and the other as the destination, enumerates all feasible relocations of one station from the source to every insertion position in the destination, and selects the move that optimizes the induced change in travel distance in both trucks: BB1-MIN selects the minimum change, whereas BB1-MAX selects the maximum change. Distance evaluations use the route-distance function 𝛿 (·) 
+
+defined in Eq. (9) . Algorithm 2 and Figure 3 summarize the proce-dure; the diagram depicts BB1-MAX, and BB1-MIN differs only in using an argmin instead of an argmax. 
+
+Algorithm 2 Deterministic Station Rebalancing with Mini-mum/Maximum Difference BB1-MIN / BB1-MAX)  
+
+> 1:
+
+Randomly select two distinct routes.  
+
+> 2:
+
+Select one route as the source and set the other as the destination.  
+
+> 3:
+
+Generate all feasible single-station relocations from the source to the destination route.  
+
+> 4:
+
+Evaluate each relocation using the induced change in route distance 
+
+𝛿 (·) ; select the best-improvement relocation (minimum for BB1-MIN, maximum for BB1-MAX).  
+
+> 5:
+
+Update the solution encoding ( R,®𝒕 ) according to the selected relocation. 
+
+Biased relocation sampling. The Station Rebalancing using Roulette-Wheel Selection (BB2-MIN and BB2-MAX) operator em-ploys the same 1–0 relocate neighborhood as BB1 but selects relo-cations stochastically via roulette-wheel sampling biased toward low-distance-increase (BB2-MIN) or high-distance-increase (BB2-MAX) moves. Let 𝑅 𝑡 and 𝑅 𝑡 ′ denote the randomly selected routes, 
+
+Figure 3: BB1-MAX operator diagram. The red arrows indi-cate the step sequence. 
+
+with N𝑟𝑒𝑙 (𝑅 𝑡 , 𝑅𝑡 ′) as the set of all feasible single-station relocations from 𝑅 𝑡 to admissible insertion positions in 𝑅 𝑡 ′ .For each move 𝑚 ∈ N 𝑟𝑒𝑙 (𝑅 𝑡 , 𝑅𝑡 ′), the induced distance change 
+
+Δ𝑚 is computed as shown in Eq. (19) . The operator transforms 
+
+{Δ𝑚 }𝑚 ∈ N 𝑟𝑒𝑙 (𝑅 𝑡 ,𝑅 𝑡 ′ ) into roulette probabilities using a 𝑐 𝑚 parameter-free normalization: 𝑐 𝑚 = Δ𝑚 − min ℓ ∈ N 𝑟𝑒𝑙 (𝑅 𝑡 ,𝑅 𝑡 ′ ) Δℓ (in BB2-MIN) or 𝑐 𝑚 = Δ𝑚 − max ℓ ∈ N 𝑟𝑒𝑙 (𝑅 𝑡 ,𝑅 𝑡 ′ ) Δℓ (in BB2-MAX). 
+
+Δ𝑚 =  𝛿 (𝑅 (𝑚 ) 
+
+> 𝑡
+
+) + 𝛿 (𝑅 (𝑚 )  
+
+> 𝑡 ′
+
+) −  𝛿 (𝑅 𝑡 ) + 𝛿 (𝑅 𝑡 ′ ), (19) Weights ( 𝑤 𝑚 ) and probabilities ( 𝑃 (𝑚 )) are computed according to Eq. (20) . The operator samples one move 𝑚 according to 𝑃 (𝑚 )
+
+and applies it to update ( R,®𝒕 ). Algorithm 3 and Figure 4 summarize the procedure (red arrows indicate the step sequence). 
+
+𝑤 𝑚 = 1
+
+𝜀 + 𝑐 𝑚 
+
+,𝑃 (𝑚 ) = 𝑤 𝑚 
+
+Íℓ ∈ N 𝑟𝑒𝑙 (𝑅 𝑡 ,𝑅𝑡 ′ ) 𝑤 ℓ
+
+,
+
+(20) 
+
+Algorithm 3 Station Rebalancing using Roulette-Wheel Selection (BB2-MIN / BB2-MAX)  
+
+> 1:
+
+Randomly select two distinct routes.  
+
+> 2:
+
+Select one as source 𝑅 𝑡 and the other as destination 𝑅 𝑡 ′ . 
+
+> 3:
+
+Generate N𝑟𝑒𝑙 (𝑅 𝑡 , 𝑅𝑡 ′): all feasible single-station relocations.  
+
+> 4:
+
+Compute Δ𝑚 and roulette probabilities 𝑃 (𝑚 ) per Eqs. (19) –(20) (min-shift for BB2-MIN, max-shift for BB2-MAX).  
+
+> 5:
+
+Sample relocation 𝑚 according to 𝑃 (𝑚 ). 
+
+> 6:
+
+Update solution encoding ( R,®𝒕 ). The AB2 operator applies an unbiased relocation by selecting both the moved station and its insertion position uniformly at random. The BB1-MIN/MAX operators apply a best-improvement relocation by choosing, among all candidate relocations between the selected routes, the move that minimizes/maximizes the induced change in travel distance. The BB2-MIN/MAX operators use the same relocate neighborhood as BB1-MIN/MAX, but select a move by roulette-wheel sampling with probabilities derived from induced distance changes, which adds stochasticity while biasing selection toward relocations that preserve route length. Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems GECCO ’26, July 13-17, 2026, San José, Costa Rica 
+
+Figure 4: Diagram of the Station Rebalancing using Roulette-Wheel Selection operator (BB2-MIN/MAX). 
+
+## 4 Experimental Settings 
+
+This section describes the case-study instance, the evaluation pro-tocol, and the execution platform. The section also reports the parameter-tuning procedure used to set NSGA-II hyperparameters. 
+
+## 4.1 Problem instance 
+
+Bike demand is inferred from changes in bicycle availability at each station and aggregated at an hourly resolution. The experiments focus on Mondays 07:00–08:00. The dataset covers 2019–2025, with station status sampled every 4–5 minutes. After preprocessing and missing-data handling, the instance includes 460 dock-based sta-tions and 328 Mondays. Figure 5 shows the station locations and the depot. The fleet contains 20 trucks with capacity 20 bikes each. Demand uncertainty is represented with scenarios derived from historical observations. The data are split into 80% training and 20% validation. For each split, Monte Carlo sampling generates 15 training scenarios and 15 validation scenarios for each evaluation. The robustness objective uses a high-demand scenario, i.e., the 90th percentile of the empirical demand distribution for each station. Hy-perparameter tuning is performed on a reduced instance containing 25% of the stations. 
+
+## 4.2 Evaluated metrics and baseline methods 
+
+This subsection summarizes the evaluated metrics and heuristic greedy baselines. 
+
+Multiobjective optimization (MO) metrics. MO performance is measured with 𝑔𝑑 + and 𝑖𝑔𝑑 + for proximity to the Pareto front [ 2 ]. The 𝑠𝑝𝑟𝑒𝑎𝑑 metric evaluates the dispersion of non-dominated solu-tions [ 10 ], and #𝑛𝑑𝑠 counts the obtained non-dominated set size. The relative hypervolume ( 𝑟ℎ𝑣 ) assesses coverage and dominance [ 20 ]. A reference front is approximated by pooling all non-dominated solutions across runs because the true Pareto front is unknown. 
+
+Problem-related metrics. Operational performance is assessed via total travel distance and scenario-weighted unmet demand. Total distance is computed as 𝑓 dist (R) (Eq. (8) ) from route distance 𝛿 (·) 
+
+(Eq. (9) ) using shortest-path distances from Dijkstra’s algorithm. Scenario-weighted unmet demand is 𝑓 ud (R) (Eq. (10) ), where unmet demand is obtained from the deterministic recourse evaluation 
+
+Z( R, ℎ ) (Section 2); unvisited stations contribute |𝜏 𝑖,ℎ − 𝑂 𝑖 |.
+
+Figure 5: Instance map: the red points are the bike-shared stations and the blue is the depot. 
+
+Greedy-based baseline methods. Two greedy constructive heuris-tics provide non-evolutionary baselines: RRCP-BI (Appendix A.1) and GLOBE (Appendix A.2). Both construct feasible route sets and enforce single-visit constraints by design. Construction is guided by the expected-demand proxy b𝐷 𝑖 (Eq. (21) ), while objective values are computed by the deterministic evaluator. RRCP-BI builds pickup– drop pairs using a randomized restricted candidate list and as-signs pairs to trucks via distance-aware balanced insertion. GLOBE samples feasible pair-moves from a global candidate set using score-biased probabilities. Baseline configurations target distance (GLOBE_Dist, RRCP-BI_Dist), demand satisfaction (GLOBE_Serv, RRCP-BI_Serv), or both (GLOBE_SD, RRCP-BI_SD). 
+
+## 4.3 Parameter settings 
+
+Parametric experiments identified the best-performing configu-rations of the domain-specific mutation operators ( ®𝒕 mutations) within NSGA-II. Tuning was performed with Irace [ 12 ], which eval-uates candidate configurations via iterative racing under a fixed budget. Relative hypervolume ( 𝑟ℎ𝑣 ) was used as the tuning objective. Tuning used the 25% instance with a budget of 1200 experiments. Table 1 lists the candidate parameter domains. Irace tunes the crossover and mutation operators applied to R and their probabili-ties. Population size is fixed to 200 and the number of generations to 500, based on preliminary experiments. 
+
+Table 1: Candidates for the hyperparameters                      
+
+> Parameter Domain Crossover on R(𝐶 𝑅 )OX, PMX, ERX, EERX Mutation on R(𝑀 𝑅 )IM, BMM, BSM, SM Probability of mutation R(𝑃𝑀 𝑅 ){0.01, 0.05, 0.1, 0.15, 0.20, 0.25} Probability of crossover R(𝑃𝐶 𝑅 ){0.1, 0.25, 0.5, 0.7, 0.9, 1} Probability of mutation ®𝒕 (𝑃𝑀 𝑇 ){0.01, 0.05, 0.1, 0.15, 0.20, 0.25}
+
+Table 2 reports the best configuration selected for each mutation operator. Each selected configuration is evaluated with 36 indepen-dent runs on the 100% instance for subsequent analysis. 
+
+## 4.4 Execution platform and implementation 
+
+The proposed methods were developed in Python 3.10.12, using the scikit-learn, NetworkX, OSMnx [ 4], and PyMOO [ 3] libraries. GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh 
+
+Table 2: Parameter configurations for each operator.                               
+
+> Operator 𝐶 𝑅 𝑀 𝑅 𝑃𝑀 𝑅 𝑃𝐶 𝑅 𝑃𝑀 𝑇
+> AB2 PMX SM 0.25 0.1 0.15 BB1-MIN PMX SM 0.25 0.1 0.20 BB1-MAX PMX BSM 0.01 0.1 0.25 BB2-MAX PMX SM 0.20 0.1 0.25 BB2-MIN PMX SM 0.20 0.1 0.15
+
+Computational experiments were executed on a high-performance cluster consisting of 126 SD530 nodes, each equipped with 52 Intel Xeon Gold 6230R cores operating at 2.10 GHz and 192 GB of RAM. The nodes are connected through an InfiniBand HDR100 network, and each node includes 950 GB of local scratch storage. The source code is available at https://github.com/pedrozad/bike-gecco-2026. 
+
+## 5 Experimental analysis 
+
+This section presents the experimental results obtained with the proposed approach. All comparative results have been statistically validated using the Wilcoxon signed-rank test with Bonferroni cor-rection and a significance level of 𝛼 = 0.01; detailed test outcomes are reported in Appendix B. The analysis is organized into three parts: an evaluation of the proposed mutation operators, a valida-tion against baseline approaches, and a problem-centric analysis assessing the practical impact of the obtained solutions. 
+
+## 5.1 Analysis of the Proposed Operators 
+
+This section analyzes the performance of the proposed mutation operators using both quantitative metrics and visual inspection of the resulting Pareto fronts. Tables 3-5 summarize the distribution of quality indicators across independent runs, while Figures 6–7 illustrate the corresponding Pareto fronts in the objective space, allowing a qualitative assessment of convergence and diversity. In Table 3, the relative hypervolume (rhv, maximization) is re-ported. This metric evaluates the overall quality of the approxima-tion set by jointly capturing convergence, dominance, and diversity with respect to a reference Pareto front, constructed by aggregating the non-dominated solutions obtained across all the experiments. 
+
+Table 3: Results of rhv for the studied instance.                        
+
+> Min Median IQR Max AB2 0.445 0.504 0.035 0.533 BB1-MAX 0.620 0.750 0.054 0.851 BB1-MIN 0.360 0.438 0.044 0.530 BB2-MAX 0.388 0.503 0.040 0.551 BB2-MIN 0.382 0.467 0.039 0.541
+
+The results show that BB1-MAX clearly outperforms all other variants, achieving the highest median rhv value as well as the best maximum performance. This indicates that promoting diversi-fication through high-impact relocations, while retaining a deter-ministic best-improvement selection, is particularly effective for exploring high-quality trade-offs in the objective space. In contrast, intensification-oriented operators (BB1-MIN and BB2-MIN) obtain substantially lower rhv values, suggesting that favoring low-impact moves limits exploration and restricts access to well-dominated regions of the Pareto front. Purely exploratory or stochastic strategies (AB2 and BB2 variants) achieve intermediate rhv values, confirming that exploration is beneficial but insufficient on its own to match the performance of a guided diversification strategy. No clear advantage is observed between purely random exploration (AB2) and biased stochastic sampling (BB2) in terms of rhv. The notable exception is BB1-MAX, where deterministic selection combined with explicit diversification yields a substantial performance gain over all stochastic alternatives. This highlights that, for this problem, how diversification is guided is more relevant than the degree of randomness itself. Table 4 reports the results for igd+ and gd+ (both minimization), which assess the convergence with respect to the reference Pareto front. While igd+ emphasizes coverage of the front, gd+ focuses on the average proximity of the obtained solutions. 
+
+Table 4: Results for IGD+ and GD+ metrics.                                                 
+
+> IGD+ GD+ Min Med IQR Max Min Med IQR Max AB2 0.156 0.181 0.014 0.210 0.110 0.141 0.029 0.186 BB1-MAX 0.043 0.065 0.009 0.093 0.062 0.078 0.006 0.102 BB1-MIN 0.179 0.217 0.027 0.252 0.114 0.159 0.025 0.200 BB2-MAX 0.144 0.176 0.016 0.208 0.116 0.151 0.027 0.183 BB2-MIN 0.168 0.203 0.023 0.249 0.106 0.152 0.029 0.199
+
+The results are consistent across both metrics and strongly align with the rhv analysis. BB1-MAX achieves the lowest median val-ues for both IGD+ and GD+, indicating superior convergence and a closer approximation to the reference front. This confirms that deterministic best-improvement combined with diversification not only improves dominance but also enhances convergence quality. Exploratory operators such as AB2 and BB2-MAX systematically outperform intensification-oriented variants, reinforcing the obser-vation that exploration is essential to avoid premature convergence. In contrast, BB1-MIN exhibits the worst convergence behavior, de-spite producing compact solution sets, suggesting that excessive intensification restricts the search to suboptimal solution regions. Table 5 reports the results for spread and #nds, two indicators that characterize the structure of the obtained Pareto fronts but do not directly assess their quality with respect to the reference front. The spread metric measures the dispersion of solutions around their centroid and is therefore a front-internal indicator, indepen-dent of convergence or dominance. Under this definition, BB1-MIN achieves the highest median spread, indicating more dispersed solution sets. However, this dispersion does not translate into bet-ter performance, as these solutions remain far from the reference Pareto front, a fact already evidenced by the IGD+ and GD+ results. In contrast, BB1-MAX exhibits lower spread values, reflecting more compact solution sets that are nonetheless better aligned with the reference front. This indicates that high-quality fronts do not re-quire large internal dispersion, but rather an effective placement of solutions along the true trade-off surface. Regarding the number of non-dominated solutions (#nds), all operators produce similarly large non-dominated sets, with median values close to the population size. Statistical analysis (Appendix B) indicates that no statistically significant differences are observed for this metric. This suggests that all variants are equally capable Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems GECCO ’26, July 13-17, 2026, San José, Costa Rica 
+
+Table 5: Results for Spread and #NDS metrics.                                                 
+
+> Spread #NDS Min Med IQR Max Min Med IQR Max AB2 5.074 5.680 0.481 6.142 194 198 2.25 200 BB1-MAX 2.247 2.576 0.456 4.126 188 199 2.00 200 BB1-MIN 5.583 6.462 0.390 6.991 192 198 2.00 200 BB2-MAX 4.911 5.348 0.346 5.904 190 198 1.25 200 BB2-MIN 5.121 5.981 0.480 6.642 190 198 2.00 200
+
+of maintaining large non-dominated populations, and that perfor-mance differences are primarily driven by solution quality and front location, rather than by the cardinality of the obtained sets. To complement the quantitative analysis, we now provide a vi-sual validation of the proposed operators by inspecting the resulting Pareto fronts in the objective space. We include a three-dimensional representation of the complete front to assess global convergence and coverage (Figure 6), together with a two-dimensional projec-tion highlighting the most relevant trade-off of the problem under critical demand conditions (Figure 7). Similar trends are observed when considering expected unmet demand, and therefore only the critical case is reported. 
+
+Figure 6: Three-dimensional Pareto front obtained by the different mutation operators. 
+
+Figure 6 shows the three-dimensional Pareto fronts obtained by the different mutation operators together with the reference front. The visualization confirms the quantitative results: BB1-MAX consistently produces solution sets that are closer to the reference front across the three objectives, whereas intensification-oriented variants converge to regions that are visibly shifted away from the true trade-off surface. Exploratory strategies achieve broader coverage but exhibit weaker proximity to the reference front. Figure 7 illustrates the trade-off between travel distance and critical unmet demand, directly reflecting the robustness-oriented objective introduced in this work. The projection confirms the superior alignment of BB1-MAX with the reference Pareto front, while intensification-oriented variants remain shifted away from the true trade-off surface. Other operators are able to reach only partial segments of the front, typically corresponding to solutions that require large increases in distance for marginal improvements in service quality. These observations are consistent across both service quality objectives, reinforcing the conclusion that guided 
+
+Figure 7: 2D front projection: distance vs. critical unmet de-mand. 
+
+diversification enables the identification of well-balanced and mean-ingful solutions. 
+
+## 5.2 Validation against Baseline Approaches 
+
+This section validates our approach by comparing BB1-MAX against several greedy baselines and an ablated variant where the domain-specific mutation is replaced by a standard inversion operator. Table 6 summarizes the results. Here, #nds denotes the number of non-dominated solutions contributed by each method to the global reference Pareto front. This metric reflects the effective contribution of each approach to the overall trade-off surface. 
+
+Table 6: Results of MO metrics.                                                            
+
+> rhv gd+ igd+ spread #nds BB1-MAX 0.975 0.004 0.007 1.241 36
+> BB1-MIN 0.681 0.092 0.153 1.564 1BB2-MAX 0.742 0.062 0.111 2.046 3BB2-MIN 0.696 0.087 0.142 1.699 3GLOBE_SD 0.402 0.007 0.127 0.414 2GLOBE_Dist 0.251 0.048 0.180 0.377 0GLOBE_Serv 0.362 00.131 0.294 6RRCP-BI_SD 0.283 0.096 0.172 0.378 0RRCP-BI_Dist 0.279 0.098 0.181 0.423 0RRCP-BI_Serv 0.294 0.086 0.171 0.442 0BB1-MAX_abl 0.674 0.070 0.152 2.420 2
+
+The results show that BB1-MAX clearly dominates the compari-son, achieving the best convergence and dominance metrics while contributing a substantially larger portion of the reference Pareto front. In contrast, greedy strategies are only able to contribute solutions located at extreme regions of the front, typically char-acterized by very low distance but extremely poor service quality (high unmet and critical unmet demand). The ablated evolutionary variant exhibits a behavior similar to the remaining evolutionary baselines: it is able to identify a small number of isolated non-dominated solutions, but these correspond to large increases in distance with only marginal improvements in service quality, resulting in a limited contribution to the front. Figure 8 visually confirms these observations by showing the reference Pareto front together with the origin of each solution. Notably, only two greedy methods contribute non-dominated so-lutions, both sharing a strong bias toward distance minimization, while the remaining greedy approaches fail to reach competitive trade-offs. Overall, these results highlight that the advantage of GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh 
+
+Figure 8: Two-dimensional Reference Pareto front projection: distance vs. critical unmet demand. 
+
+BB1-MAX lies not only in reaching the Pareto front, but in iden-tifying well-balanced and practically relevant regions of it, rather than extreme and poorly compensated solutions. 
+
+## 5.3 Problem-centric analysis 
+
+Finally, this section analyzes the obtained solutions from a problem-centric perspective, focusing on their operational impact and com-paring them with the current system (no rebalancing). We first assess service availability at station level, and then study the trade-offs induced by different fleet sizes in the solutions generated. 
+
+Figure 9: Histogram of the number of bikes needed per sta-tion in the non-rebalancing configuration (BASE), compared with the closest to ideal vector in normal and critical cases. 
+
+Figure 9 reports the distribution of stations according to the number of bikes that users attempted to obtain but were unavail-able. Results are shown for the current configuration and for the BB1-MAX solution closest to the ideal point, evaluated under both normal and critical demand scenarios. In the non-rebalancing con-figuration, only a limited number of stations fully satisfy demand, while a large fraction experience shortages. In contrast, the pro-posed solution substantially increases the number of stations with zero unmet demand, indicating a clear improvement in service qual-ity. In fact, this behavior is preserved under critical cases, showing that the selected solution is robust to high-demand conditions. 
+
+Figure 10: Total distance distribution of the solutions of our approach by number of trucks. 
+
+Figures 10 and 11 analyze the Pareto-optimal solutions produced by BB1-MAX by grouping them according to the number of trucks used. For each fleet size, boxplots summarize the distribution of total distance and unmet demand (the critical unmet demand is very similar). The case with zero trucks corresponds to the current system configuration, which exhibits zero distance but the high-est unmet demand. Solutions using up to 15 trucks achieve very low travel distances, but at the cost of poor service quality. The transition to 16 trucks represents a clear improvement in unmet demand, although with higher variability in distance. Solutions with 17 trucks further stabilize distance while maintaining good service levels, whereas additional trucks beyond this point yield only marginal improvements in service quality and distance vari-ability. These results suggest that 16–18 trucks provide the best compromise between operational cost and service quality, with diminishing returns observed for larger fleet sizes. 
+
+Figure 11: Unmet demand distribution of the solutions of our approach by number of trucks. 
+
+## 6 Conclusions and future work 
+
+This work proposed a set of domain-specific mutation operators for a tri-objective bike rebalancing problem, together with a novel formulation of a robustness-oriented objective that explicitly ac-counts for service degradation under critical demand scenarios. By integrating this third objective, the approach moves beyond average-case optimization and enables the systematic identification of solutions that remain effective under adverse conditions. The experimental analysis shows that guided diversification, par-ticularly through the BB1-MAX operator, significantly improves convergence, dominance, and practical solution quality when com-pared to greedy strategies and ablated variants. The obtained so-lutions not only perform well in multi-objective metrics, but also exhibit robust and operationally meaningful trade-offs, improving service availability while keeping distance at reasonable levels. Future work will focus on three main directions. First, the pro-posed operators will be assessed within alternative MOEAs to evalu-ate their generality. Second, additional adaptive and hybrid domain-aware operators will be explored to enhance search efficiency. Fi-nally, the modeling of demand will be extended using machine learning techniques to capture temporal dynamics and uncertainty. 
+
+## Acknowledgments 
+
+This research is partially funded by the grant num-ber PID2024-158752OB-I00 (AIM-ZERO) by MI-CIU/AEI/10.13039/501100011033; and the grant number PRE2021-100645 by MCIN/AEI/10.13039/501100011033 and by the FSE+. The authors thank the Supercomputing and Bioinformatics center (UMA) for their computer resources and assistance. Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems GECCO ’26, July 13-17, 2026, San José, Costa Rica 
+
+## References 
+
+[1] Enrique Alba, Gabriel Luque, and Sergio Nesmachnow. Parallel metaheuris-tics: recent advances and new trends. International Transactions in Operational Research , 20(1):1–48, 2013. [2] Charles Audet, Jean Bigeon, Dominique Cartier, Sébastien Le Digabel, and Lu-dovic Salomon. Performance indicators in multiobjective optimization. European Journal of Operational Research , 292(2):397–422, 2021. [3] J. Blank and K. Deb. pymoo: Multi-objective optimization in python. IEEE Access ,8:89497–89509, 2020. [4] Geoff Boeing. OSMnx: New methods for acquiring, constructing, analyzing, and visualizing complex street networks, September 2017. [5] Vincent Cicirello. A survey and analysis of evolutionary operators for permuta-tions. In Proceedings of the 15th International Joint Conference on Computational Intelligence - ECTA , pages 288–299. INSTICC, SciTePress, 2023. [6] Christian Cintrano and Jamal Toutouh. Multiobjective electric vehicle charg-ing station locations in a city scale area: Malaga study case. In Juan Luis Jiménez Laredo, J. Ignacio Hidalgo, and Kehinde Oluwatoyin Babaagba, editors, 
+
+Applications of Evolutionary Computation , pages 584–600, Cham, 2022. Springer International Publishing. [7] K. Deb. Multi-Objective Optimization using Evolutionary Algorithms . John Wiley & Sons, 2001. [8] Mauro Dell’Amico, Manuel Iori, Stefano Novellani, and Anand Subramanian. The bike sharing rebalancing problem with stochastic demands. Transportation Research Part B: Methodological , 118:362–380, 2018. [9] Hongfei Jia, Hongzhi Miao, Guangdong Tian, MengChu Zhou, Yixiong Feng, Zhiwu Li, and Jiangchen Li. Multiobjective bike repositioning in bike-sharing systems via a modified artificial bee colony algorithm. IEEE Transactions on Automation Science and Engineering , 17(2):909–920, 2020. [10] Miqing Li and Jinhua Zheng. Spread assessment for evolutionary multi-objective optimization. In Evolutionary Multi-Criterion Optimization: 5th International Conference, EMO 2009, Nantes, France, April 7-10, 2009. Proceedings 5 , pages 216– 230. Springer, 2009. [11] Yanfeng Li and Yang Liu. The static bike rebalancing problem with optimal user incentives. Transportation Research Part E: Logistics and Transportation Review ,146:102216, 2021. [12] Manuel López-Ibáñez, Jérémie Dubois-Lacoste, Leslie Pérez Cáceresand Mauro Bi-rattari, and Thomas Stützle. The irace package: Iterated racing for automatic algorithm configuration. Operations Research Perspectives , 3:43–58, 2016. [13] Sergio Nesmachnow, Diego Gabriel Rossit, and Jamal Toutouh. Comparison of multiobjective evolutionary algorithms for prioritized urban waste collection in Montevideo, Uruguay. Electronic Notes in Discrete Mathematics , 69:93–100, 2018. [14] Bruno A. Neumann-Saavedra and Rossana Cavagnini. Column-generation-based heuristics for integrating static rebalancing and faulty bike collection in bike-sharing systems. OR Spectrum , 47(2):375–409, Jun 2025. [15] Aliki Pouliasi, Amalia Nikolopoulou, Konstantinos Gkiotsalitis, and Konstantinos Kepaptsoglou. An exact approach for the static docked bike rebalancing problem that minimizes the routing costs and unmet demand under various geographic considerations. Journal of Public Transportation , 27:100141, 2025. [16] Tal Raviv, Michal Tzur, and Iris A. Forma. Static repositioning in a bike-sharing system: models and solution approaches. EURO Journal on Transportation and Logistics , 3(2):175–203, 2013. [17] C.S. Shui and W.Y. Szeto. A review of bicycle-sharing service planning problems. 
+
+Transportation Research Part C: Emerging Technologies , 117:102648, 2020. [18] Jamal Toutouh, Diego Rossit, and Sergio Nesmachnow. Soft computing methods for multiobjective location of garbage accumulation points in smart cities. Annals of Mathematics and Artificial Intelligence , 88(1):105–131, 2020. [19] Carlos M. Vallez, Mario Castro, and David Contreras. Challenges and opportuni-ties in dock-based bike-sharing rebalancing: A systematic review. Sustainability ,13(4), 2021. [20] Eckart Zitzler and Lothar Thiele. Multiobjective optimization using evolutionary algorithms—a comparative case study. In International conference on parallel problem solving from nature , pages 292–301. Springer, 1998. GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh 
+
+## A Greedy constructive baselines 
+
+This section describes two greedy constructive heuristics devised as baselines for the tri-objective overnight rebalancing problem in Section 2. Both heuristics output a feasible route set R = {𝑅 𝑡 }𝑡 ∈ T 
+
+(Eq. (5) ) and satisfy the single-visit constraints by construction (Eqs. (6) – (7) ). Both heuristics use an expected-demand proxy to guide construction, but they are not scenario-aware optimizers: the objective values are computed exclusively by the deterministic scenario evaluator in Section 2.4. 
+
+## A.1 Randomized Restricted Candidate Pairing with Balanced Insertion (RRCP-BI) 
+
+RRCP-BI is a two-stage greedy constructor designed to address the problem for large instances. Stage 1 stochastically creates pickup– drop pairs under a restricted candidate list (RCL) policy. Stage 2 assigns pairs to trucks using a distance-aware insertion rule to obtain R.RRCP-BI derives a deterministic proxy net desired change from an expected-demand input b𝐷 𝑖 and the corresponding proxy deficit 
+
+def 𝑖 and surplus sur 𝑖 magnitudes according to Eq. (21) and Eq. (22) ,respectively. 
+
+b𝐷 𝑖 = expected_demand 𝑖 − 𝑂 𝑖 , (21) 
+
+def 𝑖 = max {b𝐷 𝑖 , 0}, sur 𝑖 = max {− b𝐷 𝑖 , 0}. (22) Let S+ and S− be the sets of deficit and surplus stations, respec-tively (Eq. (23) ). For a candidate pair (𝑖, 𝑗 ) with 𝑖 ∈ S − and 𝑗 ∈ S +,RRCP-BI defines a capacity-capped proxy transfer volume 𝑞 (𝑖, 𝑗 )
+
+according to Eq. (24) , where 𝐶 is the truck capacity (in bikes). This value is used only for construction; scenario-dependent transfers and unmet demand are computed by the evaluator (Section 2.4). 
+
+S+ = {𝑖 ∈ S | def 𝑖 > 0}, S− = {𝑖 ∈ S | sur 𝑖 > 0}. (23) 
+
+𝑞 (𝑖, 𝑗 ) = min {sur 𝑖 , def 𝑗 , 𝐶 }. (24) Algorithm 4 summarizes RRCP-BI. The method consists of Stage 1 (randomized pairing, lines 3–10) and Stage 2 (pair insertion into truck routes, lines 11–15). 
+
+Parameters. RRCP-BI uses six user parameters. 𝑚 max is the max-imum size of the restricted candidate list RCL (𝑖 ) and bounds the number of deficit candidates evaluated per iteration. 𝛽 pick ≥ 0 con-trols pickup selection pressure in Eq. (25) : 𝛽 pick = 0 yields uniform sampling over A− , and larger values bias selection toward larger surplus sur 𝑖 . 𝛽 drop ≥ 0 controls drop selection pressure in Eq. (30) :
+
+𝛽 drop = 0 yields uniform sampling within RCL (𝑖 ), and larger values bias selection toward higher score (𝑖, 𝑗 ). The score mode selects the definition of score (𝑖, 𝑗 ) (service-only, inverse-distance, or service-per-distance; Eqs. (27) – (29) ), which determines the construction bias toward transfer volume versus proximity. 𝜆 ≥ 0 is the load-balancing penalty in Eq. (32) that discourages assigning many pairs to the same truck by increasing the cost of trucks with larger 𝑛 𝑡 .
+
+𝜀 > 0 is a numerical-stability constant used in Eqs. (25) and (30) and in the inverse-distance terms to avoid division by zero and undefined probabilities. 
+
+Stage 1: randomized pair-and-remove with RCL. RRCP-BI com-putes the proxy quantities b𝐷 𝑖 , sur 𝑖 , and def 𝑖 (Alg. 4, line 1) and initializes the available sets A− and A+ and the pair list P (Alg. 4, line 2). RRCP-BI iterates while A− ≠ ∅ and A+ ≠ ∅ (Alg. 4, line 3). At each iteration, the method samples a pickup station 𝑖 ∈ A − using Eq. (25) (Alg. 4, line 4). Given 𝑖 , the method builds RCL (𝑖 ) ⊆ A +
+
+of size 𝑚 = min {𝑚 max , |A + |} using Eq. (26) (Alg. 4, line 5). The method computes score (𝑖, 𝑗 ) for each 𝑗 ∈ RCL (𝑖 ) using one of Eqs. (27) – (29) (Alg. 4, line 6). The method samples the drop station 
+
+𝑗 ∈ RCL (𝑖 ) using Eq. (30) . The sampled pair (𝑖, 𝑗 ) is appended to a pair list P, P ← P ∪ {( 𝑖, 𝑗, 𝑞 (𝑖, 𝑗 ))} and removed from availability, i.e., A− ← A − \ { 𝑖 } and A+ ← A + \ { 𝑗 }. This update ensures that each station appears in at most one pair, which implies the single-visit constraints after routing. 
+
+Pr (𝑖 ) = (sur 𝑖 + 𝜀 )𝛽 pick 
+
+Í 
+
+> 𝑢 ∈ A −
+
+(sur 𝑢 + 𝜀 )𝛽 pick 
+
+, 𝛽 pick ≥ 0, (25) 
+
+RCL (𝑖 ) ⊆ A +, |RCL (𝑖 )| = 𝑚, (26) (A) service-only: score (𝑖, 𝑗 ) = 𝑞 (𝑖, 𝑗 ), (27) (B) inverse-distance: score (𝑖, 𝑗 ) = 1
+
+𝑑 𝑖 𝑗 + 𝜀 , (28) (C) service-per-distance: score (𝑖, 𝑗 ) = 𝑞 (𝑖, 𝑗 )
+
+𝑑 𝑖 𝑗 + 𝜀 , (29) 
+
+Pr ( 𝑗 | 𝑖 ) = (score (𝑖, 𝑗 ) + 𝜀 )𝛽 drop 
+
+Í  
+
+> 𝑣 ∈RCL (𝑖 )
+
+(score (𝑖, 𝑣 ) + 𝜀 )𝛽 drop 
+
+, 𝛽 drop ≥ 0. (30) 
+
+Stage 2: balanced insertion of pairs into truck routes. RRCP-BI ini-tializes empty routes and per-truck state variables (Alg. 4, line 11). RRCP-BI then processes each pair (𝑖, 𝑗 ) ∈ P (Alg. 4, line 12) and assigns the pair to the truck that minimizes Δ𝑡 (𝑖, 𝑗 ) + 𝜆𝑛 𝑡 using Eqs. (31) – (32) (Alg. 4, line 13). After selecting 𝑡 ★, the method ap-pends 𝑖 and 𝑗 to 𝑅 𝑡 ★ and updates ℓ𝑡 ★ and 𝑛 𝑡 ★ (Alg. 4, line 14). RRCP-BI returns the constructed route set R (Alg. 4, line 16). 
+
+Δ𝑡 (𝑖, 𝑗 ) = 𝑑 ℓ𝑡 ,𝑖 + 𝑑 𝑖,𝑗 + 𝑑 𝑗, 0 − 𝑑 ℓ𝑡 ,0, (31) 
+
+cost 𝑡 (𝑖, 𝑗 ) = Δ𝑡 (𝑖, 𝑗 ) + 𝜆𝑛 𝑡 , 𝜆 ≥ 0. (32) 
+
+## A.2 GLOBE: Global Score-Biased Pair-Move Greedy 
+
+GLOBE is a greedy constructor that builds multi-truck routes by repeatedly selecting one pickup–drop pair-move across all trucks. The method uses score-biased sampling over a global feasible move set and enforces the single-visit constraints by removing both se-lected stations after each move. GLOBE uses the expected-demand proxy to guide construction, while objective values are computed by the deterministic evaluator in Section 2.4. GLOBE uses the proxy net desired change b𝐷 𝑖 (Eq. (21) ) and the corresponding sur 𝑖 and def 𝑖 magnitudes (Eq. (22) ). The method maintains a global visited set 𝑈 ⊆ S , per-truck current positions 
+
+𝑢 𝑡 , and per-truck routes 𝑅 𝑡 . Initialization sets 𝑈 ← ∅ and 𝑢 𝑡 ← 0
+
+for all 𝑡 ∈ T (Alg. 5, 2). Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems GECCO ’26, July 13-17, 2026, San José, Costa Rica 
+
+Algorithm 4 RRCP-BI 
+
+Require: (S , T , 𝑑 𝑖 𝑗 , 𝐶, 𝑂 𝑖 ); expected-demand proxy; 𝑚 max ;
+
+𝛽 pick , 𝛽 drop ; score mode; 𝜆 ; 𝜀 > 0
+
+Ensure: Route set R = {𝑅 𝑡 }𝑡 ∈ T  
+
+> 1:
+
+Compute b𝐷 𝑖 , sur 𝑖 , def 𝑖 via Eqs. (21)–(22)  
+
+> 2:
+
+A− ← { 𝑖 : sur 𝑖 > 0}; A+ ← { 𝑖 : def 𝑖 > 0}; P ← ∅  
+
+> 3:
+
+while A− ≠ ∅ and A+ ≠ ∅ do  
+
+> 4:
+
+Sample 𝑖 ∈ A − using Eq. (25)  
+
+> 5:
+
+Build RCL (𝑖 ) of size 𝑚 using Eq. (26)  
+
+> 6:
+
+Compute score (𝑖, 𝑗 ) for 𝑗 ∈ RCL (𝑖 ) using Eqs. (27)–(29)  
+
+> 7:
+
+P ← P ∪ {( 𝑖, 𝑗, 𝑞 (𝑖, 𝑗 ))}  
+
+> 8:
+
+A− ← A − \ { 𝑖 } 
+
+> 9:
+
+A+ ← A + \ { 𝑗 } 
+
+> 10:
+
+end while  
+
+> 11:
+
+Initialize 𝑅 𝑡 ← () , ℓ𝑡 ← 0, 𝑛 𝑡 ← 0 for all 𝑡 ∈ T  
+
+> 12:
+
+for all (𝑖, 𝑗 ) ∈ P do  
+
+> 13:
+
+𝑡 ★ ← arg min 𝑡 ∈ T {Δ𝑡 (𝑖, 𝑗 ) + 𝜆𝑛 𝑡 } using Eqs. (31)–(32)  
+
+> 14:
+
+Append 𝑖, 𝑗 to 𝑅 𝑡 ★ ; update ℓ𝑡 ★ ← 𝑗 ; 𝑛 𝑡 ★ ← 𝑛 𝑡 ★ + 1 
+
+> 15:
+
+end for  
+
+> 16:
+
+return R
+
+Algorithm 5 summarizes GLOBE. The method iterates by rebuild-ing the global feasible move set and sampling one move (Alg. 5, 5–10) until no feasible move remains (Alg. 5, 11–12). 
+
+Parameters. GLOBE uses five user parameters. 𝑑 1 > 0 bounds the distance from the current truck position to a pickup station and 𝑑 2 >
+
+0 bounds the distance from pickup to drop. 𝛾 ≥ 0 controls selection pressure in the score-biased sampling distribution (Eq. (39) ). The 
+
+score mode selects the definition of score (𝑡, 𝑖, 𝑗 ) (Eqs. (36) – (38) ). 
+
+𝜀 > 0 is a numerical-stability constant used in inverse-distance terms and in the sampling distribution. 
+
+Global feasible moves under distance thresholds. At each iteration, GLOBE defines 𝑆 and 𝐷 , the available surplus and deficit sets among unvisited stations, respectively according to Eq. (33) (Alg. 5, 3). A feasible pair-move is a triple (𝑡, 𝑖, 𝑗 ) with 𝑡 ∈ T , 𝑖 ∈ 𝑆 , and 𝑗 ∈ 𝐷 
+
+that satisfies the distance thresholds 𝑑 (𝑢 𝑡 , 𝑖 ) ≤ 𝑑 1 and 𝑑 (𝑖, 𝑗 ) ≤ 𝑑 2.
+
+𝑆 = {𝑖 ∈ S \ 𝑈 : sur 𝑖 > 0}, 𝐷 = { 𝑗 ∈ S \ 𝑈 : def 𝑗 > 0}. (33) For each feasible move, GLOBE defines the capacity-capped proxy service 𝑞 (𝑖, 𝑗 ) and the incremental move distance Δ(𝑡, 𝑖, 𝑗 )
+
+according to Eq (34) (Alg. 5, 6). GLOBE collects all feasible moves into a global candidate set Ω (Eq. (35)). 
+
+𝑞 (𝑖, 𝑗 ) = min {sur 𝑖 , def 𝑗 , 𝐶 }, Δ(𝑡, 𝑖, 𝑗 ) = 𝑑 (𝑢 𝑡 , 𝑖 ) + 𝑑 (𝑖, 𝑗 ). (34) 
+
+Ω = {( 𝑡, 𝑖, 𝑗 ) : 𝑡 ∈ T , 𝑖 ∈ 𝑆, 𝑗 ∈ 𝐷, 𝑑 (𝑢 𝑡 , 𝑖 ) ≤ 𝑑 1, 𝑑 (𝑖, 𝑗 ) ≤ 𝑑 2 }.
+
+(35) For each (𝑡, 𝑖, 𝑗 ) ∈ Ω, GLOBE computes a nonnegative score 
+
+score (𝑡, 𝑖, 𝑗 ) using one of the score modes: service-only, inverse-distance, and service-per-distance (Eq. (36)–(38)). (A) service-only: score (𝑡, 𝑖, 𝑗 ) = 𝑞 (𝑖, 𝑗 ), (36) (B) inverse-distance: score (𝑡, 𝑖, 𝑗 ) = 1
+
+Δ(𝑡, 𝑖, 𝑗 ) + 𝜀 , (37) (C) service-per-distance: score (𝑡, 𝑖, 𝑗 ) = 𝑞 (𝑖, 𝑗 )
+
+Δ(𝑡, 𝑖, 𝑗 ) + 𝜀 , (38) The method samples one move from Ω using score-biased prob-abilities Pr (𝑡, 𝑖, 𝑗 ) (Eq. (39) ). After sampling (𝑡 ★, 𝑖 ★, 𝑗 ★), GLOBE ap-pends [𝑖 ★, 𝑗 ★] to 𝑅 𝑡 ★ , updates 𝑢 𝑡 ★ ← 𝑗 ★, increments 𝑚 𝑡 ★ , and marks both stations as visited (Alg. 5, lines 9–10). 
+
+Pr (𝑡, 𝑖, 𝑗 ) = (score (𝑡, 𝑖, 𝑗 ) + 𝜀 )𝛾 
+
+Í(𝑡 ′,𝑖 ′,𝑗 ′ ) ∈ Ω (score ′ (𝑡 ′, 𝑖 ′, 𝑗 ′) + 𝜀 )𝛾 , 𝛾 ≥ 0. (39) The method terminates when 𝑆 = ∅ or 𝐷 = ∅, or when Ω = ∅
+
+(Alg. 5, lines 11–12). If termination occurs with unvisited stations, the returned solution remains feasible under the single-visit con-straints but can be partial. 
+
+Algorithm 5 GLOBE 
+
+Require: (S , T , 𝑑 𝑖 𝑗 , 𝐶, 𝑂 𝑖 ); expected-demand proxy; 𝑑 1, 𝑑 2; 𝛾 ; 𝜆 ;score mode; 𝜀 > 0
+
+Ensure: Route set R = {𝑅 𝑡 }𝑡 ∈ T  
+
+> 1:
+
+Compute b𝐷 𝑖 , sur 𝑖 , def 𝑖 via Eqs. (21)–(22)  
+
+> 2:
+
+Initialize 𝑅 𝑡 ← () , 𝑢 𝑡 ← 0, 𝑚 𝑡 ← 0 for all 𝑡 ∈ T ; 𝑈 ← ∅  
+
+> 3:
+
+Build 𝑆, 𝐷 via Eq. (33)  
+
+> 4:
+
+Build Ω via Eq. (35)  
+
+> 5:
+
+while 𝑆 ≠ ∅ and 𝐷 ≠ ∅ and Ω ≠ ∅ do  
+
+> 6:
+
+For all (𝑡, 𝑖, 𝑗 ) ∈ Ω, compute 𝑞 (𝑖, 𝑗 ) and Δ(𝑡, 𝑖, 𝑗 ) via Eq. (34)  
+
+> 7:
+
+For all (𝑡, 𝑖, 𝑗 ) ∈ Ω, compute score (𝑡, 𝑖, 𝑗 ) via Eqs. (36)–(38)  
+
+> 8:
+
+Sample (𝑡 ★, 𝑖 ★, 𝑗 ★) ∈ Ω via Eq. (39)  
+
+> 9:
+
+𝑅 𝑡 ★ ← 𝑅 𝑡 ★ ∥ [ 𝑖 ★, 𝑗 ★] 
+
+> 10:
+
+𝑢 𝑡 ★ ← 𝑗 ★; 𝑚 𝑡 ★ ← 𝑚 𝑡 ★ + 1; 𝑈 ← 𝑈 ∪ { 𝑖 ★, 𝑗 ★} 
+
+> 11:
+
+Build 𝑆, 𝐷 via Eq. (33)  
+
+> 12:
+
+Build Ω via Eq. (35)  
+
+> 13:
+
+end while  
+
+> 14:
+
+return R
+
+## B Statistical Test 
+
+This section shows the statistical test of the mutation operators and the BB1-MAX ablated version. Figures 12-16 shows heatmaps of the pairwise comparison using Wilcoxon signed-rank test with Bonferroni ( 𝛼 < 0.01 ). Red cells indicate significant differences, while blue cells indicate non-significant results. GECCO ’26, July 13-17, 2026, San José, Costa Rica Diego Daniel Pedroza-Perez, Gabriel Luque, Sergio Nesmachnow, and Jamal Toutouh 
+
+Figure 12: Heatmap of pairwise comparisons based on the rhv metric. 
+
+Figure 13: Heatmap of pairwise comparisons based on the gd+ metric. 
+
+Figure 14: Heatmap of pairwise comparisons based on the igd+ metric. 
+
+Figure 15: Heatmap of pairwise comparisons based on the spread metric. 
+
+Figure 16: Heatmap of pairwise comparisons based on the #nds metric.
