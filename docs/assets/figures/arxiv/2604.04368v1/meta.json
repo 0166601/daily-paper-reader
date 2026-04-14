@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.04368v1/fig-001.webp",
+      "caption": "Figure 18: Cumulative distribution of failed delivery tasks categorized by failure reason.",
+      "page": 11,
+      "index": 1,
+      "width": 1038,
+      "height": 213
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04368v1/fig-002.webp",
+      "caption": "Figure 17: Overall comparison of all baseline combinations across four key evaluation metrics.",
+      "page": 11,
+      "index": 2,
+      "width": 1027,
+      "height": 216
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04368v1/fig-003.webp",
+      "caption": "Figure 24: Sensitivity of OrbitTransit to data plane delay. Legend entries X mins (Y%) denote telemetry delayed by X minutes with probability Y%.",
+      "page": 17,
+      "index": 3,
+      "width": 489,
+      "height": 339
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04368v1/fig-004.webp",
+      "caption": "Figure 21: Baseline performance under different constellation configurations.",
+      "page": 12,
+      "index": 4,
+      "width": 1038,
+      "height": 207
+    },
+    {
+      "url": "assets/figures/arxiv/2604.04368v1/fig-005.webp",
+      "caption": "Figure 23: Performance and computational differences between OrbitTransit and the optimal solution.",
+      "page": 16,
+      "index": 5,
+      "width": 487,
+      "height": 289
+    }
+  ]
+}

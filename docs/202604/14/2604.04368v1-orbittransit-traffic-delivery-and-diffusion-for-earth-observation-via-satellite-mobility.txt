@@ -1,0 +1,1075 @@
+Title: OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility
+
+URL Source: https://arxiv.org/pdf/2604.04368v1
+
+Published Time: Tue, 07 Apr 2026 01:21:42 GMT
+
+Number of Pages: 17
+
+Markdown Content:
+# OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility 
+
+# Haoyuan Zhao ∗
+
+Simon Fraser University Burnaby, Canada hza127@sfu .ca 
+
+# Long Chen ∗
+
+Simon Fraser University Burnaby, Canada longchen .cs@ieee .org 
+
+# Yi Ching Chou 
+
+Simon Fraser University Burnaby, Canada ycchou@sfu .ca 
+
+# Hao Fang 
+
+Simon Fraser University Burnaby, Canada fanghaof@sfu .ca 
+
+# Jiangchuan Liu 
+
+Simon Fraser University Burnaby, Canada jcliu@sfu .ca 
+
+## Abstract 
+
+The emerging demand for Earth observation (EO) to address environmental challenges has driven unprecedented growth in its primary carrier, Low Earth Orbit satellites, in recent years. Ground stations (GSs), the egress points of these net-works, are congested due to the massive volume of EO traffic, and their deployment is constrained by geographic, political, and budgetary factors. Although inter-satellite links (ISLs) can partially relieve this congestion by forwarding traffic to alternative GSs, existing ISL-based approaches can hardly ad-dress traffic contention caused by biased GS distribution and may also raise sustainability concerns due to prolonged ISL paths. In this paper, we propose OrbitTransit, a pickup-carry-offload (PCO) approach that leverages satellite mobility for data delivery and integrates ISLs for traffic diffusion to allevi-ate the resource contention inherent in PCO delivery. The proposed orbit-as-node framework and contention-avoidant delivery jointly determine the optimal hybrid PCO-ISL path, minimizing energy consumption and balancing GS traffic. Ex-tensive experiments show that OrbitTransit reduces battery consumption by 47 .16% , decreases task failures by 1.09 ×, and improves GS load balancing compared with state-of-the-art GS selection and routing algorithms. 
+
+## 1 Introduction 
+
+As environmental degradation worsens and becomes more frequent [ 1 ], Earth Observation (EO) has become critical for monitoring and research. Recently, Low Earth Orbit (LEO) satellites have emerged as a promising space data delivery medium and observation platform, offering download band-widths of up to 200 Mbps [ 2, 3 ] and fine-grain sensing reso-lution of 30 m [ 4 ], with leading operators such as Starlink,    
+
+> ∗These authors contributed equally to this work. To appear in the Proceedings of ACM MobiSys 2026. Pickup
+> Carry
+> PCO delivery Offload
+> Ground station
+> Load status Ground station-satellite link
+> Bent-pipe
+> delivery
+> ISL delivery Inter-satellite link User equipment
+
+Figure 1: Overview of the typical backhaul path in Low Earth Orbit satellite networks. 
+
+Kuiper, and OneWeb. However, a single EO mission can gen-erate tens of terabytes of data per day [ 5, 6 ], including high-resolution spectral data and images, which must be offloaded to ground infrastructure for processing and analysis. With the increasing demand for EO tasks and the growing number of sensing satellites, the volume of global EO data can easily accumulate to the petabyte scale. Accordingly, the ground stations (GS), the egress points of LEO satellite networks (LSNs), have gradually become congestion hotspots, noticed by both the user community and researchers [7–9]. As shown in Figure 1, typical LSN backhaul relies on nearby GSs to “bent-pipe” [ 2, 8 , 10 ] data through GS-satellite link (GSL), but GS deployment is constrained by geographic, political, and budgetary, leading to a scarcity of GSs in remote regions. To address this, inter-satellite links (ISLs) enable satellite-to-satellite laser communication, allowing remote users (e.g., ships and islands) to reach distant GSs via multi-hop backhaul. For example, recently introduced LEO observa-tion platforms, such as NASA’s Near Space Network [ 11 , 12 ], are capable of both ISL communication and EO missions. Accordingly, recent studies propose GS selection [ 8 , 13 ] and ISL routing [ 14 – 20 ] to alleviate GS congestion, reduce delays, and minimize energy consumption. Moreover, leveraging the high-speed orbital motion of LEO satellites ( ≈ 7.8 km/s), EO data can be picked up , car-ried , and offloaded at downstream GSs without relying on ISLs, a strategy known as PCO delivery in Figure 1. PCO  
+
+> arXiv:2604.04368v1 [cs.NI] 6 Apr 2026 Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu
+
+significantly reduces the energy consumed for data propaga-tion, since satellites traverse their orbits ballistically without additional energy input, whereas a typical laser transmitter can consume up to 35 Watt [ 21 ]. Although the 90-minute orbital period of LEO satellites can substantially delay deliv-ery compared with ISLs, EO data are generally intended for long-term monitoring and analysis, with collection cycles spanning hours or even days [ 22 ]. Thus, such delivery delays remain acceptable. However, through subsequent trace-driven simulation and analysis, we observe that these solutions cannot fundamen-tally resolve GS congestion for two challenges: (i) Biased GS distribution. Traditional GS selection [ 13 ] and ISL-based routing [ 14 , 16 , 18 –20 ] cannot fundamentally overcome traf-fic hotspots caused by the scarcity of GS resources, which stems from the uneven deployment of GSs and their strong coupling to population distribution. (ii) Orbital resource contention. Although PCO delivery reduces ISL usage by leveraging satellite mobility, existing methods [ 8 , 23 , 24 ] in-evitably underutilize orbital resources when offloading to target GSs, leading to depleted storage and energy, delaying delivery, and raising battery sustainability concerns. In this paper, we propose OrbitTransit, a hybrid PCO-ISL 
+
+delivery system for EO data that mitigates GS congestion and orbital resource contention through traffic diffusion . Specifi-cally, to simplify the dynamic nature inherent in LSN mod-eling, we introduce the Orbit-as-Node (OAN) framework, which leverages static orbital parameters to reduce the scale of the topology and abstract GSL and ISL updates without compromising optimality. For the challenge (i), we design an OAN-based GS traffic diffusion mechanism that determines the optimal GS destination for each flow and mitigates dis-tribution bias by balancing traffic across orbits through ISL delivery. To address challenge (ii), we propose a contention-avoidant delivery scheme that combines PCO with minimal ISL usage to offload data to target GSs, avoiding orbital re-source contention and prioritizing real-time delivery tasks. To evaluate OrbitTransit, we build a control plane proto-type based on real-world LSN topologies, satellite configura-tions, and ground infrastructure documentation. The control plane records the position and resource status of each satel-lite and GS, and updates ISL and GSL connectivity according to existing work and documentation [ 3 , 25 , 26 ]. We compare OrbitTransit against four state-of-the-art GS selection and space routing solutions. Extensive experimental results show that OrbitTransit reduces battery consumption by 47.16%, achieves 1.09 × fewer delivery failures, and limits the maxi-mum GS queueing delay to 4.75 ms. Our main contributions are summarized as follows. 
+
+• We conduct a trace-driven study of existing GS selection and routing methods, and find that their limitations pri-marily stem from biased ground station deployment and underutilized orbital resources, then explore potential so-lutions to fundamentally address these issues (§2, §3). 
+
+• Based on these insights, we propose the OrbitTransit, a sustainable and contention-aware traffic diffusion frame-work that leverages hybrid PCO-ISL delivery using the orbit-as-node framework. We formulate and model the OrbitTransit system and demonstrate how it addresses the aforementioned issues (§4, §5). 
+
+• We build the LSN control plane and implement the Orbit-Transit system. Extensive experiments demonstrate the ef-fectiveness of OrbitTransit in balancing GS load, extending satellite lifespan, and achieving higher delivery capacity compared to four state-of-the-art solutions across various constellation setups (§7). 
+
+## 2 Background of LSNs 
+
+Ground infrastructure in LSNs. Ground stations and points of presence (PoPs) are the primary bridge between LSN traffic and terrestrial networks. As shown in Figure 1, user equip-ment (UE) sends packets to satellites, which forward the data to nearby GSs or neighboring satellites via ISL, depending on GS availability. GSs receive packets and forward them to PoPs over fiber optic links for high-speed backhaul. In-bound traffic follows a similar reverse path: packets sent from servers pass through the PoP and GS and reach the UE. 
+
+Backhaul strategies in LSNs. The bent-pipe strategy, where a satellite simultaneously visible to both the UE and a GS directly forwards UE packets to the GS, is the dominant offloading approach in today’s LSNs [ 2, 3 , 8 ]. This method proved feasible in early Starlink deployments, offering short routing paths and low energy consumption. However, a typi-cal Starlink GS requires an unobstructed minimum elevation angle of 25 ° to establish a GSL, yielding a coverage circle of roughly 2,500 km in diameter [ 3 ]. As a result, the bent-pipe strategy quickly falls short for users outside GS coverage. 
+
+Roles of ISLs in LSNs. Apart from underdeveloped re-gions, users on islands and cargo ships also lack access to GSs. To serve LSN users not covered by nearby GSs, ISLs enable communication with neighboring satellites, allowing traffic to be forwarded across the constellation and offloaded to distant GSs for backhaul. Since version V1.5, all new Starlink satellites have carried ISL transmitters, with the adoption ratio already reaching 80% and steadily rising [ 27 ]. Other LSN providers, such as OneWeb and Kuiper, are also actively deploying ISL technology. Although ISLs can theoretically support Gbps-level trans-mission rates [ 28 , 29 ], their actual performance can be se-verely affected by the chaotic space environment [ 2, 30 ], OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA 1 5 10   
+
+> Ground stations ranked by load
+> 10 1
+> 10 2
+> 10 3
+> Assigned tasks
+> Nearest
+> Nearest-available
+> 1510
+> 10 0
+> 10 3
+> 10 6
+> Queuing
+> delay (ms)  Nearest
+> Nearest-available
+
+Figure 2: Number of assigned tasks and queuing delays for the top-10 loaded ground stations. 
+
+routing updates [ 3 , 31 ], and traffic bursts during Internet peak hours [ 10 , 32 ]. Therefore, it remains essential to limit ISL usage and reserve bandwidth and energy [ 14 , 16 , 18 – 20 ]for real-time applications [ 32 – 35 ], especially given that EO data are generally delay-tolerant and massive in volume. 
+
+Energy sustainability in LSNs. Unlike other edge de-vices, satellite batteries are difficult, if not impossible, to replace. Moreover, half of a LEO satellite’s orbital period occurs on the dark side, without solar panel charging, while energy consumption for basic operations, communications, and onboard processing remains continuous. Consequently, efficient energy management, such as limiting prolonged or intensive ISL communications and processing [ 13 , 18 , 19 ], is critical for extending battery lifespan and ensuring the sustainability of LSN constellations. 
+
+Integrated EO-communication systems . Driven by growing demand for low-latency communication and on-orbit observation, integrated platforms combining commu-nication and sensing functions are emerging. Representative examples include Starshield [ 36 ], launched in April 2025, NASA’s Near Space Network (NSN) [ 11 , 12 ], introduced in early 2025, and traditional EO leaders such as Planet Labs [ 37 ], increasingly moving toward integrated architec-tures. For example, NSN supports optical relay and inter-satellite communication [ 38 ], with data rates up to 5 Gbps and a long-term target of ≥ 100 Gbps, enabling navigation, tracking, telemetry, and remote sensing data relay. Although Starshield’s detailed specifications remain undisclosed, pub-lic reports and official statements suggest that it also supports ISL communication, like standard Starlink satellites, and can accommodate multiple EO-related tasks [ 39 – 41 ]. These de-velopments indicate that integrated EO-communication sys-tems will become increasingly important. 
+
+## 3 Measurement and Insights 
+
+In this section, we conduct a trace-driven study of existing methods for GS selection and routing. We analyze the root causes of their failures from the perspectives of ground in-frastructure, orbital resources, and spatiotemporal dynamics, deriving insights that point to potential solutions. 
+
+Existing GS selection algorithms. To address GS con-gestion issues, two general methods are commonly used to select appropriate destination GSs. (i) Nearest selection: The satellite selects the nearest GS to offload traffic, behaving like the bent-pipe strategy when the nearest GS is within communication range. This approach has been observed in the early stages through Starlink traffic analyses [ 2 , 8 , 10 ]. (ii) Nearest-available selection: As the user base grows and ISLs become available between most satellites, the nearest GS often becomes suboptimal due to regional policies, vis-ibility constraints, and load conditions [ 31 ]. In such cases, traffic is rerouted to more distant GSs to optimize overall constellation performance and balance load, a behavior also observed in current Starlink topologies [3]. 
+
+Existing space routing algorithms. Once the destina-tion GS is selected, there are two major approaches to deliver the data. (i) ISL-based routing: The satellite routes traffic to the destination GS via ISLs, with the path determined by fac-tors such as delay, bandwidth, satellite resource, and energy consumption [ 16 , 18 , 42 – 44 ]. In this paper, we categorize the bent-pipe strategy as an edge case of ISL-based routing with zero ISL connections. (ii) PCO delivery: The satellite picks up data from the user, carries it, and offloads it to the destination GS through its mobility [ 8 ]. In this way, it saves energy otherwise consumed by ISL communication. 
+
+Simulation setup. The constellation is configured using real-world two-line element data [ 45 ] from Starlink and GS infrastructure extracted from FCC filings [ 26 ]. The EO traffic is generated based on the volume and deadlines of real-world EO missions. The key evaluation metrics include GS load balance, routing efficiency, and orbital resource utilization to assess the performance of existing methods 1.
+
+## 3.1 Lessons from ISL-based Algorithms 
+
+Performance of ISL-based algorithms. We first evalu-ate ISL-based routing with two GS selection algorithms, as shown in Figure 2. Under nearest selection, the top four loaded GSs become congested due to excessive assigned tasks, resulting in queuing delays of up to 10 6 ms. This effectively renders these GSs unresponsive, while 97% of the remaining GSs operate below 50% load, leading to low overall utiliza-tion. In contrast, nearest-available strategically offloads data to farther GSs, achieving a more balanced load distribution and much lower queuing delays, with no GS overloaded and a maximum delay of 3.42 ms. However, its extended ISL paths often deplete onboard batteries, raising sustainability concerns, as shown in Figure 3. Energy consumption and path length also increase with higher traffic intensity, since nearby GSs become fully loaded and satellites must offload to more distant GSs. 
+
+GS deployment-demand mismatch. We notice that the ineffectiveness of ISL-based algorithms is caused by a core            
+
+> 1For a detailed description of the experimental setup, see §7. Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu 12345
+> Traffic intensity
+> 0
+> 2
+> 4
+> Satellite energy
+> usage (Wh)  ×10 4Nearest Nearest-available
+> 12345
+> Traffic intensity
+> 0
+> 5
+> 10
+> Average routing
+> path length
+
+Figure 3: Satellite onboard battery consumption and routing path length under two GS selection algorithms. 
+
+contradiction in the current LSN structure. The primary ob-jective of serving remote regions in LSNs conflicts with the practical constraints of GS deployment . The distribution of GSs and population density is illustrated in Figure 4, using Starlink, the leading LSN provider, as an example. It is evi-dent that the deployment of GSs is highly biased and related to urbanization. Furthermore, Figure 5 illustrates the global distribution of networked areas, estimated using human set-tlement theory, which characterizes modernization by the relationship between population density and nighttime light intensity [ 46 ]. Combined with Figure 4, this reveals that large populations without Internet access, who are the primary poten-tial users of LSNs, still lack sufficient GS coverage . Specifically, we partition the Earth’s surface into 1,500 km 2 grids, approx-imately matching the coverage area of a GS [ 3 ]. As shown in Figure 6, many remote population clusters of about 10 mil-lion people are served by only one or two GSs, whereas other networked regions enjoy substantially richer GS availability, with access to more than six GSs. 
+
+Infrastructure constraints and design goals. This con-flict stems from two factors: (i) Socio-economic and regu-latory constraints. Deploying GSs in remote regions faces high deployment costs, limited local infrastructure, spectrum-licensing hurdles, and geopolitical constraints. As a result, underdeveloped regions such as Africa remain in the early stages of GS deployment, with only two Starlink GSs re-cently activated in Nigeria 2. (ii) Data center proximity con-straint. Modern 400ZR-based data center interconnects typi-cally span 80-120 km [ 47 ], limited by optical impairments, signal-to-noise ratio, and cost. Consequently, LSN infras-tructures, particularly GSs, are usually colocated with data centers to ensure low-latency, stable communication. How-ever, because data centers are concentrated in developed regions, GS coverage is saturated in North America, eastern South America, Europe, and Australia, as shown in Figure 4. Under this skewed GS deployment, the nearest selection approach overloads the already sparse GS resources in re-mote regions. Although the nearest-available strategy can partially alleviate this by redirecting traffic to more distant GSs, the uneven GS distribution often forces excessively long 
+
+> 2https://dishycentral .com/starlink-ground-station-locations Starlink ground station coverage 6k 60k 600k Population density (per  1km  2 grid)
+
+Figure 4: The distribution of ground station coverage and population densities. Networked area 
+
+Figure 5: Networked re-gions based on human settlement theory. 10 −2 10 −1 10 0 10 1 10 2 10 3
+
+> Population (Millions)
+> 0
+> 2
+> 4
+> 6
+> 8
+> 10
+> Number of
+> ground stations
+> Networked
+> Remote
+
+Figure 6: Number of Star-link ground stations per population group. 0 11 23 35 47 59 71       
+
+> Orbit index
+> 0.0
+> 0.5
+> 1.0
+> Disk usage ratio
+> (a) Across orbits
+> Time (Min.)
+> 0150 300
+> 0150 300
+> Time (Min.)
+> 0.0
+> 0.5
+> 1.0
+> Disk usage ratio
+> (b) Over time
+> Orbits
+> 023 47
+
+Figure 7: Satellite onboard disk usage ratios across or-bits and time. 
+
+rerouting paths, leading to unsustainable onboard energy consumption. Thus, we derive our observation as follows. 
+
+Observation 1 : The ISL-based algorithm cannot resolve congestion in GS resource-scarce regions and suffers from prolonged ISL rerouting paths due to biased GS deployment. 
+
+## 3.2 Lessons from PCO Delivery 
+
+Performance of PCO delivery. Similarly, we evaluate PCO delivery combined with two GS selection methods. As ex-pected, PCO delivery consumes significantly less energy than ISL-based routing, with an average of 6.73 × lower energy consumption. However, we observe that PCO delivery often fails because satellites in traffic-intensive regions have their onboard 1 TB recorders [ 48 ] fully filled or their batteries com-pletely depleted, while satellites in neighboring orbits remain idle. Specifically, at traffic intensity level 5, PCO exhibits a failure rate of 48 .71% with the nearest-available approach and an even higher rate of 63 .03% with the nearest-selection approach due to concentrated traffic allocation. Such a high failure rate renders PCO delivery theoretically attractive but practically unacceptable. 
+
+Inefficient onboard resource utilization. After ana-lyzing satellites’ onboard resource usage, we observe that 
+
+naive PCO delivery inevitably congests the orbits above target GSs, while neighboring orbits remain mostly idle . Since PCO OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA Shell 1 Shell 2 Shell 3 
+
+> 0
+> 5
+> 10
+> Num. of
+> established GSLs
+
+Figure 8: Satellite distribution and number of estab-lished GSLs. 0 30 60 90 120         
+
+> Time (Min.)
+> 0
+> 15
+> 30
+> Num. of GSL
+> switches
+> (a) From satellite's viewpoint
+> Shell 1 Shell 2 Shell 3
+> 030 60 90 120
+> Time (Min.)
+> 0
+> 40
+> 80
+> Num. of GSL
+> switches
+> (b) From ground station's viewpoint
+> USA GS UK GS JP GS
+
+Figure 9: Number of GSL switches from satellite and ground station viewpoints. 
+
+requires satellites to pass within the elevation range of tar-get GSs to offload data, the orbits directly overhead become highly congested as the necessary paths to the destinations. Figure 7(a) shows the average disk usage ratio per orbit at 0, 150, and 300 minutes. At 0 min, most orbits have low storage ratios since satellites initially carry no data. By 150 minutes, satellites in orbit indices 23 to 47 become heavily congested, with average disk usage ratios reaching 0.98, while those in other orbits (2 to 22) remain entirely idle. This pattern occurs when orbits 23 to 47 pass over GS-dense regions, while the others mainly cover oceans. The congested orbits are also dynamic in the temporal domain due to the Earth’s rotation, which makes satellites appear to move westward from the GS perspective, as shown in Figure 11. As a result, the necessary paths to target GSs shift to neighboring orbits, causing peak traffic to gradually move toward higher orbit indices between 150 and 300 minutes, as shown in Figure 7(a). This pattern also appears within individual orbits over time, as shown in Figure 7(b): three example orbits become congested when passing GS-dense regions and return to idle when traveling above oceans and remote areas. Therefore, the lesson we derive from PCO delivery is as follows. 
+
+Observation 2 : The existing methods overlook the orbital congestion issue inherent to PCO delivery, leaving resources underutilized in both the spatial and temporal domains. 
+
+## 3.3 Lessons from Spatiotemporal Dynamics in Space-Ground Networks 
+
+During the trace-driven study, we identified another poten-tial challenge in control plane implementation. LSNs involve 7.8 km/s orbital speed Satellite Mobility-induced dynamics Ground station GSL ISL Relative stability 
+
+Figure 10: Dynamic GSL and stable intra-orbit ISL connectivity. Satellite  
+
+> ≈0.23° (27.9 km/ min on equator) Sub-satellite point Orbital ground track Ground track drift
+
+Figure 11: Shift in orbital ground tracks caused by Earth’s rotation. 
+
+massive numbers of edge connectivity and node position up-dates , which substantially complicate both problem modeling and the solution design. 
+
+Spatiotemporal dynamics of GSL links. As shown in Figure 8, a satellite snapshot with a colormap reports the number of established GSLs for each satellite, demonstrating that the spatial distribution of GSLs is highly dynamic. GSL dynamics also manifest in the temporal domain. During an orbital period, a satellite experiences frequent GSL switches while passing GS-dense regions, as shown in Figure 9(a) for three satellites in different Starlink shells. From the GS perspective, GSL switches are similarly frequent and often sustained, driven by the uniform distribution of the Walker constellation 3, as illustrated in Figure 9(b) using GSs in the USA, the UK, and Japan. Due to the identical altitude, eccentricity, and inclination in a Walker constellation, satellites in the same orbit fol-low similar trajectories and maintain fixed relative positions, a property that also holds for adjacent satellites in neigh-boring orbits over short time periods. This results in stable intra-orbit ISL connections and relatively stable inter-orbit ISL connections between neighboring orbits, as shown in Figure 10. Similarly, the set of orbits visible from a GS re-mains relatively stable over a time interval, since the Earth’s rotation introduces only about 27 .9 km of displacement per minute at the equator, as shown in Figure 11. Given that a GS can extend coverage to a 2,500 km diameter circle [ 3 ], the visibility window of an orbit can extend up to 90 minutes. Therefore, we can conclude the following observation. 
+
+Observation 3 : Both ISL and GSL connectivity become more stable from an orbital viewpoint. 
+
+## 3.4 Takeaways 
+
+From the above experiments and analyses, we draw the fol-lowing insights. (i) An orbital viewpoint modeling frame-work is required to capture space-ground dynamics while controlling modeling complexity. (ii) A novel GS selection algorithm is needed to address the biased GS deployment, while avoiding prolonged ISL rerouting. (iii) A routing al-gorithm is necessary to mitigate orbital congestion in PCO delivery while fully utilizing orbital resources. Motivated by   
+
+> 3https://en .wikipedia .org/wiki/Satellite _constellation#Walker _Constellation Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu
+
+these insights, we first formulate the required models in §4 and subsequently present OrbitTransit in §5. 
+
+## 4 LSN Topology Modeling 4.1 LSN Topology and Task Model 
+
+Constellation. We denote the LSN constellation as (𝑉 , 𝐸 ),where 𝑉 = {𝑠𝑎𝑡 𝑘 | 𝑘 = 1 . . . 𝑁 𝑘 } is the set of satellites and 𝐸 
+
+is the set of edges representing ISL and GSL links. For ISL establishment, we follow the standard strategy [ 49 , 50 ] in which each satellite maintains 4 ISL connections with its neighbors, two within the same orbit and two with adjacent orbits. We then define the 𝐺 = {𝑔 𝑗 | 𝑗 = 1 . . . 𝑁 𝑗 } as the set of all ground stations. For GSL establishment, a ground station 𝑔 𝑗 forms a GSL link with a satellite if the elevation angle is greater than 25 ° [3]. 
+
+LSN delivery task. We define the time series in our model as 𝑇 = {1, . . . , 𝑡, . . . , 𝑁 𝑡 }. The delivery tasks in the LSNs initialized at time 𝑡 can be expressed as 𝑆 (𝑡 ) = {𝑠 𝑡 𝑖 | 𝑖 =
+
+1 . . . 𝑁 𝑖 }, where each task 𝑠 𝑡 𝑖 is represented as follows: 
+
+𝑠 𝑡 𝑖 = (𝑠𝑎𝑡, 𝑑, 𝜏 ) (1) 
+
+𝑠𝑎𝑡 represents the source satellite when sensing data, or the first-hop satellite of a task when it originates from UE. 𝑑 
+
+denotes the data volume, and 𝜏 indicates the task deadline. Each task needs to be assigned to a target GS for data offloading. We use a binary variable to represent the respon-sibility of GSs for receiving tasks, defined as follows: 
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 ) = {0, 1} (2) The parameter 𝑥 𝑗 (𝑠 𝑡 𝑖 ) is 1 if the 𝑠 𝑡 𝑖 task is assigned to the 𝑗 -th ground station; otherwise, it is 0.Similarly, to formulate each satellite’s responsibility for tasks 𝑠 𝑡 𝑖 , we introduce two binary variables to represent task responsibility for each satellite in 𝑉 , formulated as follows: 
+
+𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) = {0, 1}, 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) = {0, 1}, ∀ˆ𝑡 ∈ [ 𝑡, 𝑁 𝑡 ] (3) The variable 𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) is set to 1 if 𝑠𝑎𝑡 𝑘 is involved in the trans-mission of the 𝑠 𝑡 𝑖 task at time ˆ𝑡 . Similarly, the variable 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 )
+
+is set to 1 if 𝑠𝑎𝑡 𝑘 stores the transmission data of the 𝑠 𝑡 𝑖 task at time ˆ𝑡 , and 0 otherwise. Here, ˆ𝑡 belongs to [𝑡,𝑇 ] because task 𝑠 𝑡 𝑖 can be processed only after its initialization. 
+
+## 4.2 Energy Model 
+
+Life consumption model. Due to constrained energy bud-gets and the high cost of satellite battery replacement, on-board power must be used intelligently. The depth of dis-charge (DoD) is adopted to evaluate battery life consumption and is defined as follows: 
+
+𝐷𝑜𝐷 𝑡 𝑘 = 𝐵 𝑚𝑎𝑥 − 𝐵 𝑡 𝑘 
+
+𝐵 𝑚𝑎𝑥 
+
+, (4) 
+
+𝐵 𝑡 𝑘 = 𝑚𝑎𝑥 (0, 𝐸 𝑘,𝑡  
+
+> 0
+
++ 𝐸 𝑘,𝑡  
+
+> +
+
+− 𝐸 𝑘,𝑡 𝑡𝑟𝑎𝑛𝑠 − 𝐸 𝑘,𝑡 𝐼𝑂 ) (5) 
+
+𝐵 max denotes the maximum onboard battery capacity, and 𝐵 𝑡 𝑘 
+
+represents the current battery level of satellite 𝑠𝑎𝑡 𝑘 at time 𝑡 .
+
+𝐸 𝑘,𝑡  
+
+> 0
+
+and 𝐸 𝑘,𝑡  
+
+> +
+
+represent the current energy level and the en-ergy harvested by the solar panel during time 𝑡 , respectively. The terms 𝐸 𝑘,𝑡 𝑡𝑟𝑎𝑛𝑠 and 𝐸 𝑘,𝑡 𝐼𝑂 denote the energy consumed for data transmission and storage I/O operations, respectively. They can be formulated as follows: 
+
+𝐸 𝑘,𝑡 𝑡𝑟𝑎𝑛𝑠 =∑︁    
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 )
+
+𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) · 𝑑 · 𝜅, (6) 
+
+𝐸 𝑘,𝑡 𝐼𝑂 =∑︁    
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 )
+
+𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) · 𝑑 · 𝜁 (7) The two equations compute the total energy consumption at time 𝑡 by summing all task responsibilities and multiplying them by the energy factors: 𝜅 Wh/GB for transmission and 
+
+𝜁 Wh/GB for I/O operations, respectively. In practice, satellites should not deplete all of their energy in order to maintain operational availability and function-ality. A minimum battery level is defined to prevent such situations from occurring: 
+
+𝐵 𝑡 𝑘 
+
+𝐵 𝑚𝑎𝑥 
+
+≥ D, ∀𝑠𝑎𝑡 𝑘 ∈ 𝑉 , 𝑡 ∈ 𝑇 (8) The life consumption of a battery is calculated based on the DoD difference between charges and discharges [ 42 ], and it increases exponentially as the difference grows: 
+
+L𝑡 𝑘 = 𝑒 𝑚𝑎𝑥 (0,𝐷𝑜𝐷 𝑡 𝑘 −𝐷𝑜𝐷 𝑡 −1  
+
+> 𝑘 )
+
+− 1𝐷𝑜𝐷 𝑡 𝑘 ≤𝐷𝑜𝐷 𝑡 −1 
+
+> 𝑘
+
+, (9) The symbol 1𝑥 evaluates to 1 when the condition 𝑥 is satisfied and 0 otherwise. It is used to set the life consumption to 0
+
+when the previous DoD is greater than the current DoD, indicating a charging event. 
+
+## 4.3 Constraints and Problem Formulation 
+
+GS capacity. Since each GS is equipped with multiple phased-array antennas, and each antenna can communicate with multiple satellites through time multiplexing [ 3 , 7 ], we focus on the total volume of traffic handled by the GS rather than the number of transmission tasks: ∑︁    
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 )
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 ) · 𝑑 ≤ 𝐶𝑎𝑝 𝑔 𝑗 , ∀ 𝑡 ∈ 𝑇 , 𝑔 𝑗 ∈ 𝐺. (10) The summation accumulates the traffic volumes of all tasks that have been assigned to ground station 𝑔 𝑗 at time 
+
+𝑡 . In summary, each GS should receive a total transmission volume that remains within its capacity 𝐶𝑎𝑝 𝑔 𝑗 during any time interval 𝑡 to 𝑡 + 1.OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA Diffusion search map Abstracted topology Orbit-as-node framework (5.1) OAN-based traffic diffusion (5.2) Contention-avoidant delivery (5.3)  
+
+> Congestion-free GS selection ISL-PCO hybrid routing map
+> Delivery in 5 min s10 mins 15 mins
+> Simulated constellation Ground stations GS selection and routing schedule
+> EO task control center
+> Satellites topology EO tasks GS loads
+> OrbitTransit
+> Data plane Control plane
+
+Figure 12: The overview of the OrbitTransit system. Satellite capacity. Each satellite must not transmit data exceeding its throughput capacity, and its carried data must remain within the onboard storage limits: ∑︁    
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 )
+
+𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) · 𝑑 ≤ 𝐶𝑎𝑝 𝑠𝑎𝑡 𝑘 , ∀𝑠𝑎𝑡 𝑘 ∈ 𝑉 , 𝑡 ∈ 𝑇 (11) ∑︁    
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 )
+
+𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) · 𝑑 ≤ 𝑆𝑡𝑜𝑟𝑒 𝑠𝑎𝑡 𝑘 , ∀𝑠𝑎𝑡 𝑘 ∈ 𝑉 , 𝑡 ∈ 𝑇 (12) 
+
+Task requirements. All the tasks within 𝑆 needed to be assigned to a valid GS and have been processed, and their deadline should be guaranteed: ∑︁  
+
+> 𝑗 ∈𝐺
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 ) = 1, ∀𝑠 𝑡 𝑖 ∈ 𝑆 (𝑡 ), ∀𝑡 ∈ 𝑇 (13) 
+
+D𝑠 𝑡 𝑖 ≤ 𝜏, ∀𝑠 𝑡 𝑖 , ∀𝑡 ∈ 𝑇 (14) The first equation states that each task 𝑠 𝑡 𝑖 needs to be assigned to a valid GS. D𝑠 𝑡 𝑖 denotes the delivery time of task 𝑠 𝑡 𝑖 , which should less than the deadline. The D𝑠 𝑡 𝑖 will be formulated later using the orbit-as-node model. Given these constraints, our goal is to determine the ap-propriate GS for each task, as well as the routing path and delivery method (e.g., 𝑥 𝑗 (𝑠 𝑡 𝑖 ), 𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ), and 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 )), in order to minimize the overall battery life consumption of the LSN and the average task delivery time: 
+
+minimize ∑︁   
+
+> 𝑠𝑎𝑡 𝑘 ∈𝑉 ,𝑡 ∈𝑇
+
+L𝑡 𝑘 +∑︁     
+
+> 𝑠 𝑡 𝑖 ∈𝑆 (𝑡 ),𝑡 ∈𝑇
+
+D𝑠 𝑡 𝑖 ,𝑠.𝑡 . (1) − ( 14 ),
+
+(15) 
+
+## 5 OrbitTransit Methodology 
+
+In this section, we introduce OrbitTransit, which consists of three key components motivated by the preceding analysis: Orbit-as-Node (OAN) modeling, OAN-based traffic diffusion, and contention-avoidant delivery. 
+
+Framework overview. The overview of OrbitTransit is shown in Figure 12. Based on the constellation configuration, the OAN framework abstracts the basic modeling unit from satellites to orbits, providing a simplified orbit-level search Satellite orbits 
+
+> ISL
+> Deadline
+> Load capacity
+> Onboard capacity
+> Delivery time (s) Storage Energy cost
+> PCO
+> Delivery time (min) Storage Energy cost Ground station Satellite Constraints PCO and ISL delivery trade-offs
+> Ground station capacity Onboard energy Delivery task
+
+Figure 13: Constraints and trade-offs in ISL-PCO hybrid space delivery problem. Orbit-as-Node modeling Logical orbital-node Logical inter-orbital links Logical orbit-GS links Satellite-level modeling Intra-orbital links Inter-orbital links Sat-GS links (a) (b) Satellite 
+
+Figure 14: (a) Satellite-level modeling; (b) Orbit-as-node modeling. 
+
+space and delivery-time formulation for the following com-ponents. The traffic diffusion component then determines the optimal offloading GS for each EO task collected from the EO task control center. Finally, the contention-avoidant delivery module selects the optimal routing path for each EO task and returns the delivery scheme to the GS for execution. 
+
+Optimization goals. As shown in Figure 13, a balanced GS load distribution needs to be achieved to overcome the biased GS deployment mentioned in Observation 1. More-over, the advantages of ISL-based and PCO routing in terms of delivery time, onboard storage, and energy consumption need to be jointly exploited and optimized to address the limitations mentioned in Observation 1 and Observation 2. 
+
+## 5.1 Orbit-as-Node Framework 
+
+OAN overview. As shown in Figure 14(a), satellite-level modeling introduces massive node and edge updates in LSNs. Based on Observation 3, we simplify the model, as illustrated in Figure 14(b). In this abstraction, each logical orbital node maintains a single GSL to its connectable GSs and a single inter-orbit ISL to its neighboring orbits. These logical links collapse the massive GSL and ISL sets without affecting graph connectivity , based on two principles: (i) two neighboring orbits are reachable through inter-orbit links [ 51 , 52 ]; (ii) if one satellite in an orbit is connected to a GS, other satellites in the same orbit can reach this GS via intra-orbit ISLs. 
+
+Delivery path in OAN model. We operate at the orbit level rather than per-satellite destinations, since any satellite on an orbit can reach any point on that orbit via ISL or PCO delivery . This abstraction greatly reduces routing complexity: with the first Starlink shell (22 satellites per orbit), the routing Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu Overtime Overloaded Optimal ISL energy deficit OID in 5 mins 10 mins 15 mins 10 15 510 
+
+> Traffic level at x mins Concurrent ISL transfer (Unchanged delivery time)
+> x
+
+Figure 15: A traffic diffu-sion instance. PCO in 5 mins 10 mins 
+
+> 15 mins Optimal Optimal Traffic collision 10-1 -2 500012 12 Satellites location at time X Concurrent ISL transfer Orbital resources contention X
+
+Figure 16: An orbital con-tention instance. 
+
+table shrinks by a factor of 22 ×22 when routing orbit to orbit instead of satellite to satellite. Moreover, the OAN routing 
+
+does not compromise path optimality : (i) the number of inter-orbit hops to the destination orbit is unchanged; (ii) once on the destination orbit, the number of intra-orbit hops to the destination satellite is also unchanged. These properties follow from the grid-like topology of LSNs, where the total path length is invariant to whether the path first traverses along an orbit or across orbits. 
+
+OAN model formulation. We define 𝑂 = {𝑜 𝑙 | 𝑙 =
+
+1 . . . 𝑁 𝑙 } as the set of orbits arranged in sequential order. For example, the adjacent orbits of 𝑜 1 are 𝑜 𝑁 𝑙 and 𝑜 2. The sets 
+
+𝑉 (𝑜 𝑙 ) and 𝐺 (𝑜 𝑙 ) represent the satellites within orbit 𝑜 𝑙 and the ground stations covered by this orbit, respectively. As mentioned earlier (Figure 10 and Figure 11), these two sets are relatively stable, with their ground tracks influenced only by the Earth’s rotation. We then formulate the PCO delivery time as O𝑡 𝑠𝑎𝑡 𝑘 (𝑔 𝑗 ),which represents the orbital flight time required for 𝑠𝑎𝑡 𝑘 
+
+at time 𝑡 to reach the elevation range of ground station 𝑔 𝑗 ,where a GSL can be established. This delivery time is calcu-lated based on the orbital speed and the angular distance to the target elevation range. 
+
+Delivery time formulation. Then the task delivery time 
+
+D𝑠 𝑡 𝑖 can be formulated using the PCO delivery time and the binary variables we defined above: 
+
+D𝑠 𝑡 𝑖 = 𝑡 +∑︁  
+
+> 𝑡 ∈𝑇
+
+∑︁ 𝑠𝑎𝑡 𝑘 ∈𝑉 
+
+𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 )∑︁  
+
+> 𝑔 𝑗 ∈𝐺
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 )O 𝑡 𝑠𝑎𝑡 𝑘 (𝑔 𝑗 ) (16) The first two summations identify all satellites 𝑠𝑎𝑡 𝑘 as-signed to store and perform PCO delivery of task 𝑠 𝑡 𝑖 across all time. The third summation locates the ground station 𝑔 𝑗 
+
+to which task 𝑠 𝑡 𝑖 is offloaded, extracts the corresponding PCO delivery time, and aggregates it accordingly. In summary, this equation selects all satellites involved in the PCO deliv-ery of task 𝑠 𝑡 𝑖 and sums their corresponding delivery times, since the delivery may be completed by multiple satellites. 
+
+Concurrent ISL-PCO transmission . Since a satellite maintains relatively stable inter-orbit ISLs with its neighbors while traversing its orbit, PCO delivery and ISL transmission 
+
+Algorithm 1 OAN-based traffic diffusion 
+
+Input: 𝑇 , (𝑉 , 𝐸 ), 𝐺, 𝑆 (𝑡 )
+
+Output: {𝑥 𝑗 (𝑠 𝑡 𝑖 )|∀ 𝑠 𝑡 𝑖 ∈ 𝑆 (𝑡 ), 𝑡 ∈ 𝑇 , 𝑔 𝑗 ∈ 𝐺 } 
+
+> 1:
+
+𝑆 𝑎𝑠𝑠𝑖𝑔𝑛 = {}  
+
+> 2:
+
+for 𝑡 ∈ 𝑇 do  
+
+> 3:
+
+for 𝛿 ∈ { 0, 1, −1, 2, −2, . . . } do ⊲ Traffic diffusion  
+
+> 4:
+
+for 𝑠 𝑡 𝑖 ∈ 𝑆 (𝑡 ) do  
+
+> 5:
+
+𝑠𝑎𝑡, 𝑑, 𝜏 ← 𝑠 𝑡 𝑖  
+
+> 6:
+
+𝑜 𝑙 (𝑠𝑎𝑡 ) := the unique 𝑜 ∈ 𝑂 with 𝑠𝑎𝑡 ∈ 𝑉 (𝑜 ) 
+
+> 7:
+
+˜𝑜 := 𝑜 𝑙 +𝛿  
+
+> 8:
+
+for 𝑔 𝑗 ∈ 𝐺 ( ˜𝑜 ) do ⊲ Ascending by distance to 𝑠𝑎𝑡  
+
+> 9:
+
+𝑚 𝑔 𝑗 := Í𝑠 𝑡 𝑖 ∈𝑆 𝑎𝑠𝑠𝑖𝑔𝑛 𝑥 𝑗 (𝑠 𝑡 𝑖 ) · 𝑑 ⊲ Load of GS 𝑔 𝑗  
+
+> 10:
+
+if O𝑡 𝑠𝑎𝑡 (𝑔 𝑗 ) ≤ 𝜏 ∧ 𝑚 𝑔 𝑗 + 𝑑 ≤ 𝐶𝑎𝑝 𝑔 𝑗 then  
+
+> 11:
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 ) = 1; 𝑆 𝑎𝑠𝑠𝑖𝑔𝑛 := 𝑆 𝑎𝑠𝑠𝑖𝑔𝑛 ∪ { 𝑠 𝑡 𝑖 } 
+
+> 12:
+
+𝑆 (𝑡 ) := 𝑆 (𝑡 ) \ { 𝑠 𝑡 𝑖 } 
+
+> 13:
+
+if 𝑆 (𝑡 ) = ∅ then ⊲ All tasks assigned  
+
+> 14:
+
+Break 
+
+can occur concurrently , as illustrated in Figure 15. Taking the optimal light-green path as an example, the data crosses from orbit 0 to orbit 1 via an ISL while simultaneously approaching the target GS on orbit 1 through PCO delivery. Therefore, the ISL transmission time is inherently absorbed into our model, as the PCO delivery time is dominant. 
+
+## 5.2 OAN-based Traffic Diffusion 
+
+With the defined OAN model, we can determine the offload GS 𝑔 𝑗 for each task 𝑠 𝑡 𝑖 (represented by the binary variable 
+
+𝑥 𝑗 (𝑠 𝑡 𝑖 )), as shown in Algorithm 1. 
+
+Task-GS assignment . For each time 𝑡 and every task 𝑠 𝑡 𝑖 
+
+initialized at that time, we identify the orbit 𝑜 𝑙 to which the source satellite 𝑠𝑎𝑡 belongs (Lines 5-7) using the OAN model. The variable ˜𝑜 denotes the orbit currently being searched for suitable GSs. Line 8 evaluates each GS in ascending order of distance to 𝑠𝑎𝑡 to ensure that tasks are completed as early as possible . Line 10 verifies whether the PCO delivery time is less than the deadline 𝜏 and whether the GS 𝑔 𝑗 still has sufficient capacity to handle the task, which enforces the constraints in Eq. (10) and Eq. (14) . Any task passing these checks is removed from the set 𝑆 (𝑡 ) (Lines 11-12). 
+
+Orbit-wise traffic diffusion . If a task cannot be assigned because all GSs in orbit ˜𝑜 are either congested or unable to meet the task deadline, the algorithm diffuses the traffic to neighboring orbits through ISLs (Line 3), as illustrated in Fig-ure 15. Starting from orbit 0, it sequentially evaluates orbit 1,orbit −1, orbit 2, and orbit −2 until an optimal GS is found, ensuring that the delivery path traverses the minimal number of ISLs between orbits . This procedure is guaranteed to termi-nate as long as the aggregate GS capacity exceeds the total OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA 
+
+data volume to be transmitted, thereby ensuring the con-straint in Eq. (13). This mechanism is also tailored to address the orbital congestion issue discussed in Observation 2. 
+
+## 5.3 Contention-Avoidant Delivery 
+
+Given the congestion-free GS selection, the contention-avoidant delivery determines the optimal PCO-ISL routing path as shown in Algorithm 2. For each task 𝑠 𝑡 𝑖 , we first extract the relevant information and the candidate GS chosen by traffic diffusion algorithm (Lines 3-5). 
+
+Support for real-time tasks. We then check whether the delivery time D𝑠 𝑡 𝑖 allows the task to reach the selected GS before its deadline. In rare cases, some EO tasks may have deadlines close to real-time [ 22 ], in which any PCO-involved delivery cannot satisfy the requirement. For such tasks, we set the delivery mode to ISL-only to guarantee timely completion (Line 17) and use the space routing algo-rithm [ 16 , 18 , 42 –44 ] to determine the optimal path, thereby ensuring that the OrbitTransit framework is compatible with both real-time and delay-tolerant applications. 
+
+PCO-only delivery. If the deadline permits and the target GS 𝑔 𝑗 lies on the same orbit as 𝑠𝑎𝑡 , then 𝑠𝑎𝑡 can deliver the task via PCO without ISLs. The transmission variable 𝑦 𝑠𝑎𝑡 is set to 1 at time 𝑡 and D𝑠 𝑡 𝑖 , and the storage variable 𝑧 𝑠𝑎𝑡 is set to 1 over this interval (Lines 7–9). These variables indicate the GSL that picks up and offloads the task data and the satellite that carries the data, respectively. 
+
+PCO-ISL hybrid delivery. If the target GS is not covered by the current orbit, the task data must be forwarded to orbit 𝑜 𝛿 covering it (Lines 10-16). We initialize 𝑡 𝑖𝑠𝑙 as D𝑠 𝑡 𝑖 to mark the ISL transmission start time, a critical factor later resolved to avoid the resource contention in Observation 2. Before ISL transmission, the source satellite 𝑠𝑎𝑡 carries the data (Line 13). Once ISL transmission begins, satellites along path 𝜋 forward the data (Line 15). Finally, the last satellite on path 𝜋 carries the data and offloads it to the target GS (Line 16), where 𝑡𝑎𝑖𝑙 (𝜋 ) denotes the last satellite in the path. Once all tasks have their 𝑡 𝑖𝑠𝑙 initialized, the optimal ISL time 𝑡 𝑖𝑠𝑙 is obtained by solving a minimum-cost maximum-flow (MCMF) problem under satellite capacity constraints (Line 20). This avoids delivery tasks with resource contention, as illustrated in Figure 16. For example, if 𝑡 𝑖𝑠𝑙 = 𝑡 and ISL transmission starts immediately, the satellite in orbit 0 expe-riences contention between 5 and 10 minutes. This can be resolved if the task in orbit 1 delays its 𝑡 𝑖𝑠𝑙 to 10 minutes. The effectiveness is further shown by comparing its optimality gap with the ground truth in the evaluation section. 
+
+## 6 System Design 
+
+Prototype compatibility. As shown in Figure 12, Orbit-Transit relies on data plane inputs obtainable from existing 
+
+Algorithm 2 Contention-avoidant delivery 
+
+Input: 𝑇 , (𝑉 , 𝐸 ), 𝐺, 𝑆 (𝑡 )
+
+Output: {𝑦 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ), 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 )|∀ 𝑠 𝑡 𝑖 ∈ 𝑆 (𝑡 ), 𝑡 ∈ 𝑇 , 𝑠𝑎𝑡 𝑘 ∈ 𝑉 } 
+
+> 1:
+
+for 𝑡 ∈ 𝑇 do  
+
+> 2:
+
+for 𝑠 𝑡 𝑖 ∈ 𝑆 (𝑡 ) do  
+
+> 3:
+
+𝑠𝑎𝑡, 𝑑, 𝜏 ← 𝑠 𝑡 𝑖  
+
+> 4:
+
+𝑜 𝑙 (𝑠𝑎𝑡 ) := the unique 𝑜 ∈ 𝑂 with 𝑠𝑎𝑡 ∈ 𝑉 (𝑜 ) 
+
+> 5:
+
+𝑔 𝑗 := extract target GS from the 𝑥 𝑗 (𝑠 𝑡 𝑖 ) = 1, ∀𝑔 𝑗 ∈ 𝐺  
+
+> 6:
+
+if D𝑠 𝑡 𝑖 ≤ 𝜏 then  
+
+> 7:
+
+if 𝑔 𝑗 ∈ 𝐺 (𝑜 𝑙 ) then  
+
+> 8:
+
+𝑦 𝑠𝑎𝑡 𝑡 (𝑠 𝑡 𝑖 ) = 1; 𝑦 𝑠𝑎𝑡 
+
+> D𝑠 𝑡 𝑖
+
+(𝑠 𝑡 𝑖 ) = 1 ⊲ GSL receive/sent  
+
+> 9:
+
+𝑧 𝑠𝑎𝑡  
+
+> ˜𝑡
+
+(𝑠 𝑡 𝑖 ) = 1, ∀˜𝑡 ∈ [ 𝑡, D𝑠 𝑡 𝑖 ] ⊲ Data carry  
+
+> 10:
+
+else ⊲ Cross orbit data transfer  
+
+> 11:
+
+𝑜 𝛿 := the orbit can cover 𝑔 𝑗  
+
+> 12:
+
+𝑡 𝑖𝑠𝑙 = D𝑠 𝑡 𝑖 ⊲ Time to ISL  
+
+> 13:
+
+𝑧 𝑠𝑎𝑡  
+
+> ˜𝑡
+
+(𝑠 𝑡 𝑖 ) = 1, ∀˜𝑡 ∈ [ 𝑡, 𝑡 𝑖𝑠𝑙 ] 
+
+> 14:
+
+𝜋 := extract ISL path to orbit 𝑜 𝛿  
+
+> 15:
+
+𝑦 ˆ𝑠𝑎𝑡 𝑡 𝑖𝑠𝑙 (𝑠 𝑡 𝑖 ) = 1, ∀ ˆ𝑠𝑎𝑡 ∈ 𝜋  
+
+> 16:
+
+𝑧 𝑡𝑎𝑖𝑙 (𝜋 ) 
+
+> ˜𝑡
+
+(𝑠 𝑡 𝑖 ) = 1, ∀˜𝑡 ∈ [ 𝑡 𝑖𝑠𝑙 , D𝑠 𝑡 𝑖 ] 
+
+> 17:
+
+else ⊲ ISL-only transmission  
+
+> 18:
+
+𝜋 := extract ISL path to GS 𝑔 𝑗  
+
+> 19:
+
+𝑦 ˆ𝑠𝑎𝑡 𝑡 (𝑠 𝑡 𝑖 ) = 1, ∀ ˆ𝑠𝑎𝑡 ∈ 𝜋  
+
+> 20:
+
+Solve for 𝑡 𝑖𝑠𝑙 for all tasks using the MCMF solver, sub-ject to the constraints in Eqs. (11) - (12). satellite hardware and ground infrastructure via CCSDS-based telemetry [ 53 ]. Telemetry packets provide satellite status, including state of charge, payload activity, and mem-ory usage, which are periodically collected by the onboard computer and broadcast to GSs. EO tasks are issued by mis-sion control centers (e.g., ESMO [ 54 ]) with target coordinates, observation modes, and timing parameters. Global GS load can also be obtained through distributed ground network management systems [ 55 ]. Based on these inputs, OrbitTran-sit generates GS selection and routing schedules, which are forwarded by GSs to the target satellites for execution. To il-lustrate its compatibility with existing EO workflows, a brief wildfire monitoring example is provided in Appendix A.1. 
+
+Robustness and scalability. In practice, transmission data and telemetry may be delayed or partially missing due to packet loss or limited bandwidth [ 3, 32 , 56 ]. For unac-knowledged data, OrbitTransit performs opportunistic ISL retransmissions or reroutes traffic when the previous relay moves out of range, by re-executing Lines 10–16 in Algo-rithm 2. For delayed telemetry, the Orbit-as-node model is tolerant because scheduling decisions rely on orbital-level aggregates, where errors from any single satellite have lim-ited influence. The aggregated state is updated once delayed telemetry arrives, correcting prior estimates. Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu 
+
+The control plane operates as a periodic and event-driven controller, incrementally updating the topology when teleme-try indicates significant changes in GS load or orbital re-sources, or when previously missing telemetry arrives, rather than recomputing routes upon each per-satellite telemetry update. This design bounds control-plane overhead and im-proves scalability to large-scale LSN constellations. 
+
+Fault tolerance during PCO delivery. Due to the un-predictable outer-space environment, a satellite may become unavailable because of solar storms or emergency maneu-vers [ 18 , 57 ], preventing it from continuing its data-carrying mission. In such cases, the OrbitTransit reconstructs the re-maining path and selects the nearest feasible satellite via intra- or inter-orbital ISLs to resume delivery. If the fallback satellite lacks sufficient storage, the task is temporarily frag-mented and forwarded through multiple ISL relays until a valid satellite or target GS becomes available. Similarly, when rerouting leads to deadline violations or an emergency ad-vances the task deadline, delivery is escalated to an ISL-only mode, as shown in Algorithm 2. 
+
+Adaptation to unpredictable exceptions. Some com-mercial GSs, such as Starlink, also act as Internet exchange or peering facilities for terrestrial networks, so their aggre-gate load is highly dynamic and no longer solely determined by satellite traffic. When the target GS cannot accommo-date scheduled offloading due to unexpected external traffic surges, the satellite can temporarily defer offloading until the GS becomes available, since a typical LEO satellite maintains a communication window of about 10 minutes with a GS [ 3]. If offloading remains infeasible after this window, the control plane initiates a new mission for OrbitTransit to identify and execute offloading to the next optimal GS. 
+
+## 7 Implementation and Evaluation 7.1 OrbitTransit Implementation 
+
+Experiment parameters. Our satellite constellation model is built from two-line element data [ 45 ] for Starlink, OneWeb, and Telesat, with 1 584 , 720 , and 784 satellites at altitudes from 550 to 1,200 km. These form representative constel-lations with different scales, altitudes, and coverage. Each satellite is equipped with a 5,000 Watt-minute battery [ 42 ], a 1 TB data recorder [ 48 ], and solar panels providing 120 Wcharging power in sunlight [ 18 ], with the minimum battery threshold D set to 0.2. The energy factors 𝜅 and 𝜁 are set to 0.08 [42 ] and 2.51 × 10 −5 [58 ] Watt-minutes per megabit, representing unit energy consumption for transmission and I/O. Based on [ 7, 18 , 28 , 29 ], each satellite has ISL and GSL bandwidth 𝐶𝑎𝑝 𝑠𝑎𝑡 of 1 Gbps. The GS setup is based on infrastructure documented by the FCC [ 25 ], consisting of 165 GSs in total. Following [ 3 ], a GS establishes a GSL link with a satellite when the elevation angle exceeds 25 °. The maximum GS capacity 𝐶𝑎𝑝 𝑔 is 10 Gbps when 8 phased-array antennas are deployed, as inferred from Starlink’s FCC filings [ 26 ]. OrbitTransit and the control plane are implemented in Python with 2,500 lines of code based on the PyEphem astronomy library, and all experiments are run on a Linux server with two AMD 7313 CPUs. 
+
+Delivery tasks. Based on reports that EO missions can generate 3.9-7 TB of data per day per sensor or satellite [ 5 , 6 ], we sample each EO task with a delivery amount 𝑑 from 2 TB to 10 TB to evaluate baseline performance under varying traffic intensities. EO task deadlines range from minutes to hours depending on urgency. Wildfire detection typically requires delays within 20-30 minutes [ 59 ], whereas long-term monitoring data can tolerate delays up to 3 hours [ 22 ]. Accordingly, each task is assigned a deadline 𝜏 between 20 and 180 minutes to represent different urgency levels. 
+
+Evaluation metrics. We evaluate the baselines from three perspectives: (i) GS metrics. GS load ratio, number of dropped tasks, and queueing delay characterize congestion based on incoming transmission volume and the GS capacity described earlier. (ii) Satellite metrics. Satellite energy consumption, recorder storage utilization, and battery life consumption are estimated using the standard lithium-ion battery model [ 42 ]. (iii) Task metrics. Task delivery and failure ratios are ana-lyzed, with failures divided into timeout, GS congestion, and storage overflow. Average routing path length, measured in hops, is also reported to represent routing quality. 
+
+Comparison baselines. We select two GS selection meth-ods. (i) Nearest [ 2 , 8 , 10 ]: an early-stage Starlink strategy that forwards traffic to the nearest available GS. (ii) SusCO [ 13 ]: a LEO offloading framework that selects low-cost collabora-tive GS groups to reduce energy consumption and improve capacity. We also include two representative space routing algorithms covering both ISL-based and PCO-like delivery. (i) Umbra [ 8 ]: a PCO method with a withhold scheme, where satellites retain data when the target GS is congested and later offload it via time-expanded networks. (ii) SHORT [ 7 ]: a LEO routing algorithm using orbital geodetic addresses to adapt to maneuvers, failures, and dynamic conditions. We evaluate OrbitTransit against all combinations of these GS selection and routing baselines. 
+
+## 7.2 Performance Evaluation 
+
+System-level performance evaluation. We first evaluate the key metrics in Figure 17. For GS congestion, the near-est GS selection strategy quickly fails due to the imbalance between LSN supply and demand, creating severe bottle-necks at nearby GSs, as shown in Figure 17(a). Although SHORT+SusCO can strategically select suitable GSs to bal-ance the load, the biased GS distribution forces it to choose OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA 1 2 3 4 5                
+
+> Traffic intensity
+> 0
+> 15
+> 30
+> Num. of GS
+> dropped tasks
+> (a) GS congestion metric
+> OrbitTransit SHORT+Nearest SHORT+SusCO Umbra+Nearest Umbra+SusCO
+> 12345
+> Traffic intensity
+> 0
+> 5
+> 10
+> Average routing
+> path length
+> (b) Routing efficiency metric
+> 12345
+> Traffic intensity
+> 0
+> 40
+> 80
+> Battery life
+> consumption
+> (c) Life consumption metric
+> 12345
+> Traffic intensity
+> 0.0
+> 0.5
+> 1.0
+> Delivery
+> success ratio
+> (d) Delivery efficiency metric
+
+Figure 17: Overall comparison of all baseline combinations across four key evaluation metrics. 0 500 1000 
+
+Num. of failed tasks 
+
+0.0 
+
+0.5 
+
+1.0 
+
+> CDF
+
+(a) Overall 
+
+OrbitTransit SHORT+Nearest SHORT+SusCO Umbra+Nearest Umbra+SusCO 
+
+0 75 150 
+
+Num. of failed tasks 
+
+0.0 
+
+0.5 
+
+1.0 
+
+> CDF
+
+(b) Ground station drop 
+
+0 400 800 
+
+Num. of failed tasks 
+
+0.0 
+
+0.5 
+
+1.0 
+
+> CDF
+
+(c) Satellite resource contention 
+
+0 25 50 
+
+Num. of failed tasks 
+
+0.0 
+
+0.5 
+
+1.0 
+
+> CDF
+
+(d) Task timeout 
+
+Figure 18: Cumulative distribution of failed delivery tasks categorized by failure reason. 1 2 3 4 5     
+
+> Traffic intensity
+> 10 0
+> 10 2
+> 10 4
+> Max. queue
+> delay (ms)
+> (a)
+> OrbitTransit SHORT/Umbra+
+> Nearest
+> SHORT/Umbra+
+> SusCO
+> 12345
+> Traffic intensity
+> 0.0
+> 2.5
+> 5.0
+> Max. GS
+> load ratio
+> (b)
+
+Figure 19: Ground station performance under different selection methods. 
+
+GSs far from the UE, resulting in a 5.52 × longer ISL propaga-tion path, as shown in Figure 17(b). In contrast, OrbitTransit achieves the best overall performance by alleviating GS con-gestion through traffic diffusion, while maintaining a routing path length comparable to the ISL-based method SHORT, and only slightly higher than the PCO-like method, Umbra. The prolonged ISL path of SHORT+SusCO yields the high-est battery life consumption, as shown in Figure 17(c). Umbra-based methods minimize battery consumption by avoiding ISL usage, yet attain only a 43.25% delivery success ratio due to frequent onboard resource contention and task timeouts, as shown in Figure 17(d). OrbitTransit and SHORT+SusCO both reach a 100% delivery success ratio at low traffic intensity, but performance declines as traffic approaches constellation and GS capacity limits. Overall, OrbitTransit achieves the highest delivery success ratio while reducing battery consumption by 47.16% compared to ISL-based routing. 
+
+Evaluation in task metrics. Figure 18 shows the cu-mulative distribution of failed tasks under each baseline. OrbitTransit yields 1.09 × fewer failed delivery tasks than 0 23 47 71    
+
+> Orbit index
+> 0.0
+> 0.5
+> 1.0
+> Disk usage ratio
+> (a)
+> OrbitTransit Umbra+Nearest/SusCO
+> 0250 500
+> Time (Min.)
+> 0.0
+> 0.5
+> 1.0
+> Disk usage ratio
+> (b)
+
+Figure 20: Satellite disk usage ratio under different PCO-like methods. 
+
+other baselines (Figure 18(a)), with most failures caused by traffic intensity exceeding constellation capacity. Specifically, all baselines with nearest GS selection consistently suffer from GS congestion, leading to high queue delays and task drops, as shown in Figure 18(b). Moreover, SHORT routing, with intensive ISL usage, often exhausts satellite batteries in hotspot regions, causing resource contention (Figure 18(c)), with 3.34 × more failed tasks than other baselines. Finally, as shown in Figure 18(d), Umbra routing frequently misses task deadlines due to the lack of delivery-time management, resulting in delayed and inefficient PCO delivery. 
+
+Evaluation in GS metrics. As shown in Figure 19, the nearest selection strategy quickly degrades as traffic intensity increases because it lacks a traffic distribution mechanism, resulting in a queue delay of 10 4 ms and a load ratio of 4.7, about 5× the designed capacity. Although SusCO achieves the lowest average queue delay and load ratio by distributing traffic more sparsely, it also leads to longer ISL paths, as shown in Figure 17(b). OrbitTransit maintains a maximum Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu 1 2 3 4 5                
+
+> Traffic intensity
+> 0
+> 110
+> 220
+> Battery life
+> consumption
+> (a) OneWeb
+> OrbitTransit SHORT+Nearest SHORT+SusCO Umbra+Nearest Umbra+SusCO
+> 12345
+> Traffic intensity
+> 0
+> 60
+> 120
+> Battery life
+> consumption
+> (b) Kuiper
+> 12345
+> Traffic intensity
+> 0.0
+> 0.5
+> 1.0
+> Delivery
+> success ratio
+> (c) OneWeb
+> 12345
+> Traffic intensity
+> 0.0
+> 0.5
+> 1.0
+> Delivery
+> success ratio
+> (d) Kuiper
+
+Figure 21: Baseline performance under different constellation configurations. 
+
+queue delay of 4.75 ms and a load ratio of 80%, comparable to SusCO in quality of service, but with a shorter path length. 
+
+Evaluation in satellite metrics. We compare Umbra with OrbitTransit to evaluate orbital resource utilization. As shown in Figure 20(a), high-load orbits are between in-dices 45 and 68. Umbra uses only a few orbits, leaving neigh-bors underutilized and causing low overall storage utiliza-tion. In contrast, through orbit-wise traffic diffusion (Fig-ure 15), OrbitTransit distributes traffic across neighboring orbits, achieving a higher delivery success ratio (Figure 17(d)) while avoiding overload on individual orbits. In the temporal domain, orbits are effectively utilized only when covering GS-dense regions, causing low utilization for Umbra around 250 minutes, as shown in Figure 20(b). OrbitTransit instead maintains higher and more balanced utilization over time via contention-avoidant delivery, scheduling carry-on and offloading to leverage idle satellites and smooth peak traffic. 
+
+Evaluation in different constellations. The generality of OrbitTransit across constellations is shown in Figure 21. Battery consumption increases noticeably for OneWeb and Kuiper compared to Starlink, since satellites in smaller con-stellations must handle more traffic and are more likely to deep discharge. Similarly, all baselines show a steeper de-cline in delivery success ratio as traffic intensity grows, due to sparser satellite distribution and more frequent onboard resource contention. Overall, OrbitTransit reduces battery consumption by 49 .57% and 71 .12% on OneWeb and Kuiper compared to SHORT, while improving delivery success ratio by 53 .20% and 44 .71% compared to all baselines. 
+
+Evaluation against the optimal solution. To assess how closely OrbitTransit approaches the ground-truth so-lution in the GS selection and space routing problems, we employ PuLP [ 60 ] as a linear and mixed-integer program-ming modeler and use its solution as a benchmark. Due to space constraints, we defer the detailed formulation and ex-periment results to Appendix §A.2. The experiment shows that OrbitTransit achieves performance comparable to PuLP while incurring much lower runtime and memory overhead. 
+
+Evaluation under delayed data plane states. We also evaluate the robustness of OrbitTransit under delayed data-plane states, as described in Section §6. The results show that OrbitTransit incurs only a 2.15% degradation in rout-ing efficiency, while remaining comparable in other metrics. Details are provided in Appendix §A.3. 
+
+## 8 Related Work 
+
+Recent research efforts on LSNs span from topology and constellation design [ 61 – 63 ] to early-stage measurements [ 2 ,3 , 10 , 64 –66 ]. This trend has further extended to protocol design [ 14 , 15 , 17 , 57 , 67 ], onboard task scheduling [ 18 , 20 ,68 ], and specialized frameworks for applications such as Earth observation [69–71] and video streaming [32–35]. Due to the mobility and sustainability concerns of satellite platforms, space routing studies have aimed to improve band-width, delay, reliability, and battery efficiency. For example, Lai et al. [ 18 ] proposed an ISL-based routing algorithm for battery-aware forwarding, while Chen et al. [ 43 ] introduced a cooperative transmission scheme for dynamic topologies and time-varying resources. Meanwhile, prior works [ 8 , 24 ]have explored using satellite mobility for data delivery. In particular, Tao et al. [ 8 ] proposed a withhold scheduling scheme in which a satellite defers transmission when the visible GS is suboptimal and offloads to a future GS. Our trace-driven study shows that prior ISL-based rout-ing methods [ 16 , 18 , 42 – 44 ] cannot fundamentally resolve detoured ISL paths caused by uneven GS deployment and still rely heavily on ISLs. Existing PCO-like delivery stud-ies [ 8 , 24 ] overlook resource contention on congested orbits, leading to inefficient utilization. Motivated by these limi-tations and our measurements, we propose OrbitTransit, a hybrid PCO-ISL EO data diffusion method that leverages the orbit-as-node framework to address these issues. 
+
+## 9 Conclusion 
+
+In this paper, we proposed the OrbitTransit to address GS congestion during delay-tolerant delivery in LSNs. To tackle the complexity and dynamics introduced by frequent GSL updates, we introduced the orbit-as-node framework to sim-plify edge connectivity without compromising optimality. The proposed traffic diffusion mechanism distributed con-gested traffic into neighboring orbits, while the contention-avoidant delivery component coordinated task allocation to OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA 
+
+prevent resource conflicts on satellites, thereby balancing GS loads and ensuring timely delivery. We believe this paper only scratched the surface of PCO delivery. For future work, we planned to extend OrbitTransit to incorporate cross-layer optimization, overseas delivery, and replication and consistency mechanisms for data center synchronization, among others. 
+
+## References 
+
+[1] Evan Bush. California fires and conditions that made them more likely tied to climate change. https://www .nbcnews .com/science/climate-change/california-fires-conditions-more-likely-climate-change-rcna189696. [2] Sami Ma, Yi Ching Chou, Haoyuan Zhao, Long Chen, Xiaoqiang Ma, and Jiangchuan Liu. Network characteristics of leo satellite constel-lations: A starlink-based measurement from end users. In Proc. IEEE INFOCOM , 2023. [3] Nitinder Mohan, Andrew E Ferguson, Hendrik Cech, Rohan Bose, Prakita Rayyan Renatin, Mahesh K Marina, and Jörg Ott. A multifac-eted look at starlink performance. In Proc. ACM WWW , 2024. [4] NASA Goddard Space Flight Center. Landsat 8. https:// landsat .gsfc .nasa .gov/satellites/landsat-8/, 2024. [5] National Environmental Satellite, Data, and Information Service (NES-DIS). In a first for nesdis, jpss ground program moves its data to the cloud. https://www .nesdis .noaa .gov/news/first-nesdis-jpss-ground-program-moves-its-data-the-cloud, 2021. [6] National Calibration Center, NESDIS. Visible infrared imaging ra-diometer suite (viirs). https://ncc .nesdis .noaa .gov/VIIRS/, 2025. [7] Yuanjie Li, Lixin Liu, Hewu Li, Wei Liu, Yimei Chen, Wei Zhao, Jianping Wu, Qian Wu, Jun Liu, and Zeqi Lai. Stable hierarchical routing for operational leo networks. In Proc. ACM MobiCom , 2024. [8] Bill Tao, Maleeha Masood, Indranil Gupta, and Deepak Vasisht. Trans-mitting, fast and slow: Scheduling satellite traffic through space and time. In Proc. ACM MobiCom , 2023. [9] Hughes Network Systems. Oneweb gateways require complex hughes engineering. https://www .hughes .com/resources/insights/satellite-broadband/oneweb-gateways-require-complex-hughes-engineering. [10] Haoyuan Zhao, Hao Fang, Feng Wang, and Jiangchuan Liu. Realtime multimedia services over starlink: A reality check. In Proc. ACM NOSSDAV , 2023. [11] National Aeronautics and Space Administration. “near space network”. https://www .nasa .gov/near-space-network/, 2025. [12] National Aeronautics and Space Administration. “what is the near space network?”. https://www .nasa .gov/technology/space-comms/ what-is-the-near-space-network/, 2025. [13] Yi Ching Chou, Long Chen, Hengzhi Wang, Feng Wang, Hao Fang, Haoyuan Zhao, Miao Zhang, and Xiaoyi Fan. Commercial dishes can be my ladder: Sustainable and collaborative data offloading in leo satellite networks. In Proc. IEEE INFOCOM , 2025. [14] Deepak Vasisht, Jayanth Shenoy, and Ranveer Chandra. L2d2: Low latency distributed downlink for leo satellites. In Proc. ACM SIGCOMM ,2021. [15] Xu Li, Feilong Tang, Yanmin Zhu, Luoyi Fu, Jiadi Yu, Long Chen, and Jiacheng Liu. Processing-while-transmitting: Cost-minimized transmission in sdn-based stins. IEEE/ACM TON , 2021. [16] Zeqi Lai, Hewu Li, Yikun Wang, Qian Wu, Yangtao Deng, Jun Liu, Yuanjie Li, and Jianping Wu. Achieving resilient and performance-guaranteed routing in space-terrestrial integrated networks. In Proc. IEEE INFOCOM , 2023. [17] Xuyang Cao and Xinyu Zhang. Satcp: Link-layer informed tcp adapta-tion for highly dynamic leo satellite networks. In Proc. IEEE INFOCOM ,2023. [18] Weisen Liu, Zeqi Lai, Qian Wu, Hewu Li, Qi Zhang, Zonglun Li, Yuan-jie Li, and Jun Liu. In-orbit processing or not? sunlight-aware task scheduling for energy-efficient space edge computing networks. In 
+
+Proc. IEEE INFOCOM , 2024. [19] Long Chen, Yi Ching Chou, Haoyuan Zhao, Hengzhi Wang, Feng Wang, Hao Fang, Sami Ma, Feilong Tang, Linghe Kong, and Jiangchuan Liu. On-demand and scalable topology control service for leo satellite network evolving. IEEE Transactions on Services Computing , 2025. [20] Long Chen, Feilong Tang, Zhetao Li, Laurence T Yang, Jiadi Yu, and Bin Yao. Time-varying resource graph based resource model for space-terrestrial integrated networks. In Proc. IEEE INFOCOM , 2021. [21] TESAT-Spacecom. Scot20 data sheet. https://satsearch .co/products/ tesat-scot20-smallsat-optical-communication-terminal, 2024. [22] NASA Earthdata. Near real-time versus standard products. https://www .earthdata .nasa .gov/learn/earth-observation-data-basics/near-real-time-versus-standard-products, 2024. [23] Cloud Constellation Corporation. Spacebelt data security as a service. https://spacebelt .com/, 2025. [24] Huawei Huang, Song Guo, and Kun Wang. Envisioned wireless big data storage for low-earth-orbit satellite-based cloud. IEEE Wireless Communications , 2018. [25] Federal Communications Commission. Spacex services, inc. fcc filings. https://fcc .report/company/SpaceX-Services-Inc, 2024. [26] Federal Communications Commission. Public Notice: Authoriza-tion for 40 technically identical 1.85 m antennas to communicate with the Starlink NGSO satellite system. https://docs .fcc .gov/public/ attachments/DOC-409643A1 .pdf, 2025. [27] Jonathan McDowell. Starlink launch statistics. https://planet4589 .org/ space/con/star/stats .html. [28] Zhiwei Zhai, Liekang Zeng, Tao Ouyang, Shuai Yu, Qianyi Huang, and Xu Chen. Seco: Multi-satellite edge computing enabled wide-area and real-time earth observation missions. In Proc. IEEE INFOCOM , 2024. [29] Jiaqi Cao, Shengli Zhang, Qingxia Chen, Houtian Wang, Mingzhe Wang, and Naijin Liu. Computing-aware routing for leo satellite networks: A transmission and computation integration approach. IEEE Transactions on Vehicular Technology , 2023. [30] Pingyue Yue, Jianping An, Jiankang Zhang, Jia Ye, Gaofeng Pan, Shuai Wang, Pei Xiao, and Lajos Hanzo. Low earth orbit satellite security and reliability: Issues, solutions, and the road ahead. IEEE Communications Surveys & Tutorials , 2023. [31] Liz Izhikevich, Manda Tran, Katherine Izhikevich, Gautam Akiwate, and Zakir Durumeric. Democratizing leo satellite network measure-ment. Proceedings of the ACM on Measurement and Analysis of Com-puting Systems , 2024. [32] Hao Fang, Haoyuan Zhao, Jianxin Shi, Miao Zhang, Guanzhen Wu, Yi Ching Chou, Feng Wang, and Jiangchuan Liu. Robust live streaming over leo satellite constellations: Measurement, analysis, and handover-aware adaptation. In Proc. ACM MM , 2024. [33] Haoyuan Zhao, Jianxin Shi, Guanzhen Wu, Hao Fang, Yi Ching Chou, Long Chen, Feng Wang, and Jiangchuan Liu. Baroc: Concealing packet losses in lsns with bimodal behavior awareness for livecast ingestion. In Proc. IEEE INFOCOM , 2025. [34] Miao Zhang, Jiaxing Li, Haoyuan Zhao, Linfeng Shen, and Jiangchuan Liu. Starstream: Live video analytics over space networking. In Proc. ACM MM , 2024. [35] Jinwei Zhao and Jianping Pan. Low-latency live video streaming over a low-earth-orbit satellite network with dash. In Proc. ACM MMsys ,2024. Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu 
+
+[36] Space Exploration Technologies Corp. (SpaceX). Starshield. https: //www .spacex .com/starshield, 2025. [37] National Aeronautics and Space Administration. Nasa’s push toward commercial space communications gains momentum. https://www .nasa .gov/technology/space-comms/nasas-push-toward-commercial-space-communications-gains-momentum, 2023. [38] National Aeronautics and Space Administration. Near space network (nsn) user’s guide. https://explorers .larc .nasa .gov/APSMEX25/SMEX/ pdf_files/Prog05c_NSN_UsersGuide .pdf, 2025. [39] Logan Misturado. “spacex’s starshield shapes the earth observation and national security industries”. https://spacesecurity .wse .jhu .edu/ 2024/09/23/spacexs-starshield-shapes-the-earth-observation-and-national-security-industries/, 2024. [40] New Space Economy. “the impact of spacex starshield on commercial earth observation companies”. https://newspaceeconomy .ca/ 2024/09/20/the-impact-of-spacex-starshield-on-commercial-earth-observation-companies/, 2024. [41] Fraunhofer Institute for High Frequency Physics and Radar Techniques (FHR). “remote sensing and target acquisition with starlink satellites”. https://www .fhr .fraunhofer .de/en/sections/Multifunctional-RF-and-Radar-Systems-MFR/Remote-sensing-and-target-acquisition-with-Starlink-satellites-JB2022 .html, 2022. [42] Yuan Yang, Mingwei Xu, Dan Wang, and Yu Wang. Towards energy-efficient routing in satellite networks. IEEE JSAC , 2016. [43] Long Chen, Feilong Tang, Xu Li, Jiacheng Liu, Yanqin Yang, Jiadi Yu, and Yanmin Zhu. Delay-optimal cooperation transmission in remote sensing satellite networks. IEEE TMC , 2022. [44] Tian Pan, Guohao Ruan, Qiang Fu, Zhengjie Luo, Junkai Huang, Xing-shuang Luo, and Tao Huang. Stableroute: When dijkstra’s algorithm meets topology-varying satellite networks. In Proc. IEEE INFOCOM ,2025. [45] Dr. T.S. Kelso. Celestrak: Satellite tracking and orbital data. https: //celestrak .org/, 2025. [46] Paul Sutton, Dar Roberts, Christopher Elvidge, and Kimberly Baugh. Census from heaven: An estimate of the global human population using night-time satellite imagery. International Journal of Remote Sensing , 2001. [47] PacketLight Networks. 400g zr, openzr+ and open roadm. https://www .packetlight .com/resources/articles/400g-zr-openzr-openroadm, 2025. [48] NASA Jet Propulsion Laboratory. Nisar mission — observatory overview. https://nisar .jpl .nasa .gov/mission/observatory/overview/, 2025. [49] Ruoqi Deng, Boya Di, Hongliang Zhang, Linling Kuang, and Lingyang Song. Ultra-dense leo satellite constellations: How many leo satellites do we need? IEEE TWC , 2021. [50] Long Chen, Feilong Tang, Linghe Kong, Rui Li, Zhi Hou, Jiacheng Liu, Xu Li, and Song Guo. Load-adaptive and energy-efficient topology control in leo mega-constellation networks. In Proc. IEEE GLOBECOM ,2022. [51] Joseph Mclaughlin, Jee Choi, and Ramakrishnan Durairajan. × grid: A location-oriented topology design for leo satellites. In Proc. 1st ACM Workshop on LEO Networking and Communication , 2023. [52] Junfeng Wang, Lei Li, and Mingtian Zhou. Topological dynamics characterization for leo satellite networks. ScienceDirect Computer Networks , 2007. [53] Mike Kearney. Ccsds overview. https://ntrs .nasa .gov/api/citations/ 20150002579/downloads/20150002579 .pdf, 2014. [54] National Aeronautics and Space Administration. Earth science mis-sion operations (esmo). https://www .nasa .gov/goddard/earth-science-projects-division/esmo/, 2025. [55] A network approach to ground station services: Final report prepared for noaa ground processing demonstration (gpd). Kongsberg Satellite Services Inc., Contract 1332KP24C00009, 2025. [56] Jihao Li, Hewu Li, Zeqi Lai, Qian Wu, Yijie Liu, Qi Zhang, Yuanjie Li, and Jun Liu. Satguard: Concealing endless and bursty packet losses in leo satellite networks for delay-sensitive web applications. In Proc. ACM WWW , 2024. [57] Yuanjie Li, Hewu Li, Wei Liu, Lixin Liu, Wei Zhao, Yimei Chen, Jianping Wu, Qian Wu, Jun Liu, Zeqi Lai, et al. A networking perspective on starlink’s self-driving leo mega-constellation. In Proc. ACM MobiCom ,2023. [58] Mercury Systems, Inc. Rh3440 solid-state data recorder. https://www .mrcy .com/application/files/5216/3001/4013/ 5008 .22E_RH3440_3U_VPX_SRIO_SSDR .pdf, 2021. [59] NASA Earthdata. Wildfire detection in the us and canada within a minute of satellite observation. https://wiki .earthdata .nasa .gov/ display/FIRMS/2022/07/14/Wildfire +detection +in +the +US +and +
+
+Canada +within +a+minute +of +satellite +observation, 2022. [60] Stuart Mitchell, Anita Kean, Andrew Mason, Michael O’Sullivan, Antony Phillips, and Franco Peschiera. Pulp: A python linear pro-gramming modeler. https://coin-or .github .io/pulp/. [61] Debopam Bhattacherjee and Ankit Singla. Network topology design at 27,000 km/hour. In Proc. ACM CoNEXT , 2019. [62] Yannick Hauri, Debopam Bhattacherjee, Manuel Grossmann, and Ankit Singla. "internet from space" without inter-satellite links. In 
+
+Proc. ACM HotNets , 2020. [63] Vaibhav Singh, Akarsh Prabhakara, Diana Zhang, Osman Yağan, and Swarun Kumar. A community-driven approach to democratize access to satellite ground stations. In Proc. ACM MobiCom , 2021. [64] Mohamed M Kassem, Aravindh Raman, Diego Perino, and Nishanth Sastry. A browser-side view of starlink connectivity. In Proc. ACM IMC , 2022. [65] François Michel, Martino Trevisan, Danilo Giordano, and Olivier Bonaventure. A first look at starlink performance. In Proc. ACM IMC , 2022. [66] Hammas Bin Tanveer, Mike Puchol, Rachee Singh, Antonio Bianchi, and Rishab Nithyanand. Making sense of constellations: Methodolo-gies for understanding starlink’s scheduling algorithms. In Proc. ACM CoNEXT , 2023. [67] Zeqi Lai, Weisen Liu, Qian Wu, Hewu Li, Jingxi Xu, and Jianping Wu. Spacertc: Unleashing the low-latency potential of mega-constellations for real-time communications. In Proc. IEEE INFOCOM , 2022. [68] Jayanth Shenoy, Om Chabra, Tusher Chakraborty, Suraj Jog, Deepak Vasisht, and Ranveer Chandra. Cosmac: Constellation-aware medium access and scheduling for iot satellites. In Proc. ACM MobiCom , 2024. [69] Bill Tao, Om Chabra, Ishani Janveja, Indranil Gupta, and Deepak Va-sisht. Known knowns and unknowns: Near-realtime earth observation via query bifurcation in serval. In Proc. USENIX NSDI , 2024. [70] Xiao Fu, Yue Hu, Prashanth Sutrave, Peter A Beerel, and Barath Ragha-van. Fireloc: Low-latency multi-modal wildfire geolocation. In Proc. of the ACM Embedded Networked Sensor Systems , 2024. [71] Wei Liu, Huiting Yang, and Jiandong Li. Multi-functional time ex-panded graph: A unified graph model for communication, storage, and computation for dynamic networks over time. IEEE JSAC , 2023. [72] National Aeronautics and Space Administration. Fire infor-mation for resource management system (firms). https:// www .earthdata .nasa .gov/data/tools/firms, 2025. [73] National Aeronautics and Space Administration. Firms adds ultra real-time data from modis and viirs. https://www .earthdata .nasa .gov/news/ feature-articles/firms-adds-ultra-real-time-data-from-modis-viirs, 2025. OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA      
+
+> [74] National Oceanic and Atmospheric Administration. Jpss high rate data. https://www .ospo .noaa .gov/operations/jpss/high-rate-data .html, 2025. [75] Juan Pablo Vielma. Mixed integer linear programming formulation techniques. SIAM Review , 2015.
+
+## A Appendix A.1 Wildfire Monitoring Example 
+
+Adapting to task urgency. OrbitTransit can be directly integrated into existing EO mission workflows, with wildfire monitoring as one representative example. EO satellites pe-riodically scan fire-prone regions and report data to the task control center (e.g., ESMO) for risk assessment, where rou-tine wildfire products typically tolerate deadlines of around 
+
+3 hours [ 72 ]. Once a high-risk area is identified, the control center can issue follow-up tasks with higher revisit frequency and tighter deadlines, potentially within minutes [ 73 ]. Orbit-Transit then adapts its delivery strategy accordingly: routine data can use PCO to reduce ISL usage and battery consump-tion, while urgent follow-up observations can re-execute the contention-avoidant delivery algorithm and, if necessary, fall back to ISL-only transmission. 
+
+Boosting capacity and coverage. Current NOAA satel-lites used for wildfire detection still rely on direct broadcast to offload EO data, with a maximum data rate of 25 Mbps at 7812 MHz [ 74 ]. This limited downlink capacity may become insufficient as EO tasks continue to increase in scale, sensing quality, and observation frequency. Moreover, existing direct-broadcast receiving stations are primarily maintained by the observation community, which limits their deployment scale and global coverage. By leveraging hybrid PCO-ISL deliv-ery over commercial GS infrastructures, OrbitTransit can substantially improve both delivery capacity and service coverage for wildfire monitoring. 
+
+## A.2 PuLP Modeling and Benchmarking 
+
+Big-M linearization. All variables, constraints, and formu-lations that do not involve exponentiation, logarithmic, or trigonometric functions are encoded in the same manner as described in §4. For formulations that include products of two decision variables, such as 𝑥 𝑗 (𝑠 𝑡 𝑖 ) and 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) in Eq. 16, we linearize these bilinear terms using the big-M method. For simplicity, we omit the task 𝑠 𝑡 𝑖 and the subscripts and superscripts of 𝑥 𝑗 (𝑠 𝑡 𝑖 ) and 𝑧 𝑘  
+
+> ˆ𝑡
+
+(𝑠 𝑡 𝑖 ) in the following discussion. Since both 𝑥 and 𝑧 are binary variables, the big-M param-eter can be set to 1. We introduce a new binary auxiliary variable 𝛼 with the following constraints: 
+
+𝛼 ≤ 𝑥, 𝛼 ≤ 𝑧, 𝛼 ≥ 𝑥 + 𝑧 − 1.
+
+(17) These constraints ensure that 𝛼 = 𝑥 · 𝑧 holds, thereby eliminating the bilinear term from the formulation. Thus, for each 𝑥 · 𝑦 product in Eq. 16, we introduce a new auxiliary variable 𝛼 to replace it, and PuLP must determine the optimal Conference’17, July 2017, Washington, DC, USA Haoyuan Zhao, Long Chen, Yi Ching Chou, Hao Fang, and Jiangchuan Liu 10 1 10 2 10 3 10 4 10 5    
+
+> Number of breakpoints
+> 10 −15
+> 10 −12
+> 10 −9
+> 10 −6
+> 10 −3
+> 10 0
+> Error (log scale)  RAE
+> MSE
+> 10 110 210 310 410 5
+> Number of breakpoints
+> 0
+> 100
+> 200
+> 300
+> Max Memory
+> usage (MB)
+
+Figure 22: Trade-off between the number of break-points, approximation error, and memory usage in the linearized energy model. 
+
+value of 𝛼 subject to constraint (17) as well as the nested constraints on 𝑥 and 𝑦 described in §4. 
+
+Linear interpolation for energy model. The life con-sumption function in Eq. 9 includes an exponential term in Euler’s number, which cannot be handled directly by linear programming. To linearize it, we isolate the nonlinear part and rewrite Eq. 9 in the simplified form 𝑓 (𝑥 ) = 𝑒 𝑥 , omitting the remaining terms since they are linear. We then initial-ize 𝑚 breakpoints {𝑎 1, . . . , 𝑎 𝑚 } that uniformly partition the range [0, 1], which matches the domain of a DoD value. Their corresponding function values are precomputed as 
+
+𝑏 𝑖 = 𝑓 (𝑎 𝑖 ), ∀𝑖 ∈ { 1, . . . , 𝑚 }. (18) We then introduce interpolation weights 𝜆 𝑖 ∈ [ 0, 1] whose sum is constrained to 1:∑︁  
+
+> 𝑖 ∈ { 1,...,𝑚 }
+
+𝜆 𝑖 = 1. (19) The linear surrogate ˜𝑓 (𝑥 ′) and its input 𝑥 ′ are given by 
+
+𝑥 ′ =∑︁  
+
+> 𝑖 ∈ { 1,...,𝑚 }
+
+𝜆 𝑖 𝑎 𝑖 , (20) 
+
+˜𝑓 (𝑥 ′) =∑︁  
+
+> 𝑖 ∈ { 1,...,𝑚 }
+
+𝜆 𝑖 𝑏 𝑖 . (21) Given any input 𝑥 ′ and a set of coefficients 𝑎 𝑖 , there must ex-ist a combination of 𝜆 𝑖 that satisfies constraint (20) due to the convex combination representation of affine functions [ 75 ]. Therefore, the approximated value of 𝑓 (𝑥 ′) can be expressed using the same set of 𝜆 𝑖 and 𝑏 𝑖 . Since the surrogate ˜𝑓 (𝑥 ′) is linear, the variables 𝜆 𝑖 can be jointly solved in PuLP under constraints (19) and (20) , where the coefficients 𝑎 𝑖 and 𝑏 𝑖 are precomputed from 𝑓 (𝑥 ) = 𝑒 𝑥 .
+
+Hyperparameter setups. To determine a suitable break-point granularity, we uniformly sample points in the range 
+
+[0, 1] for 1 × 10 3 iterations and compute the average relative approximation error (RAE) and mean squared error (MSE) between 𝑓 (𝑥 ) and ˜𝑓 (𝑥 ′). The results are shown in Figure 22. We observe that 1,000 breakpoints already achieve an RAE of 3.19 × 10 −6 and an MSE of 2.37 × 10 −13 , while finer granu-larities do not significantly improve accuracy and can even introduce slight degradation due to floating-point precision 1 2 3 4 5             
+
+> 0
+> 20
+> 40
+> Total delivery
+> time (min)
+> 12345
+> 0.0
+> 1.5
+> 3.0
+> Elapsed
+> runtime (s)  ×10 3
+> 12345
+> Traffic intensity
+> 0
+> 12
+> 24
+> Battery life
+> consumption
+> (a) Performance gap
+> 12345
+> Traffic intensity
+> 0.0
+> 0.5
+> 1.0
+> Max memory
+> usage (GB)  ×10 2
+> (b) Computation overhead
+> OrbitTransit PuLP (optimal solution)
+
+Figure 23: Performance and computational differences between OrbitTransit and the optimal solution. 
+
+and PuLP’s solver tolerance, in addition to increasing mem-ory usage. Therefore, we set 𝑚 to 1,000 in our experiments to balance accuracy and efficiency. 
+
+Experiment results. Due to the complexity of the space routing and task placement problem and the large scale of the satellite constellation, the PuLP fails to resolve even the smallest 2 TB traffic-intensity case, encountering an out-of-memory error despite the 512 GB of available DRAM in our testbed system. To enable tractable analysis, we scale down the constellation to focus on specific RoI regions rather than the global regions, and further reduce the EO data volume accordingly to maintain the same level of traffic intensity. The performance gap and computation overheads are shown in Figure 23. The performance of OrbitTransit in terms of delivery time and battery life consumption is com-parable to PuLP, with average differences of 2.01 minutes and 
+
+3.62 , respectively. However, PuLP incurs unacceptable com-putation overhead, as both its elapsed runtime and memory usage grow exponentially with increasing task scale, reach-ing 2400 seconds and 94 GB, respectively, whereas Orbit-Transit maintains a maximum elapsed runtime and memory usage of only 6.37 seconds and 0.21 GB. These results indi-cate that although OrbitTransit is not theoretically optimal, its performance gap remains acceptable, and its computation overhead is substantially more practical and efficient when deployed on real-world computational units in GSs. 
+
+## A.3 Impact of delayed data plane states 
+
+Telemetry delay simulation setup. To better reflect real-world telemetry delays, we maintain a historical buffer for the data plane states shown in Figure 12. When OrbitTransit queries the load or energy status of a ground station 𝑔 𝑗 or satellite 𝑠𝑎𝑡 𝑘 , it receives a delayed historical state instead of the latest one. After GS selection and routing decisions are made based on this delayed information, the actual delivery is still executed using the real-time states of 𝑔 𝑗 and 𝑠𝑎𝑡 𝑘 .This setup allows us to evaluate how OrbitTransit performs OrbitTransit: Traffic Delivery and Diffusion for Earth Observation via Satellite Mobility Conference’17, July 2017, Washington, DC, USA 1 2 3 4 5            
+
+> Traffic intensity
+> (a)
+> 0
+> 75
+> 150
+> ISL-only
+> fallback count
+> No delay
+> 10 mins (10%)
+> 15 mins (20%)
+> 20 mins (30%)
+> 12345
+> Traffic intensity
+> (b)
+> 0.0
+> 0.1
+> 0.2
+> ISL-only
+> fallback ratio
+> 12345
+> Traffic intensity
+> (c)
+> 1.00
+> 1.75
+> 2.50
+> Average routing
+> path length
+> 12345
+> Traffic intensity
+> (d)
+> 0.0
+> 0.5
+> 1.0
+> Delivery
+> success ratio
+
+Figure 24: Sensitivity of OrbitTransit to data plane de-lay. Legend entries X mins (Y%) denote telemetry de-layed by X minutes with probability Y%. 
+
+when its control decisions are based on stale data plane observations. 
+
+Experiment results. We define three telemetry-delay lev-els, as shown in the legend of Figure 24. Delayed telemetry samples are injected independently at random. As shown in Figure 24(a), OrbitTransit triggers more ISL-only fallback as the delay level increases, with the fallback count increasing by 1.21 × from the 10 min (10%) setting to the 20 min (30%) setting. This is because stale status may cause the scheduled path or destination to become infeasible, in which case Or-bitTransit falls back to ISL-only transmission, as described in Section §6, to ensure successful delivery. To quantify how many tasks are affected by stale states, we define the fallback ratio as the number of tasks that trigger ISL-only fallback divided by the total number of tasks. Figure 24(b) shows that this ratio is largely independent of traffic intensity, indicat-ing that the higher fallback count mainly comes from the increased number of tasks. Even under the 20 min (30%) set-ting, only 9.54% of tasks are affected, since the orbit-as-node model relies on orbital-level aggregates and is inherently tolerant to stale or partially inaccurate states. The impact on overall delivery performance is also limited. As shown in Figure 24(c), the average routing path length increases by only 2.15% from the no-delay setting to the 20 min (30%) setting, mainly because the affected 9.54% of tasks fall back to pure-ISL transmission. Meanwhile, the delivery success ratio remains unchanged, since OrbitTransit is a hybrid PCO-ISL system and can adapt to real-time routing conditions by switching to feasible ISL-based delivery when the originally scheduled path becomes infeasible.
