@@ -1,0 +1,86 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-001.webp",
+      "caption": "Figure 4 Sensitivity analysis of large drone energy parameters. The baseline scenario is located at the center of the plot. 1",
+      "page": 15,
+      "index": 1,
+      "width": 1311,
+      "height": 924
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-002.webp",
+      "caption": "Table 2 Notational glossary.",
+      "page": 7,
+      "index": 2,
+      "width": 979,
+      "height": 652
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-003.webp",
+      "caption": "Table 4 Results and performance for different numbers of customers. 6",
+      "page": 18,
+      "index": 3,
+      "width": 1084,
+      "height": 733
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-004.webp",
+      "caption": "Figure 6 Sensitivity analysis of optimal solutions with respect to service area size. 1",
+      "page": 18,
+      "index": 4,
+      "width": 940,
+      "height": 381
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-005.webp",
+      "caption": "Figure 3 Optimal solutions for the large-drones-only scenario.",
+      "page": 13,
+      "index": 5,
+      "width": 752,
+      "height": 518
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-006.webp",
+      "caption": "Table 5 Computational results for Solomon dataset. 14",
+      "page": 19,
+      "index": 6,
+      "width": 1025,
+      "height": 953
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-007.webp",
+      "caption": "Figure 5 Sensitivity analysis of optimal solutions with respect to package weights. 1",
+      "page": 17,
+      "index": 7,
+      "width": 1039,
+      "height": 707
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-008.webp",
+      "caption": "Table 3 Baseline parameter values.",
+      "page": 12,
+      "index": 8,
+      "width": 979,
+      "height": 285
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-009.webp",
+      "caption": "Figure 2 Optimal green drone routing solution for the baseline scenario. Darker nodes indicate heavier package weights.",
+      "page": 12,
+      "index": 9,
+      "width": 752,
+      "height": 490
+    },
+    {
+      "url": "assets/figures/arxiv/2604.07514v1/fig-010.webp",
+      "caption": "Table 1 Drone-only or truck-drone routing problems with energy function.",
+      "page": 5,
+      "index": 10,
+      "width": 1072,
+      "height": 218
+    }
+  ]
+}

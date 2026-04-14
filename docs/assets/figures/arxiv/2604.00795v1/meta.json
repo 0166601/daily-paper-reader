@@ -1,0 +1,46 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.00795v1/fig-001.webp",
+      "caption": "Figure 3: Average maximum utility comparison between PGIPRO and GPPE for a convex and a concave Pareto front consisting of 30 solutions (noise=0.01)",
+      "page": 5,
+      "index": 1,
+      "width": 506,
+      "height": 275
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00795v1/fig-002.webp",
+      "caption": "Figure 2: Iteratively update the objective search space in IPRO (Figure from [13])",
+      "page": 4,
+      "index": 2,
+      "width": 1052,
+      "height": 278
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00795v1/fig-003.webp",
+      "caption": "Figure 1: Interface design for interactive route planning.",
+      "page": 2,
+      "index": 3,
+      "width": 329,
+      "height": 640
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00795v1/fig-004.webp",
+      "caption": "Figure 4: The seven possibly optimal routes in OsdorpMidden. The blue marker (above) indicates the origin and the red marker (below) the destination. Each colored path corresponds to one Pareto-undominated solution with objective vector [𝑑, 𝑐], where 𝑑 denotes route length (in metres) and 𝑐 the number of crossings. The yellow-green route on the extreme left corresponds to [928, 3], while the orange route extending furthest to the right corresponds to [1335, 2]. In the central region, the pink and brown routes in the upper part correspond to [703, 4] and [603, 5], respectively, and the red route in the lower central area corresponds to [586, 6]. The two routes closest to the lower boundary are the dark blue route [568, 8] and the light blue route [574, 7].",
+      "page": 6,
+      "index": 4,
+      "width": 432,
+      "height": 350
+    },
+    {
+      "url": "assets/figures/arxiv/2604.00795v1/fig-005.webp",
+      "caption": "Figure 5: Average maximum utility for Osdorp-Midden PF with 7 solutions (noise=0.01)",
+      "page": 6,
+      "index": 5,
+      "width": 506,
+      "height": 266
+    }
+  ]
+}

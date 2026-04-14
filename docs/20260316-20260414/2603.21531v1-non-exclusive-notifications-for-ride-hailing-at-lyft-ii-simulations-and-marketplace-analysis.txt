@@ -1,0 +1,1780 @@
+Title: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+URL Source: https://arxiv.org/pdf/2603.21531v1
+
+Published Time: Tue, 24 Mar 2026 02:07:25 GMT
+
+Number of Pages: 45
+
+Markdown Content:
+# Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+Farbod Ekbatani, Rad Niazadeh 
+
+University of Chicago Booth School of Business, Chicago, IL fekbatan@chicagobooth.edu, rad.niazadeh@chicagobooth.edu 
+
+Mehdi Golari, Romain Camilleri, Titouan Jehl, Chris Sholley 
+
+Lyft, Inc. 
+
+mehdig@lyft.com, rcamilleri@lyft.com, titouanj@lyft.com, chris@lyft.com 
+
+Matthew Leventi, Theresa Calderon, Angela Lam, Paul Havard Duclos 
+
+Lyft, Inc. 
+
+mleventi@lyft.com, tcalderon@lyft.com, alam@lyft.com, paul.havardduclos@gmail.com 
+
+Tim Holland, James Koch, Shreya Reddy 
+
+Lyft, Inc. 
+
+tholland@lyft.com, jkoch@lyft.com, sreddy@lyft.com 
+
+Abstract. Ride-hailing platforms increasingly face uncertain driver acceptance, which makes traditional one-to-one exclusive dis-patch (ED) less efficient: rejections and timeouts force sequential retries and lengthen rider wait times, which in turn creates friction in the marketplace. Non-exclusive dispatch (NED) mitigates this friction by broadcasting a request to multiple drivers in parallel. While NED can reduce latency, it introduces new design challenges—most notably, how to choose notification sets and how to resolve driver contention (when multiple drivers accept the same ride). In this paper—the second in a two-part collaboration with Lyft—we develop a theoretically grounded framework to evaluate the long-run performance and marketplace effects of transitioning from ED to NED. We bridge theory and practice by combining (i) an optimization model that formulates NED as a constrained welfare maximization problem with (ii) large-scale discrete-event simulations on proprietary Lyft traces and (iii) a stylized macroscopic equilibrium model. Across simulation and equilibrium analysis, we find that NED improves key fulfillment metrics relative to ED: it reduces match time (and hence rider reneging) while increasing both the number and the average quality of completed matches. We also quantify the speed–quality trade-off between two common contention resolution rules, First-Accept and Best-Accept : First-Accept maximizes speed and throughput, whereas Best-Accept is required to maximize per-match quality. Finally, we show that slightly conservative notification heuristics can improve long-run efficiency by avoiding excessive locking of high-value drivers and preserving future availability. 
+
+1 
+
+> arXiv:2603.21531v1 [cs.GT] 23 Mar 2026 Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+2
+
+## 1. Introduction 
+
+Two-sided online platforms often clear supply and demand by repeatedly matching customers to service providers. In the early days of several of these platforms, one-to-one matching—that is, connecting a single customer with a single service provider—served as the backbone mechanism to match demand and sup-ply. For example, in ride-hailing, dispatch typically runs in short cycles: the platform observes batches of unmatched ride requests and available drivers, computes matching decisions, and sends notifications to drivers to accept (Xu et al., 2018b; Azagirre et al., 2024). Such cycle-based matchings are traditionally based on 
+
+exclusive dispatch (ED): each ride request is offered to a single driver. If that driver rejects or times out, the rider remains unmatched in that cycle and must be re-attempted in subsequent cycles (Xu et al., 2018b; Zhang et al., 2017). ED is operationally simple—it avoids conflicts by construction—but its efficiency heavily relies on the assumption that drivers have high acceptance rates at the time of notification ( ¨ Ozkan and Ward, 2020). In modern ride-hailing platforms, this assumption is increasingly untenable and is being challenged by the drivers. These drivers, as gig workers of the platforms, retain discretion over which trips to accept; Their acceptance behavior reflects heterogeneous preferences, information revealed at the time of the offer, and platform incentives (Rheingans-Yoo et al., 2019; Varma et al., 2021; Horner et al., 2021; Chen et al., 2025a). Under ED, possible rejections are handled sequentially: a rejected request returns to the idle pool and is re-offered to another driver in a later cycle. This process repeats until the platform finds a driver who accepts the request. Although logically coherent, this procedure is structurally fragile. As rejections and timeouts become more frequent, sequential re-offering creates a bottleneck that increases rider waiting times and abandonment, ultimately deteriorating marketplace efficiency (Castro et al., 2020b; Aveklouris et al., 2025). This paper—and our more algorithmic companion paper Ekbatani et al. (2026)—grew out of an aca-demic–industry collaboration with Lyft, complementing a growing body of marketplace research grounded in ride-hailing platforms and industry partnerships (Azagirre et al., 2024; Castillo et al., 2025; Yan et al., 2025). Our research collaboration is motivated by a specific operational shift in the dispatch pipeline to counteract the above mentioned issues: moving from exclusive one-to-one offers to non-exclusive dispatch (NED), in which a ride request is sent to multiple nearby drivers in parallel (Sun et al., 2020; Qin et al., 2025; Chen et al., 2023). 1 By parallelizing notifications, the platform hedges against individual rejections and increases the probability of a timely successful match (without incurring the delays associated with sequential retries), improving rider waiting times and match quality. At the same time, higher fulfillment can expand drivers’ earning opportunities while maintaining driver experience through safeguards used in practice. However, moving from “one-to-one” to “many-to-one” notifications introduces new layers of (highly non-trivial) operational complexities, and in particular creates two tightly coupled design problems. First is noti-fication packing : selecting (disjoint) notification sets—which are combinatorial objects—subject to platform   
+
+> 1This design is closely related to “broadcasting” or “order-grabbing” systems studied in transportation (where drivers choose whether to “grab” a broadcast request) and to “supplier menu” designs in peer-to-peer logistics and freight platforms (where the same task is assigned to a menu of suppliers). For example, see Liu et al. (2025); Chen et al. (2025a); Mofidi and Pazour (2019); Ausseil et al. (2022); Horner et al. (2025). Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+3
+
+constraints. Second is contention resolution : deciding who gets the ride when multiple drivers accept the same broadcast notification. We focus on two contention-resolution protocols that are common in practice. • First Acceptance (FA): The platform assigns the ride to the first driver who responds. This models a fast dynamic, prioritizing speed but potentially sacrificing match quality (e.g., a closer driver might be slower to interact with the app than a distant one). • Best Acceptance (BA): The platform collects all responses and assigns the ride to the highest-scoring (e.g., the closest) driver among those who accepted. This prioritizes the quality of the match but intro-duces a mandatory waiting period to elicit responses from all drivers. This choice reflects a fundamental trade-off between match speed and match quality, which mirrors similar tensions in other broadcast-offer environments—including food rescue and donation platforms, community first-responder dispatch, and crowdsourced delivery—where a recurring design fork is whether to commit immediately to the first responder or to wait and select the best among timely responders (Shi et al., 2020; Lee et al., 2025; Henderson et al., 2022; Basık et al., 2018). These two protocols also induce fundamentally different objective functions over notification sets. Under BA, adding more drivers could only improve the score of the selected driver in expectation and always worsen the match time for this particular ride. Under FA, the valuation can be non-monotone : notifying an additional low-value but high-acceptance driver can reduce the expected score by increasing the probability that a higher-value driver loses in the contention resolution stage, but it will definitely improve the match time for this particular ride. Our research collaboration with Lyft centers on formalizing the non-exclusive dispatch optimization prob-lem under FA and BA, and on quantifying the advantages and limitations of NED relative to traditional exclusive dispatch. Within a single dispatch cycle, relaxing exclusivity expands the feasible set—and thus can only improve the platform’s best achievable objective—at the cost of increased computational complexity. 2
+
+Over time, however, broadcasting can also “reserve” multiple drivers for the same request, thinning effec-tive supply and altering future market thickness. We therefore study—both empirically and theoretically—the long-run performance of NED, as well as the resulting speed–quality tension in ride-hailing dispatch under different design choices. These considerations motivate the following research questions. 
+
+(i) Can non-exclusive dispatch fundamentally improve platform’s key fulfillment metrics (match time, quality, and throughput) compared to the traditional exclusive dispatch? (ii) If so, how to compare FA and BA in terms of these fulfillment metrics? Does the quality-speed trade-off between FA and BA contention resolution persist in equilibrium, or does one strategy strictly dominate the other over time? 3   
+
+> 2The focus of this work is largely on studying NED in a dynamic marketplace using simulations and a stylized macro-model. In our companion paper Ekbatani et al. (2026), we instead focus on the algorithmic problem of single-cycle optimization and provide a theoretical study of approximation algorithms for this combinatorial optimization problem.
+> 3As we elaborate later, we analyze the system under the assumption that drivers’ acceptance behavior remains unchanged under the new notification system. We postpone a combined analysis of fulfillment metrics and behavioral responses to future work. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+> 4
+
+1.1. Our Contributions 
+
+We provide compelling answers to the above questions using a novel two-layer empirical-theoretical frame-work. We first build a high-fidelity discrete-event simulator for NED calibrated to Lyft data (Section 3). We then develop a stylized macro model that endogenizes market thickness and provides theoretical validation (intuition) for the empirical patterns in our simulations (Section 4). Concretely, we make three contributions: 
+
+I. Unified framework for non-exclusive dispatch (Section 2): We formalize non-exclusive dispatch with stochastic driver participation and decompose NED into (i) a notification packing combinatorial optimization problem and (ii) a contention resolution protocol (under FA, BA, and the interpolating k-Accept family). This decomposition clarifies how operational rules induce different per-ride welfare objectives over notifica-tion sets and separates single-cycle optimization from long-run marketplace effects, allowing us to analyze dispatch protocols as independent decision layers. 
+
+II. Simulation study of long-run marketplace effects using Lyft data (Section 3): We build a discrete-event simulation environment using proprietary Lyft data (including rider- and driver- dependent events’ timestamps and dispatch data) and use it to benchmark a wide range of non-exclusive dispatch protocols. We rigorously evaluate multiple notification packing strategies (OPT, Greedy, Rejection-aware, and ED+; see Appendix EC.2.1) under FA/BA/ k-Accept contention rules by testing their performance based on key fulfillment metrics. The simulator models asynchronous accept/reject decisions, notification timeouts, and rider/driver abandonment, and it addresses key challenges such as counterfactual scoring and computational scalability (Appendix 3.1.2). It also provides the basic means of extending the single-cycle performance evaluation of any NED notification algorithm to its long-run performance, which we exploit next. 
+
+III. Stylized marketplace macro model for theoretical analysis (Section 4): To understand the fundamental forces driving system performance in the long-run and to isolate which effects persist once market thickness is endogenized, we introduce the Marketplace Macro Model (MMM) in Section 4. The MMM is a large-market fluid model represented as a continuous-time Markov chain (CTMC). This model provides a stylized analytical framework that captures the essence of the feedback loop between dispatch efficiency and market thickness. By solving for the steady-state equilibrium of the MMM under both FA and BA, we explain the relationship between market density and matching efficiency, providing theoretical grounding and intuition for our simulation results. Specifically, the MMM yields steady-state match probabilities and conditional match times through CTMC calculations (Proposition 4.4) and links these quantities associated with any NED algorithm (composed of a packing algorithm and a contention resolution protocol) to the equilibrium market thickness induced by that algorithm through an iterative fixed-point method. Using a simulation-based computational approach, we also demonstrate how this tool can be used to translate “local” single-cycle behavior of any NED algorithm into its performance based on “global” long-run metrics. We conclude in Section 5 with a discussion of future directions. A more detailed review of related work appears in Appendix EC.1. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+5
+
+## 2. NED Notifications Algorithmic Framework: Preliminaries 
+
+This section formalizes the within-cycle model used throughout the paper. Building on the high-level descrip-tion in Section 1, we describe the cycle-based dispatch pipeline and highlight the components most relevant for non-exclusive notifications. Our goal is not to reproduce Lyft’s full matching production system; instead, we isolate first-order features that directly affect match quality, driver responses, and rider match time. 
+
+Cycle-based matching optimization at Lyft. At a high level, the matching pipeline at Lyft, similar to other ride-hailing platforms such as Uber and DiDi, operates in real-time to connect riders and drivers. Lyft runs dispatch in discrete cycles of fixed length (e.g., every few seconds) within each geographic region (e.g., New York city). In each cycle, the platform selects which drivers to notify for which riders, sends notifications, and collects accept/reject decisions (or timeouts). Matches are finalized asynchronously later, once a driver accepts. This process repeats over discrete cycles, allowing the system to adapt to changing demand, supply, traffic conditions, and strategic behaviors. During a cycle, the platform considers (i) the set of active rides on the demand side, denoted by R, and (ii) the set of available drivers on the supply side, denoted by D. The riders in R have requested a trip in the past but have not yet been successfully matched with any driver. The drivers in D are idle (i.e., not en route to a destination) 4 and are not currently in the notified state (i.e., they have no pending notifications). Given sets R
+
+and D, the platform decides on the notifications to be sent at the end of the cycle. Once a driver is notified, the notification appears in the driver’s app. Importantly, in the current system, each driver receives at most one notification at a time. Under the baseline exclusive dispatch (ED) system, each ride request is also offered exclusively to at most one driver per cycle. A notified driver may accept or reject; if the driver does not respond within a fixed time window (e.g., ten or twenty seconds), the notification times out. While a driver is in the notified state, they are temporarily unavailable for future cycles; they return to the available pool once the notification is rejected, timed out, or withdrawn (the latter option is a feature specific to NED, as we will discuss later). To evaluate the quality of a potential match, Lyft uses a scoring system that assigns a non-negative score 
+
+wrd ∈ R≥0 to each feasible rider–driver pair (r, d ) ∈ R × D within a cycle. These scores depend on factors such as predicted pickup time, trip duration, pay, and driver utilization, as well as other ride-specific features. At a high level, the goal of single-cycle matching optimization is to decide which drivers to notify for which ride requests in that cycle so as to (myopically) maximize the total score of the eventual matches generated in that cycle. We additionally study rider and driver based metrics, including match time , defined as the time from rider’s request to match, and driver idle time , defined as the time from when a driver becomes available to when they are assigned a ride.   
+
+> 4One simplification in our model is that we consider only “simple” matches between new riders and idle drivers. In practice, platforms also use more complex options such as linking a driver who is about to finish a trip to a new rider or swapping assignments between notified drivers. We abstract away from these features in our current analysis. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+6
+
+Driver rejections. A key behavioral feature of this system is driver rejection : a notified driver may reject (or ignore) a ride request. Rejections are operationally costly. On the supply side, while a driver is in the notified state, they are unavailable for other matches; on the demand side, a rejection delays service for the rider (i.e., increases match time) and typically triggers additional notifications in later cycles. We model this behavior parsimoniously by assuming that each driver d independently accepts a notified ride with probability 
+
+pd and draws a response time τ independently from a common distribution Λ. While our framework allows for rider–driver-specific acceptance probabilities prd , we abstract away from this dependence in much of the analysis for simplicity. This distinction motivates two regimes: heterogeneity-aware matching, which explicitly accounts for heterogeneity in the estimated acceptance probabilities in the marketplace (i.e., uses heterogeneous estimates), and homogeneous-acceptance matching, which assumes a common acceptance probability estimate p for all drivers (e.g., for fairness or simplicity). 5 We study both regimes and examine how driver rejection interacts with matching decisions under each assumption. 
+
+Exclusive vs. non-exclusive notifications. Earlier, we described the standard ED notifications, under which each ride request is offered to at most one driver at a time. In contrast, under non-exclusive dispatch (NED), the platform may notify multiple drivers about the same request within each cycle (without committing the ride to any of them upfront), while still ensuring that each driver receives at most one notification. Broad-casting hedges against driver rejection by eliciting responses in parallel, but temporarily locks more drivers in the notified state and requires an additional contention-resolution step. Optimizing NED within a cycle is therefore naturally two-stage, and any procedure for this two-stage optimization problem should consist of two algorithmic components: (i) Packing algorithm : in the first stage, pick a many-to-one assignment between drivers D and riders R in that cycle, which is equivalent to selecting a collection of disjoint notification sets {Sr }r∈R with Sr ⊆ D 
+
+and ∀r, r ′ ∈ R : Sr ∩ Sr′ = ∅.(ii) Contention resolution protocol : in the second stage, once notifications are sent, resolve the potential contention among the accepting drivers for each ride, i.e., decide which accepting driver—if any— should be assigned to (pick up) the rider correspondign that request. We next examine these two stages and their algorithmic implications, which provide the building blocks for the simulation and macro-model analyses in Section 3 and Section 4. 
+
+2.1. Packing Algorithm 
+
+In each cycle, the platform observes a bipartite graph whose edges connect unmatched (or active) ride requests to available drivers. Each feasible rider–driver pair (r, d ) has a weight wrd capturing the match score, and each driver d has an acceptance probability pd. A packing algorithm partitions drivers into disjoint notification sets and assigns one set to each ride. This static decision can be framed as a welfare maximization problem:     
+
+> 5Typically, probability pis calibrated to represent the estimated marketplace average. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+7
+
+each ride r has an associated set function Fr (·) (think of it as a valuation function), induced by the specific contention-resolution protocol used in the second stage (Section 2.2), and the goal is to choose disjoint sets 
+
+{Sr }r∈R to maximize the total welfare P 
+
+> r∈R
+
+Fr (Sr ).Formally, we consider the following constrained welfare maximization problem: 
+
+max  
+
+> {Sr}r∈R
+
+X
+
+> r∈R
+
+Fr (Sr ) (W ELFARE -M AX )s.t. Sr ∩ Sr′ = ∅, ∀r, r ′ ∈ R , r ̸ = r′
+
+|Sr | ≤ U, ∀r ∈ R 
+
+Fr (Sr ) − Fr (Sr \ { d}) ≥ θ · pd, ∀r ∈ R , d ∈ Sr .
+
+The objective function maximizes the aggregate expected welfare across all active requests in the current cycle. The first constraint guarantees that the notification sets are disjoint, ensuring that no driver receives more than one notification simultaneously. The second constraint limits the number of drivers notified for any single request to a system-defined maximum U ∈ N, preventing excessive traffic (i.e., notification overload). Finally, the third constraint enforces the marginal efficiency condition: a driver d is only included in the set 
+
+Sr if their contribution to the welfare function Fr exceeds the weighted opportunity cost θ · pd. Here, θ is a threshold parameter to control the future value of leaving a driver un-notified in the current cycle. This notification process not only avoids overwhelming drivers with redundant rides but also strategically manages the availability of drivers across time, especially in under-supplied conditions. 6
+
+A central challenge in this phase is balancing short-term gain with long-term efficiency. While it might seem wasteful not to notify a driver who could plausibly accept a ride, withholding notifications can also preserve that driver’s availability for higher-value matches in future cycles. More precisely, although a solution to (W ELFARE -M AX ) with U = ∞, θ = 0 is optimal for a single-cycle, to account for the long-term impact of each decision over multiple cycles, we can tune parameters U and θ to better reflect existing opportunity costs and future consequences (see our simulations in Section 3 regarding varying these parameters). Although this optimization problem is computationally hard in its general form 7, practical instances remain tractable due to the inherent sparsity of the underlying bipartite graph, which is enforced by type filters and maximum dispatch radii. This will be discussed more in Section 3. 
+
+2.2. Contention-Resolution Protocols 
+
+While contention resolution can theoretically function as a complex, real-time adaptive process, we focus our analysis on two canonical non-adaptive rules. These protocols are selected for their simplicity and inter-pretability, yet they effectively capture the fundamental trade-off between decision speed and match quality.        
+
+> 6In other words, introducing parameters Uand θhelps with making the matching decisions to some extent non-myopic. As we show later in our analysis, this feature has benefits in terms of long-term performance.
+> 7This hardness result is formally established in our companion paper Ekbatani et al. (2026), under both FA and BA. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+8
+
+Under first-accept (FA) , the ride is immediately assigned to the first driver who accepts the notification. Under 
+
+best-accept (BA) , the platform waits until all notified drivers have either responded or timed out, and then assigns the ride to the accepting driver with the highest score. We derive the value functions for both (and numerically evaluate protocols interpolating between FA and BA, the details of which are in Section 3). 8
+
+First Accept. This approach prioritizes speed and is simple to implement, requiring minimal coordination. It naturally incentivizes quick responses from drivers, helping reduce matching delays. Additionally, it limits the number of drivers kept in notification mode. However, this strategy leads to potentially lower match quality in that cycle, and does not always yield the most efficient or optimal match; for instance, a slower-responding driver might be closer or better suited to fulfill the ride. The expected score for each rider r by sending the notification to set S, in the case of using FA, is 
+
+Fr (S) = X 
+
+> T⊆S
+
+ Y
+
+> d∈S\T
+
+(1 − pd)
+
+ Y
+
+> d∈T
+
+pd
+
+! P  
+
+> d∈T
+
+wrd 
+
+|T | (FA) The summation aggregates over all possible subsets T ⊆ S representing the drivers willing to accept the request. The product terms define the probability that exactly the drivers in T are willing to accept, assuming independent decisions. Conditional on the set T , the term    
+
+> P
+> d∈Twrd
+> |T|
+
+reflects the expected match value. This derivation relies on the assumption that response times among willing drivers are independent and identi-cally distributed; consequently, under the FA mechanism, each driver in T has an equal probability 1/|T | of responding first and securing the ride. 
+
+Best Accept. The BA protocol introduces a short waiting window to collect all driver responses before assigning the ride to the most suitable one based on a scoring function such as proximity. While this method delays immediate assignment, it can yield higher-quality matches and improve overall system efficiency. On the other hand, it may temporarily tie up multiple drivers (who accepted) without ultimately assigning them the ride, which can lead to dissatisfaction for those drivers. Additionally, since speed is not directly rewarded, drivers may be less motivated to respond promptly. The expected score for each rider r by sending the notification to set S, in the case of using BA, is 
+
+Fr (S) = X 
+
+> T⊆S
+
+ Y
+
+> d∈S\T
+
+(1 − pd)
+
+ Y
+
+> d∈T
+
+pd
+
+!
+
+max  
+
+> d∈T
+
+{wrd } (BA) Analogous to the FA formulation, the outer summation traverses all potential subsets T ⊆ S of drivers who affirmatively respond within the waiting window. The product terms capture the likelihood of observing exactly the set T of willing drivers, assuming independent acceptance probabilities. The crucial distinction lies in the valuation term max d∈T {wrd }. Unlike FA, where the match is effectively determined by reaction   
+
+> 8Note that lower match quality in a cycle does not necessarily lead to overall lower match quality in the long-run, as the market condition, i.e., how thick the market is, can also affect the quality of the match—which itself depends on how much supply is locked by the notification algorithm. We study this phenomenon in Section 3 and Section 4. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+9
+
+time, the BA strategy aggregates all responses and assigns the ride to the optimal driver within the accepting set T . Consequently, the realized utility for a given realization T is the maximum weight among all willing drivers rather than the average. Finally, we highlight a key structural distinction between the two strategies: unlike (FA), the (BA) objective function is an increasing and submodular set function. 9 This property is particularly advantageous for the first-stage packing problem, as submodularity allows us to leverage the efficient approximation algorithms known in the literature. In fact, the unconstrained formulation of (W ELFARE -M AX ) corresponds to the well-known Submodular Welfare Maximization (Vondr´ ak, 2008). In this setting, efficient polynomial-time algorithms are guaranteed to yield a (1 − 1/e )-approximation of the optimal solution. Furthermore, simple greedy algorithms (Algorithm 1 in Appendix EC.2.1) achieve a 1/2-approximation in the general unconstrained case. 
+
+k-Accept. We also consider a generalized contention resolution protocol, denoted as k-Accept, which serves as a hybrid between the pure speed of FA and the quality maximization of BA. Under this policy, the platform broadcasts notifications to the set S and finalizes a match as soon as it receives at least k responses, where 1 ≤ k ≤ U is a tunable parameter. From this subset of accepted drivers, the system assigns the rider to the candidate with the highest utility. This protocol offers a flexible control lever: low values of k minimize driver holding time, while higher values increase the likelihood of finding a high-quality match. Crucially, this policy recovers the previous strategies at its boundaries: setting k = 1 reduces to (FA), while setting k = U (or 
+
+k = |S|) forces the system to consider the entire set T , recovering the maximum weight objective of (BA). 
+
+## 3. A Large-Scale Discrete-event Simulation with Lyft Data 
+
+As described in the introduction, the main research goal in our collaboration with Lyft is to empirically and theoretically quantify the long-run performance of NED notifications in the Lyft marketplace. In this section, we focus on the empirical component: we evaluate the impact of NED on fulfillment metrics in a long window of time (twenty minutes) under the counterfactual assumption that drivers’ acceptance behavior does not change in response to the notification mechanism (i.e., we ignore temporary behavioral responses). Among other things, this empirical study provides a rigorous way to assess the potential impact of NED marketplace intervention before running an online experiment, which is typically costly and operationally risky. 10 
+
+At the core of our empirical study, we build a large-scale discrete-event simulation environment using a proprietary Lyft dataset. We use this simulator to compare strategies that differ in both their packing algo-rithms and contention-resolution rules. Throughout, we distinguish between heterogeneity-aware policies, which leverage heterogeneous acceptance probability estimates pd, and homogeneous-acceptance policies, which assume a uniform acceptance probability estimate p across the population. We aim to empirically answer the following questions:    
+
+> 9See our companion paper for examples showing FA valuations are neither monotone nor submodular. Also, they are not even “score-ordered,” which makes it difficult to design algorithms for this class (Ekbatani et al., 2026).
+> 10 The focus of this section is on simulations; we defer the stylized equilibrium analysis to Section 4. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+> 10
+
+(1) Considering key fulfillment metrics—match quality, rider match time, and throughput—do NED notifications outperform the status-quo exclusive dispatch? 
+
+(2) Is there an inherent trade-off between speed and quality in NED notification systems? How do design choices (in particular FA vs. BA) impact this trade-off in the long run? 
+
+The central findings of our simulations (later rationalized by the MMM in Section 4) are as follows: (i) NED dominates ED on fulfillment metrics: Across the tested configurations, NED simultaneously reduces match time (which reduces rider waiting and reneging) and improves the number of finalized matches, while also improving average realized match quality, relative to ED. Therefore, holding drivers’ behavior fixed, NED dominates ED in all key fulfillment metrics. (ii) A speed–quality trade-off persists between FA and BA: FA leads to shorter match times, hence faster and often more finalized matches (higher throughput). In contrast, BA produces higher average match quality, but with longer match times (and hence higher rider waiting/reneging). (iii) Throughput can dominate average quality. Even when BA has higher per-match quality, FA might lead to higher total welfare (i.e., total matching score). This reversal is driven by system throughput, that is, completing more matches in the same time window. The cumulative gain from these additional matches could then outweigh the marginal loss in individual match quality. (iv) Packing choices affect long-run availability. Allowing minor sub-optimality in the algorithm for imme-diate packing problem—e.g., being conservative via opportunity costs/thresholding, or using simple heuristics instead of optimal-per-cycle packing—can improve long-run efficiency by avoiding excessive locking of high-value drivers. We defer the discussion of managerial insights from our results and ideas to improve the system to Section 3.3. 
+
+3.1. Simulation Setup: Benchmarks, Data & Assumptions 3.1.1. NED packing algorithms. Throughout our simulations, we evaluate the performance of sev-eral distinct algorithmic strategies (inspired by practice at Lyft). Fixing the contention resolution protocol (FA, BA, or k-accept), we employ the following algorithms: (i) Optimal packing (NED OPT) , which is the single-cycle optimal algorithm and is implemented by solving an integer program, (ii) Greedy policy (Greedy) 
+
+(Algorithm 1), which iterates through the available drivers and tentatively assigns each to the ride that yields the highest marginal increase in the expected welfare, (iii) Rejection-aware heuristic (Rejection-aware) (Algo-rithm 2), which is a heuristic designed to approximate practical dispatch logic used in industry, and (iv) 
+
+Enhanced Exclusive Dispatch algorithm (ED+) (Algorithm 3), which is a hybrid strategy that improves upon the standard ED baseline by adding a second driver from remaining unassigned pool if this increases the expected welfare. In particular, we consider parametric versions of these algorithms with two parameters 
+
+(U, θ ), where U denotes the maximum size of any notification sent, and θ denotes a threshold quantifying Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+11 
+
+the estimated opportunity cost of assigning a driver (and has different specific meanings under different algo-rithms). See Appendix EC.2.1 for further technical details around these algorithms. 11 
+
+ALGORITHM 1: Greedy Packing Algorithm  
+
+> 1
+
+Input: Set of drivers D, set of rides R, threshold θ, batch limit U for ride r ∈ R do  
+
+> 2
+
+Initialize notification list Nr ← ∅  
+
+> 3
+
+Fix a random ordering of drivers: ˜D = [ d1, d 2, . . . , d n] 
+
+> 4
+
+for driver d ∈ ˜D do  
+
+> 5
+
+for ride r ∈ R with |N r | < U do  
+
+> 6
+
+Compute marginal gain: ∆d,r = Fr (Nr ∪ { d}) − Fr (Nr ) 
+
+> 7
+
+Let r∗ = arg max r∈R ∆d,r  
+
+> 8
+
+if ∆d,r ∗ > θp d then  
+
+> 9
+
+Nr∗ ← N r∗ ∪ { d}
+
+ALGORITHM 2: Rejection-aware Heuristic Algorithm  
+
+> 1
+
+Input: Set of drivers D, set of rides R, rejection likelihood function Rej (·), batch limit U 
+
+> 2
+
+for ride r ∈ R do  
+
+> 3
+
+Initialize notification list Nr ← ∅  
+
+> 4
+
+Fix a random ordering of rides: ˜R = [ r1, r 2, . . . , r n] 
+
+> 5
+
+for ride r ∈ ˜R do  
+
+> 6
+
+Let ˜Dr = [ dr, 1, . . . , d r,n r ] be the list of available drivers in D, sorted in decreasing order of weight wrd  
+
+> 7
+
+˜N ← ∅  
+
+> 8
+
+for driver d ∈ ˜Dr do  
+
+> 9
+
+˜N ← ˜N ∪ { d} 
+
+> 10
+
+if Rej (d) < 0.8 or | ˜N | ≥ U then  
+
+> 11
+
+break  
+
+> 12
+
+if | ˜N | > 1 then  
+
+> 13
+
+Nr ← ˜N , D ← D \ ˜N , R ← R \ { r} 
+
+> 14
+
+Find the maximum weight matching (ED) between remaining D and R.
+
+3.1.2. Lyft dataset: details & challenges. Our experimental evaluation utilizes a dataset of ride requests and driver trajectories from a US metropolitan area, captured during an afternoon window (4:00 PM – 4:20 PM) on a weekday. In total there are 507 riders and 1122 drivers who logged in during this time window. To adapt these historical data for our simulation environment, we address two primary challenges regarding counterfactual scoring and computational scalability. In short, we show how to use position data to obtain a proxy score for each pair of riders and drivers (even those that are not present in our matching data). We also show how to use techniques such as graph decomposition and pruning to reduce the computational complexity of the NED optimal packing problem.  
+
+> 11
+
+Algorithm design for NED is not the focus of the current paper; See our companion paper Ekbatani et al. (2026) for a theoretical study on the design and analysis of approximation algorithms for the single-cycle NED combinatorial optimization problem. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+12 
+
+ALGORITHM 3: Enhanced Exclusive Dispatch (ED+) Algorithm  
+
+> 1
+
+Input: Set of drivers D, set of rides R, threshold θ 
+
+> 2
+
+Compute the maximum weight matching M between D and R. Let (r, d ∗ 
+
+> r
+
+) ∈ M denote the matched pairs.  
+
+> 3
+
+Update available drivers: D ← D \ { d∗ 
+
+> r
+
+| (r, d ∗ 
+
+> r
+
+) ∈ M}  
+
+> 4
+
+Fix a random ordering of matched rides: ˜R = [ r1, r 2, . . . , r k ] 
+
+> 5
+
+for ride r ∈ ˜R do  
+
+> 6
+
+Initialize notification list Nr ← { d∗ 
+
+> r
+
+} 
+
+> 7
+
+Let d⋄ 
+
+> r
+
+= arg max d∈D wrd  
+
+> 8
+
+if d⋄
+
+> r
+
+̸ = ∅ and Fr ({d∗ 
+
+> r
+
+, d ⋄ 
+
+> r
+
+}) ≥ Fr ({d∗ 
+
+> r
+
+}) + θp d⋄ 
+
+> r
+
+then  
+
+> 9
+
+Nr ← { d∗ 
+
+> r
+
+, d ⋄ 
+
+> r
+
+} 
+
+> 10
+
+D ← D \ { d⋄ 
+
+> r
+
+}
+
+Proxy scoring and compatibility. A fundamental limitation of using historical logs for simulation is the observational bias inherent in the data: we record only the outcomes of realized decisions, while the responses to alternative (counterfactual) offers remain unobserved. Historical datasets record compatibility scores only for rider-driver pairs that overlapped in time during the actual operations. However, our proposed algorithms may make different decisions than the production system—for instance, choosing to keep a driver idle rather than dispatching them immediately. In such a case, the simulation might retain a driver d until a later rider r
+
+arrives, creating a potential match (r, d ) that never occurred in reality because d was already busy. Since the historical logs contain no score for this non-existent interaction, we cannot rely on the proprietary scoring. To overcome this, we reconstruct the simulation environment using the raw spatial coordinates of all agents at their arrival times. We define a proxy compatibility score based on the inverse of the Euclidean distance: 12 .
+
+wrd = 11 + dist (r, d ) . (1) This allows us to compute a consistent weight for any feasible pair within a standard dispatch radius, creating a dense and realistic testbed for comparing our algorithms. 
+
+Graph decomposition and pruning. To ensure the optimal packing algorithm OPT (Section EC.2.1.1) remains tractable, i.e. solvable within seconds, we exploit the structural properties of the compatibility graph to significantly reduce the problem dimension. 
+
+Connected components: First, we leverage the spatial sparsity of the graph. Because matches are con-strained by a maximum dispatch radius and spatial filters, the global compatibility graph naturally fractures into multiple disjoint connected components. For example, the matching dynamics in one neighborhood are often completely independent of those in a distant borough. We identify these components and solve the optimization problem for each independently, allowing for massive parallelization.   
+
+> 12 This stylized choice of a proxy score based on geographical location is due to the fact that we cannot use Lyft’s original scoring system in a simulation with counterfactual pairs due to certain technical limitations beyond the scope of this work Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+> 13
+
+Lossless pruning: Second, we implement a pruning procedure for degree-one nodes (exclusive drivers). For a rider r with a set of exclusive drivers Dr , any optimal notification set of size ℓ ≤ U must necessarily comprise the highest-utility drivers within each acceptance probability class. This dominance property allows us to immediately discard any driver who does not rank within the top U of their specific class. Consequently, the search space is drastically reduced: rather than evaluating all  |Dr |
+
+> ℓ
+
+ combinatorial subsets, we need only consider the top-ranked candidates (across the possible probability classes/driver types, explained next in Section 3.1.3). This simplification significantly lowers the computational complexity of the integer program. 
+
+3.1.3. Modeling assumptions. We adopt a few simplifying assumptions regarding riders and drivers behavior. Overall, our simulation assumes heterogeneous driver acceptance behavior (four driver types), no cancellations after a match is finalized, and stochastic abandonment for unmatched agents. Together, the following assumptions keep the simulator tractable while capturing essential market dynamics and frictions, i.e., driver selectiveness and the time cost of waiting. (i) Driver acceptance heterogeneity: To capture the variance in driver preferences, arising from unobserved factors such as earnings targets, we assume drivers are not uniform in their willingness to accept requests. We model this heterogeneity by assigning each driver to one of four distinct behavioral types upon entry. Specifically, a driver’s base acceptance probability is drawn from the set {0.1, 0.33 , 0.66 , 0.9} with corresponding population proportions {0.1, 0.3, 0.3, 0.3}. This distribution, calibrated by Lyft’s driver data, ensures a realistic mix of highly selective, moderately selective, and highly compliant agents. (ii) Driver response time: To simulate the operational latency inherent in driver interaction with the app, we introduce a stochastic decision window. Upon receiving a notification, a driver is allowed a maximum of 7 simulation cycles to accept or reject the offer. We model the actual response time as a uniform random variable drawn from the set {1, . . . , 7} cycles. This mechanism ensures that matches are not instantaneous, reflecting the real-world friction of driver availability and safety constraints. (iii) Post-match commitment: We assume perfect reliability for realized matches; that is, once a driver and rider are successfully paired by the platform, neither party cancels the trip. This assumption allows us to isolate the efficiency of the matching algorithm from the noise of operational friction, e.g., cancellations due to traffic or personal preference. (iv) Driver/rider patience and abandonment: We model the patience of unmatched agents using a proba-bilistic decay. In each simulation cycle (set to 3 seconds), any available agent who remains unmatched faces a risk of abandoning the platform. Specifically, we assume that an idle driver exits with a probabil-ity of ˜ηI = 0 .001 per cycle (and a notified driver, who has a pending notification, does not abandon the system while in this state, i.e., ˜ηN = 0 ), while an unmatched rider—who is usually more time-sensitive— exits with a higher probability of η = 0 .01 per cycle. This mechanism prevents the artificial accumulation of inventory and reflects the real-world opportunity costs faced by market participants. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+14 
+
+Figure 1 depicts the simulation logic from the viewpoint of a rider. Upon arrival at time tr , the rider enters a waiting pool. Throughout the process, whether in the waiting pool or during a matching attempt, the rider may renege and permanently leave the system with probability η. Once a notification set is drawn from the idle driver pool, the process follows one of two contention resolution protocols. In the FA branch, the rider is matched immediately upon the first acceptance. In the BA branch, the system aggregates responses and assigns the highest-scoring driver. Both protocols operate within a maximum window of 7 cycles ( i = 1 . . . 7); if no match is finalized by the end of this window, the rider returns to the waiting pool. The driver life cycle follows a parallel logic, changing between the idle and notified states as they accept or reject notifications. Rider r       
+
+> arrives at tr
+> Waiting Pool
+> (Waits) Notified? Contention Resolution?
+> FA Loop
+> (i= 1 .. 7)Any accept?
+> BA Loop
+> (i= 1 .. 7)Best accept?
+> Matched
+> (Leaves)
+> Reneged
+> (Leaves) Yes No First Accept Best Accept Yes Next i
+> Timeout Yes Next i
+> Timeout
+> η
+> η
+> η
+
+Figure 1 Flowchart illustrating the simulation lifecycle from a rider’s perspective. (Note: Under BA if the highest-ranked driver accepts prior to the 7th cycle, the match is finalized immediately.) 
+
+3.2. Simulation Results 
+
+In this section, we present the comparative results of our simulations across the defined metrics. We sample 2000 problem instances with heterogeneous drivers, where, in each instance, the acceptance probability of each driver is sampled independently from the meta distribution described in Section 3.1.3. We then perform a Monte-Carlo simulation and measure certain aggregate metrics for each sampled instance. To rigorously eval-uate the efficacy of the proposed algorithms, we focus our analysis on three primary aggregate performance indicators studied in ride-hailing fulfillment: (i) Average score: The average score of all realized (i.e., successful) matches in our dispatching horizon, calculated using the distance-based proxy defined in equation (1) (Section 3.1.2). (ii) Average match time: The average duration between a rider’s arrival to the platform and their successful pairing with a driver who accepted the ride (and selected by NED), where the average is taken over all realized matches in our dispatching horizon. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+15 
+
+(a) Benchmark (ED) 
+
+(b) NED OPT under FA (c) NED OPT under BA    
+
+> Figure 2 ED vs NED with optimal packing ( U= 3 , θ = 0 ) under FA/BA; The panels report the histogram of average match score, average rider match time, and total number of finalized matches across sampled instances.
+
+(iii) Match count: The total number of successful rider-driver pairings throughout the dispatching horizon determined by our dataset (around 20 minutes). 
+
+Baseline performance under exclusive dispatch. We begin by establishing a baseline using the optimal exclusive-dispatch policy, which solves a maximum-weight matching in each cycle. Figure 2a reports the histogram of the three key metrics for this baseline across 2000 sampled problem instances. As shown in Figure 2a, the baseline achieves a long-run average score of a little less than 0.65, with an average match time of roughly 40 seconds and a total match count slightly below 280. This sets the reference standard against which we evaluate the NED algorithms. 
+
+Performance of NED optimal packing algorithms. Next, we evaluate the performance of the NED using the same underlying optimization logic—that is, finding the optimal batch in a single cycle (NED OPT)— but relaxing the exclusivity constraint. By allowing multiple notifications ( U = 3 ) with a standard threshold (θ = 0 ), we observe significant improvements. Figure 2 displays the performance histograms of the optimal packing algorithm under FA and BA. Relative to the ED baseline, both NED OPT under FA and NED OPT under BA improve all three metrics in this setting. Two mechanisms contribute to this improvement. First, broadcasting reduces the time to obtain an acceptance, which decreases rider reneging and increases throughput. Second, as a managerial insight, relaxing the strict 
+
+U = 1 constraint avoids “single-shot” offers: high-value matches, such as a driver who is nearby and highly reliable in terms of acceptance, are not forfeited simply because another driver is marginally closer. Therefore, even if the highest-scoring candidate rejects, other plausible candidates can accept within the same notification window, potentially improving match probability and realized quality. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+> 16
+
+Based on the above findings, the two contention rules then separate along the intended dimensions. Under FA, the platform commits as soon as the first driver accepts, yielding the fastest matches (average match time around 37 seconds in our experiments). Under BA, the platform waits and then selects the highest-scoring accepting driver, producing the highest average score but with longer match times. 
+
+Sensitivity analysis & non-myopic notifications. We next perform a sensitivity analysis by investigating how system parameters—the opportunity-cost threshold ( θ) and the notification upper bound ( U )—impact our results. While we run all algorithms, we use NED OPT as the running example in the discussion. In short, we consistently observe the same qualitative results as we vary these parameters, which we elaborate on next. Figure 3 (a) varies the threshold θ with U = 3 fixed. As θ increases, packing becomes more conserva-tive (effectively the degree of parallelization reduces as fewer drivers are notified), which increases average match time and decreases the number of finalized matches. At the same time, the average score can increase slightly for small θ, because the threshold filters out low-probability/low-value possible matches. This quality effect is more pronounced under FA: BA already applies an ex-post quality filter by selecting the highest-scoring accepting driver, while FA lacks this safeguard and simply commits to the first responder. Therefore, 
+
+θ provides a tangible quality control benefit for FA that is largely redundant for BA. Figure 3 (b) varies the notification cap U with θ = 0 . Starting from the baseline U = 1 (ED), increasing 
+
+U initially improves speed and throughput for both FA and BA by increasing the chance that at least one notified driver accepts quickly. Beyond about U = 3 in our data, the marginal match-time gains shrink and the average score largely flattens, especially under FA. Intuitively, very large notification sets increase the chance that a low-scoring but fast/high-acceptance driver wins contention before a higher-scoring driver responds, effectively “hijacking” the ride from a closer, more suitable driver. This suggests that intermediate values of 
+
+U offer a better speed–quality balance. 
+
+Global performance landscape. We synthesize the results by analyzing the trade-off between speed and quality across all tested algorithms/configurations. Figure 4 presents a scatterplot of average score (left) and total match count (right) versus average match time for various combinations of packing algorithms, con-tention protocols (FA/BA), notification size upper bounds ( U ∈ { 2, 3, 4, 5}), and opportunity cost thresholds (θ ∈ { 0, . . . , 0.5}). The empirical results in Figure 4 provide a comprehensive comparison of the proposed algorithms, revealing distinct trade-offs between match time, total matches, and average score. First, we observe a clear distinction between the performance of the Greedy algorithm (circles) and the statically optimal NED OPT algorithm (squares). Although NED OPT is designed to maximize welfare in a single static snapshot, it often underperforms the Greedy approach in the long run. This counterintuitive result highlights the difference between static and dynamic optimality: by aggressively exhausting the “best” available matches in the current cycle, NED OPT can deplete high-quality driver inventory that would have been better used to serve future demand. In contrast, the Greedy algorithm, by remaining slightly suboptimal in the short run, implicitly preserves system flexibility and achieves superior aggregate outcomes over time. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+17 
+
+(a) Effect of varying θ (fixed U = 3 ). 
+
+(b) Effect of varying U (fixed θ = 0 ). 
+
+Figure 3 Sensitivity analysis of the proposed algorithms. The red markers ( U = 1 ) correspond to the exclusive-dispatch baseline and serve as a common starting point for FA (blue) and BA (green) strategies. Notably, the ED+ and the rejection-aware heuristic exhibit minimal variance with respect to θ and U , because ED+ is limited to notifying at most two drivers per request and the heuristic rarely selects more than two drivers. 
+
+Figure 4 Performance landscape of our algorithms in Appendix EC.2.1 across different configurations. Left: average score vs. average match time. Right: total match count vs. average match time. Each point corresponds to a unique combination of packing algorithm (marker), contention rule (FA vs. BA), U ∈ { 2, 3, 4, 5}, and 
+
+θ ∈ { 0, . . . , 0.5}. The exclusive-dispatch baseline ( U = 1 ) is highlighted in red. 
+
+Second, the choice between contention resolution protocols—FA and BA—presents a clear strategic trade-off. As shown in the right panel of Figure 4, FA (Blue) consistently achieves a significantly higher total number Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+18 
+
+of matches than BA (Green), driven by its faster resolution and the resulting reduction in rider reneging. At the same time, the left panel shows that BA, while slower, achieves a higher average match score by waiting to secure better-fitting drivers. Consequently, there is no single “dominant” strategy. The appropriate choice depends on the platform’s objective function. If the goal is to maximize market liquidity and throughput (match count), FA is preferable. If the platform instead prioritizes the quality of individual pairings (average score) and can tolerate modestly longer wait times, BA offers a distinct advantage. Note also that across almost all of tested configurations in Figure 4, both NED variants (FA and BA) dominate the exclusive-dispatch baseline (shown in red), based on all three key metrics, indicating that parallel notifications are the primary driver of the improvement; the FA/BA choice then governs how the gains are allocated between speed (FA) and match quality (BA). 
+
+Homogeneous-acceptance policies. We extend our analysis to “homogeneous-acceptance” algorithms, where the platform ignores heterogeneity in acceptance probability estimates and instead utilizes a global statistical average for all acceptance probabilities. This formulation is particularly relevant for fairness con-siderations, as it ensures that dispatch decisions are structurally independent of a driver’s specific history or behavioral profile. In short, (i) our results remain qualitatively similar in this setting, and (ii) we empiri-cally demonstrate that the structural advantage of NED notifications outweighs the benefit of having perfect information in ED setting. See Appendix EC.2.2 for more details. 
+
+k-accept Protocol. Finally, we analyze the impact of different contention resolution protocols on global system performance. In Section 2, we introduced the k-accept protocol as a generalized mechanism that interpolates between the speed of FA and the score maximization of BA. Figure 5 presents the simulation results for the optimal algorithm under varying k ∈ { 1, 2, 3, 4, 5}, with capacity fixed at U = 5 and threshold θ = 0 . Note that the boundary case k = 1 corresponds to the standard FA policy, while k = 5 corresponds to the BA policy.          
+
+> Figure 5 Performance metrics (average score, average match time, match count) for the optimal algorithm, i.e., NED OPT, under k-accept strategies with U= 5 , θ = 0 , for k∈ { 1,2, . . . , 5}.
+
+The results reveal a sharp trade-off between match quality and system latency. Shifting from k = 1 (FA) to 
+
+k = 2 produces a significant jump in the average match score, validating the intuition that waiting for even a Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+19 
+
+single additional response drastically improves the likelihood of finding a high-quality driver. However, this gain comes at a cost: both match time and total match count degrade as noticeably. The increase in match time reflects the latency inherent in waiting for multiple drivers to respond, while the drop in total match count suggests that the stricter requirements of higher k values may lead to more unfulfilled requests in a dynamic setting. This confirms the theoretical flexibility of the k-Accept lever: lower values of k prioritize throughput and speed (minimizing rider waiting time), while higher values prioritize the quality of individual matches at the expense of system fluidity/speed. As before, there again exists an inherent tradeoff between speed and quality. 
+
+3.3. Further Discussions 
+
+Drivers trust and the “Acceptance Rate Gap (AR-GAP)”. A critical food for thought associated with the transition to NED notification system is a behavioral feedback loop we term the Acceptance Rate Gap (AR-GAP) . If an NED system is implemented without safeguarding driver experience, it risks breaking trust in the platform’s reliability. This erosion can lead to a decrease in drivers’ acceptance probabilities, imposing signif-icant long-term costs on the platform. Specifically, if drivers frequently encounter contention, i.e., situations in which they accept a request only to be rejected in favor of another driver, they may become reluctant to engage with future notifications. This frustration can precipitate a decline in actual acceptance rates, severely undermining reducing the benefits of the new design. See Figure 6 for an illustration.               
+
+> Figure 6 Performance impact of the driver AR-GAP on optimal NED policies. An AR-GAP of xscales the baseline ED acceptance probability pto (1 −x)punder NED. While an AR-GAP of ≈0.4largely neutralizes NED’s advantages, its gains are fully realized as the acceptance rates converge (around AR-GAP ≤0.2).
+
+This adverse dynamic is particularly acute under the BA protocol, where a driver who successfully accepts a request is often explicitly rejected for a higher-utility candidate. In contrast, this issue is significantly mitigated under FA. In an FA system, the platform can retract outstanding notifications immediately upon the first acceptance, ensuring that contention events are rare and primarily driven by unavoidable network latency rather than protocol design. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+> 20
+
+We should also note that, as our study shows empirically (Section 3) and we later confirm theoretically (Section 4), in the NED notification system the throughput is higher, resulting in increased drivers’ earning opportunities. Therefore, while at the surface level a driver might feel that they are sometimes getting rejected, they will eventually be able to serve higher quality and in fact more number of riders—a win-win-win situation for the platform, drivers, and riders. 
+
+Implementation trade-offs: FA vs. BA. Beyond the behavioral risks associated with the AR-gap, the deci-sion to implement FA versus BA requires a broader perspective. While our simulations quantify the theoret-ical trade-offs in long-run performance, the operational choice involves practical considerations that extend beyond pure algorithmic study but are important in practice: • Driver experience and fairness: BA guarantees local optimality, ensuring the rider is matched with the best driver among those who accepted. This quality-based logic is easier to justify to drivers than a speed-based criterion. However, BA imposes a mandatory wait time; losing a match after waiting for the window to close can be a frustrating user experience. FA eliminates this “waiting in vain” by providing instant feedback, allowing rejected drivers to immediately consider other options. • Incentive structure and cancellations: FA creates a “race” dynamic that incentivizes drivers to respond as quickly as possible. While this speeds up market clearing, it may encourage “blind acceptance,” where drivers accept a request immediately without scrutinizing the trip details. This behavior can lead to higher post-acceptance cancellation rates, as drivers may renege once they realize the trip does not meet their preferences, thereby disrupting service reliability. 
+
+Towards a fully decentralized market design. The proposed NED framework represents a step away from purely centralized dispatching (where the platform dictates assignments) toward a semi-centralized market mechanism. However, a fully decentralized solution would eliminate the packing layer entirely, allowing drivers to view and bid on any ride in the system, potentially regulated by dynamic pricing or congestion controls. Although our current approach optimizes the “notification sets” to maximize system welfare, future research might explore mechanisms where the platform acts solely as a clearinghouse, allowing the market equilibrium to emerge organically from driver-initiated filtering and selection. 
+
+## 4. Marketplace Macro Model 
+
+In this section, we develop a stylized marketplace fluid model to isolate the long-run (i.e., equilibrium) impli-cations of the FA and BA contention-resolution protocols. The model is intentionally minimal: it abstracts away spatial heterogeneity and other platform details to focus on two questions suggested by our large-scale simulations in Section 3: (i) Can we theoretically justify the inherent trade-off between speed (FA) and quality (BA)? (ii) Does the choice of FA versus BA systematically thicken or thin the market in steady state? 
+
+Our theoretical analysis—as we elaborate throughout this section—highlights two countervailing forces, preventing either protocol from emerging as a dominant winner in terms of market thickness. Relative to BA, Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+21 
+
+the FA protocol clears notifications more quickly, so drivers and riders spend less time in the notification stage; this reduces friction and tends to increase the mass of agents available in the idle pools. At the same time, because FA attains a higher throughput of successful matches, it sustains higher driver utilization and therefore depletes the stock of idle drivers faster than BA. These forces offset in steady state. Consistent with the simulation evidence in Section 3, equilibrium market thickness is comparable under both regimes; consequently, long-run performance is driven primarily by the intrinsic speed–versus–quality trade-off rather than by major differences in endogenous market size. 
+
+Model. We consider a continuum model with mass dynamics on both sides of the market. At time t, there are Dt idle drivers and Rt waiting riders in the system. New drivers arrive at rate ˜λ, joining the idle pool, and new riders arrive at rate λ. At dispatch epochs (matching cycles), which occur according to a Poisson process, the platform selects a subset of at most U idle drivers to notify for each waiting rider, following a given NED algorithm ALG for single-cycle. Each notified driver responds after an exponential time with rate μ, independently accepting the request with probability p (and rejecting it with probability 1 − p). Upon acceptance, the platform either finalizes the match immediately or continues waiting for additional responses (depending on contention resolution protocol). Riders leave the platform and seek alternative options at rate η. This abandonment rate is independent of the notification state, since riders do not observe which drivers have been contacted until a match is finalized. Idle drivers also leave at rate ˜ηI, while notified drivers leave at a rate ˜ηN.
+
+Large market fluid model. To emphasize steady-state tradeoffs, we use a standard large-market scaling: all arrival, service, and churn rates are multiplied by a large factor N , and we study the resulting fluid limits rather than the full stochastic trajectories. 13 We focus on long-run averages over a horizon T and summarize equilibrium market thickness by (R0, D 0), where R0 denotes the long-run average number of riders awaiting notification, and D0 denotes the long-run average number of idle drivers. Furthermore, let qi represent the steady-state fraction of riders who notify exactly i drivers during a dispatch epoch. These quantities are strictly endogenous; they emerge from the interplay between the platform’s packing algorithm and the contention resolution protocol. In Sections 4.1 and 4.2, we analyze these structural interactions under the FA and BA protocols, respec-tively, for a fixed dispatch profile {qi}. Building on these derivations, Section 4.3 details the methodology for computing the equilibrium market thickness, successful match rate, and expected match time. Finally, in Section 4.4, we conduct numerical experiments to compare the protocols under this stylized framework, corroborating the extensive simulation results presented in Section 3.       
+
+> 13 Our fluid model is based on similar notions such as mean-field equilibrium (e.g., see Light and Weintraub (2022)) or stationary equilibrium (Adlakha et al., 2015). This approximation captures aggregate system behavior and allows us to characterize equilibrium driver availability and matching performance. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+22 
+
+4.1. First Accept Fluid Model 
+
+Under the FA rule, contention is resolved at the first acceptance, so the system dynamics simplify substantially. Each rider is either waiting to be notified to some drivers, or waiting for responses from a set of i ∈ { 1, . . . , U }
+
+notified drivers. Because the platform finalizes the match with the first accepting driver, riders never enter intermediate “accepted” states: when any of the i drivers accepts, the rider leaves the system and all other notified drivers return to the idle pool. 
+
+Riders. Consider a rider with i outstanding notifications. Responses arrive at total rate μi , and each response is an acceptance with probability p. Thus, the rider is matched at rate μip . If a responding driver rejects, which occurs at rate μi (1 − p), the rider transitions to a state with i − 1 outstanding notifications. This creates a cascade of states i → i − 1 → · · · → 0, where a rider either finds a match or, upon reaching state 0, is returned to the pool of riders waiting to be notified again. From there, the platform may issue a new set of notifications, or the rider may eventually abandon the system. 
+
+Drivers. The driver-side dynamics mirror these transitions. Each rider in state i corresponds to exactly i
+
+notified drivers in the dual driver state. A notified driver accepts at rate μp , in which case the match is finalized immediately and the driver leaves the system to serve the rider. A notified driver returns to the idle pool either by rejecting at rate μ(1 − p), or because another notified driver accepts first, which occurs at rate μ(i − 1) p.Finally, without loss of generality, we normalize the notification rate to one, so that a rider spends one unit of time in the idle state before being (re)notified to drivers. Figure 7 illustrates these flows for U = 3 . The resulting fluid dynamics describe how mass moves across rider states and driver states under FA, and will allow us to characterize both steady-state availability and matching throughput 
+
+# Riders Drivers                               
+
+> R0
+> λ
+> η
+> R3
+> R2
+> R1
+> 3 [ μ(1 −p) + ˜ ηN]
+> 2 ( μ(1 −p) + ˜ ηN)
+> 3μp
+> η
+> 2μp
+> η
+> μp
+> η
+> q1
+> q2
+> q3
+> μ(1 −p) + ˜ ηN
+> D0
+> ˜λ
+> ˜ηI
+> D3= 3 R3
+> D2= 2 R2
+> D1=R1
+> 2μ(1 −p) + 2˜ ηN
+> μ(1 −p) + ˜ ηN
+> μp
+> ˜ηN
+> μp
+> ˜ηN
+> μp
+> ˜ηN
+> q1R0
+> D0
+> 2q2R0
+> D0
+> 3q3R0
+> D0
+> μ(1 −p) + η
+> μp +μ(1 −p) + η
+> 2μp +μ(1 −p) + η
+
+Figure 7 State transition diagram for the FA protocol with U = 3 .Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+23 
+
+Let Ri denote the mass of riders currently waiting on an active notification set of size i, and Di the corre-sponding mass of drivers processing these requests. By construction, since every rider in state Ri has contacted exactly i drivers, the aggregate mass of drivers in the dual state satisfies the coupling condition Di = iR i, as in Figure 7. This dynamic is governed by the following system of flow equations (or equivalently, steady-state equations for the corresponding CTMC): 
+
+Rℓ (η + ℓ(μ + ˜ ηN)) = R0qℓ + ( ℓ + 1) Rℓ+1 (μ(1 − p) + ˜ ηN) 1 ≤ ℓ ≤ U (FA-E QUILIBRIUM )
+
+R0 η +
+
+> U
+
+X
+
+> ℓ=1
+
+qℓ
+
+!
+
+= λ + R1 (μ(1 − p) + ˜ ηN)
+
+D0 ˜ηI + R0
+
+> U
+
+X
+
+> ℓ=1
+
+ℓq ℓ = ˜λ +
+
+> U
+
+X
+
+> ℓ=1
+
+Dℓ (η + μ(1 − p) + ( ℓ − 1) μp ) ,
+
+where, as a convention, we define RU +1 to be zero. Solving these steady-state equilibrium equations charac-terizes the market sizes (R0, D 0) as a function of the dispatch probabilities {q1, . . . , q U }.
+
+Proposition 4.1 (FA Equilibrium) The long-run equilibrium market sizes under FA is given by: 
+
+R0 = λη + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+ , ˜λ − D0 ˜ηI
+
+μp + ˜ ηN
+
+=
+
+> λμ(1 −p)+˜ ηN
+
+PUℓ=1 
+
+PUi=ℓ qi
+
+Qij=ℓj(μ(1 −p)+˜ ηN)
+
+> η+j(μ+˜ ηN)
+
+
+
+η + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+ .
+
+While the specific algebraic form of these equations is secondary, the crucial insight is structural: there exists a continuous mapping from the notification size distribution {qi} to the steady-state market thickness (R0, D 0).Conversely, the platform’s dispatch logic (via the packing algorithm) induces a continuous mapping from the current market state (R0, D 0) back to the realized notification frequencies {qi}. Consequently, the composi-tion of these functions defines a continuous map from the probability simplex to itself. By Brouwer’s Fixed Point Theorem, there exists a fixed point representing the equilibrium of the fluid system. 
+
+Example 4.1 When η = 0 , the expressions simplify significantly. Let α := μ(1 −p)+˜ ηN 
+
+> μ+˜ ηN
+
+. Then: 
+
+˜λ − D0 ˜ηI
+
+μp + ˜ ηN
+
+=
+
+> λμ(1 −p)+˜ ηN
+
+PUℓ=1 
+
+PUi=ℓ qi
+
+Qij=ℓ α
+
+PUi=1 qi
+
+
+
+1 − Qij=1 α
+
+ =
+
+> λμ+˜ ηN
+
+PUi=1 qi
+
+Piℓ=1 αi−ℓ
+
+PUi=1 qi (1 − αi) = λμp .
+
+Observe that the expression derived above simplifies to the constant λμp , rendering it invariant with respect to the notification frequencies {qi}. Consequently, in this idealized regime, the specific parameterization of the dispatch heuristic—whether ED, NED, or varying degrees of myopia—has no impact on the equilibrium 
+
+D0. However, in practical settings where rider patience is finite ( η > 0), this invariance breaks down. The presence of abandonment explicitly couples the market thickness to the platform’s dispatch policy. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+> 24
+
+4.2. Best Accept Fluid Model 
+
+Under the BA rule, contention is resolved only after the platform collects responses from all notified drivers and selects the best available acceptance. As a result, the system dynamics are richer than under FA. Each rider is either waiting to be notified to drivers, waiting for responses from a set of i ∈ { 1, . . . , U } notified drivers, or is in an intermediate accepted state in which one or more drivers have accepted but the platform has not yet finalized the match. Unlike FA, a rider does not immediately leave the system upon the first acceptance, since the platform may wait to compare multiple acceptances before assigning the ride. 
+
+Riders. Consider a rider who has been notified to i drivers. Responses from these drivers arrive at total rate 
+
+μi . A rejection reduces the number of outstanding notifications, transitioning the rider from state i to i − 1.An acceptance, however, moves the rider into an accepted state rather than immediately finalizing the match. While in an accepted state, the rider may continue to receive additional responses from the remaining notified drivers, potentially accumulating multiple acceptances. The platform then finalizes the match according to the BA rule, selecting the best accepting driver once all the drivers responded. As riders do not observe this process, they depart at the rate η regardless of state. If all notified drivers reject, the rider eventually reaches state 0 and returns to the pool of riders waiting to be notified again. Under BA, once the i-th best notified driver accepts, notifications to all inferior drivers can be withdrawn since they will never be selected. At that moment, the rider enters an accepted state Ai (we abuse the notation and use Ai to denote both the accepted state i for the rider and also the mass of riders at this state), in which exactly i − 1 higher-ranked notified drivers remain outstanding. While in Ai, if an additional driver j < i accepts, the rider transitions to Aj , reflecting an improved best available acceptance. If one of the remaining higher-ranked drivers rejects, the rider transitions to Ai−1.Thus, accepted states evolve dynamically as responses arrive: acceptances induce transitions across accepted states corresponding to better ranked drivers, while rejections reduce the number of remaining can-didates. This structure captures the key feature of BA, namely that the platform retains the best acceptance observed so far while continuing to wait for potentially better ones. 
+
+Drivers. The driver-side dynamics reflect this delayed resolution. A driver notified for a given ride responds at rate μ. Upon acceptance, the driver does not immediately leave the system, but instead enters an intermediate accepted state where they remain pending until the platform finalizes the assignment. An accepting driver may be released back to the idle pool if another accepting driver is chosen, or if the rider exits the system. Rejections immediately return the driver to the idle pool. These dynamics are modeled using 2U states. Let D0 denote the mass of idle drivers who are not currently processing any notifications. For i ∈ { 1, . . . , U }, let Di represent the set of drivers who have been notified for a request and hold the i-th rank among all candidates notified for that specific ride. This formulation highlights a fundamental structural difference from the FA protocol. In the FA setting, a driver’s state is determined by the quantity of competitors (the total number of notified drivers). In contrast, under the BA protocol, the Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+25 
+
+state is determined by the driver’s relative rank (ordinality) within the notified set, as this ranking dictates the priority order for match finalization. In addition, for each i ∈ { 2, . . . , U }, we introduce an accepted state ˜Ai, which consists of drivers who have accepted a ride and currently hold the i-th best score for that rider. Drivers in ˜Ai remain pending until the platform either receives a better acceptance, in which case they are released back to D0, or a rejection from a higher-ranked driver, in which case they transition to state ˜Ai−1.This state representation captures the essential feature of BA on the driver side: acceptances are retained and ranked, but only the best available acceptance ultimately leads to a match, while inferior acceptances may be revoked. As in the FA model, we normalize the notification rate to one, so that riders spend one unit of time in the idle state R0 before being notified to drivers (if notified). Figure 8 illustrates the resulting state transitions for U = 3 . These dynamics form the basis for the fluid model under BA, which we use to analyze steady state behavior and matching performance. 
+
+## Riders Drivers                                              
+
+> R0
+> λ
+> η
+> R3
+> R2
+> R1
+> A3
+> A2
+> 3 [ μ(1 −p) + ˜ ηN]
+> 2 ( μ(1 −p) + ˜ ηN)
+> μp
+> η
+> μp
+> η
+> μp
+> η
+> q1
+> q2
+> q3
+> μp
+> μp
+> μp
+> μ+μ(1 −p) + 2˜ ηN
+> μp
+> η
+> μ+ ˜ ηN
+> η
+> μ(1 −p) + ˜ ηN
+> D0
+> ˜λ
+> ˜ηI
+> D3
+> D2
+> D1
+> ˜A3
+> ˜A2
+> 2μp +η
+> μp +η
+> 2 ( μ(1 −p) + ˜ ηN)
+> μ(1 −p) + ˜ ηN
+> μp
+> μp
+> 2 ( μ(1 −p) + ˜ ηN)
+> μ(1 −p) + ˜ ηN
+> ˜ηN
+> ˜ηN
+> μp
+> ˜ηN
+> (q3+q2+q1)R0
+> D0
+> (q3+q2)R0
+> D0
+> q3R0
+> D0
+> μ(1 −p) + η
+> μp +μ(1 −p) + η
+> 2μp +μ(1 −p) + η
+
+Figure 8 State transition diagram for the BA protocol with U = 3 .
+
+Similar to FA dynamics, the driver states closely mirror the rider states. In particular, for each rider in state 
+
+Ri, there is exactly one driver in each driver state Dj for j ≤ i. Also for each, rider in state Ai there are one driver in ˜Ai and one in each Dj for j < i . More formally (by an abuse of notation to use the name of each state to also denote the mass of riders/drivers at that state), 
+
+˜Ai = Ai, Di =
+
+> U
+
+X
+
+> j=i
+
+Rj +
+
+> U
+
+X
+
+> j=i+1
+
+˜Aj
+
+Furthermore, we have the following system of flow equations characterizing an equilibrium: Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+26 
+
+Rℓ (η + ℓ(μ + ˜ ηN)) = R0qℓ + ( ℓ + 1) Rℓ+1 (μ(1 − p) + ˜ ηN) 1 ≤ ℓ ≤ U
+
+(BA-E QUILIBRIUM )
+
+R0 η +
+
+> U
+
+X
+
+> ℓ=1
+
+qℓ
+
+!
+
+= λ + R1 (μ(1 − p) + ˜ ηN)
+
+Aℓ (η + ( ℓ − 1)( μ + ˜ ηN)) = μpR ℓ + ℓA ℓ+1 (μ(1 − p) + ˜ ηN) + μp 
+
+> U
+
+X
+
+> i=ℓ+1
+
+(Ai + Ri) 2 ≤ ℓ ≤ UD0 ˜ηI + R0
+
+> U
+
+X
+
+> ℓ=1
+
+ℓq ℓ = ˜λ +
+
+> U
+
+X
+
+> ℓ=1
+
+Dℓ (η + μ(1 − p) + ( ℓ − 1) μp ) + 
+
+> U
+
+X
+
+> ℓ=2
+
+˜Aℓ (η + ( ℓ − 1) μp ) ,
+
+where, for notational convenience, we define RU +1 = AU +1 = 0 .
+
+Proposition 4.2 (BA Equilibrium) The long-run equilibrium under BA is given by: 
+
+R0 = λη + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+Aℓ = R0
+
+PUi=ℓ−1 qi
+
+
+
+1 − Qij=ℓj(μ(1 −p)+˜ ηN)
+
+> η+j(μ+˜ ηN)
+
+
+
+η + ( ℓ − 1)(˜ ηN + μ) −
+
+> U
+
+X
+
+> j=ℓ
+
+
+
+> η+( ℓ−1) μp η+( ℓ−1)(˜ ηN+μ)
+
+Qji=ℓi(μ(1 −p)+˜ ηN)
+
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+
+
+Dℓ = R0
+
+> U
+
+X
+
+> j=ℓ
+
+Qji=ℓi(μ(1 −p)+˜ ηN)
+
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+
+
+D0 = ˜λ + PUℓ=1 Dℓ (η + μ(1 − p) + ( ℓ − 1) μp ) + PUℓ=2 ˜Aℓ (η + ( ℓ − 1) μp ) − R0
+
+PUℓ=1 ℓq ℓ
+
+˜ηI
+
+.
+
+It may appear puzzling that the formulas for total mass of riders in the Ri states, including R0, coincides with that under FA. The reason is that, under both FA and BA, once a ride receives an acceptance it will eventually exit the platform and never return. Under FA, the ride is always matched to the first accepting driver. Under BA, however, the ride may be assigned to a better ranked driver or may renege while waiting, thereby leaving the platform without a match. Although the resulting balance equations are identical on the rider side, the size of the idle driver pool D0 is different. This, in turn, changes the set of feasible matching options for each ride, altering the notification probabilities qi and thereby changing the equilibrium values of the Ri states, and in particular R0.As in the FA case, provided the dispatch algorithm maps the current market size (R0, D 0) continuously to the notification profile q, the system dynamics satisfy the conditions of Brouwer’s Fixed Point Theorem. This guarantees the existence of at least one equilibrium in this fluid system. 
+
+4.3. Equilibrium Analysis: The Iterative Fixed-Point Method 
+
+The fluid derivations in Sections 4.1 and 4.2 treat the notification profile q = {q0, q 1, . . . , q U } as an input, where qi represents the probability that a randomly arriving rider is notified by exactly i drivers. However, these probabilities are not exogenous constants; they are endogenous outcomes determined by the interplay between market density and the specific dispatch algorithm employed. This creates a circular dependency: Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+27 
+
+1. The steady-state market sizes ( R0, D 0) depend on the match probabilities q (via the flow balance equa-tions derived in section 4.1 and section 4.2 ). 2. The actual performance of the dispatch algorithm and the resulting match probabilities depend on the density of available agents in the steady-state of the market ( R0, D 0). To resolve this interdependency, we compute a fixed point q∗ that corresponds to a consistent operating state in which algorithmic outcomes align with the steady-state assumptions. In particular, we employ an iterative fixed-point approach illustrated in Figure 9. The process is iterative, where each iteration is as follows: 
+
+1. Initialization & analytical mapping. Starting from an initial guess q(t) at the beginning of iteration t, we use the fluid flow equations in our analytical framework (Proposition 4.1 and Proposition 4.2) to compute the implied steady-state market sizes, denoted R0(q(t)) and D0(q(t)).
+
+2. Simulation & empirical measurement. To validate the belief q(t), we simulate a marketplace snapshot with the computed densities (R0, D 0). We generate 1,000 independent problem instances using the data gener-ation process described in Section 4.4, and then run the dispatch algorithm using the discrete-event simulator in Section 3 (now with synthetic data) to record the outcomes. 
+
+3. Update & convergence. By aggregating the decisions made by the algorithm across all simulation instances, we obtain an empirical frequency vector q′. If q(t) matches the empirical frequencies (i.e., q(t) ≈
+
+q′), we declare convergence. Otherwise, we update our belief q(t+1) and go to the next iteration. Current Assumed Probabilities 
+
+q = ( q0, q 1, q 2, q 3)
+
+Theoretical State Calculation (Fluid Model Flow Equations) Simulation Environment  
+
+> - Sample 1000 instances based on R0, D 0
+> - Run Algorithm
+
+Observed Frequencies 
+
+q′ = ( q′
+
+> 0
+
+, q ′
+
+> 1
+
+, q ′
+
+> 2
+
+, q ′
+
+> 3
+
+) 
+
+> Theoretical Metrics (Match Time, Prob.)
+
+(R0, D 0)
+
+> Repeat until
+
+q ≈ q′ 
+
+> Figure 9 Schematic representation of the iterative process used to find the equilibrium in the stylized model.
+
+In the following Theorem we utilize the closed form solutions and prove that there exists a equilbirium point in this procedure. 
+
+Theorem 4.3 Let ∆U = {q ∈ RU +1 | PUi=0 qi = 1 , q i ≥ 0} denote the probability simplex of all valid notifica-tion profiles. Under the iterative procedure described in Figure 9, there exists at least one fixed point q∗ ∈ ∆U
+
+such that the expected empirical frequency vector q′ generated by the simulation environment exactly matches the assumed theoretical profile q∗.Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+28 
+
+Proof of Theorem 4.3. Let F : ∆ U → ∆U denote the composite mapping from the assumed probability profile 
+
+q to the expected empirical profile q′, such that F (q) = q′. We can decompose this mapping into two distinct steps: the analytical mapping M : q 7 → (R0, D 0) and the simulation mapping S : ( R0, D 0) 7 → q′.The domain ∆U is a probability simplex, which is by definition a compact and convex subset of RU +1 .In previous sections, we established that the analytical mapping M from q to the steady-state market sizes 
+
+(R0, D 0) is continuous. For the empirical mapping S, non-integer values of expected market sizes R0 and D0 must be passed into a discrete-event simulator. We handle this via probabilistic rounding: a continuous value x is instantiated as ⌈x⌉
+
+with probability x − ⌊ x⌋, and as ⌊x⌋ with probability ⌈x⌉ − x. This probabilistic interpolation ensures that the expected input distribution to the simulation environment varies continuously with the theoretical market thickness (R0, D 0). Consequently, the expected empirical output q′ also varies continuously with respect to the input (R0, D 0).Because both M and S are continuous, their composition F = S ◦ M is continuous over the domain. Since 
+
+F is a continuous mapping from a compact, convex set to itself, Brouwer’s Fixed Point Theorem guarantees the existence of at least one fixed point q∗ ∈ ∆U satisfying F (q∗) = q∗. □
+
+Finally, we utilize the matrix representation of the system dynamics to derive closed-form expressions for the match probability and the expected match latency. Let M be the m × m transient rate matrix for the rider states, where m = U + 1 for FA and m = 2 U for BA. Furthermore, let Q be the m × 2 absorption rate matrix, where the first column corresponds to reneging (all entries equal to η) and the second column corresponds to the “Matched” state. The specific entries are: 
+
+FA: Qi2 = ( i − 1) μp , BA: Qi2 = μp for 1 < i < 2U and Q(2 U )2 = μ + ˜ ηN.
+
+Using this framework, we derive the match probability and match time in the following proposition. 
+
+Proposition 4.4 Define the fundamental matrix as N = −M −1. For a rider starting in state i, the probability of being matched and the expected time to a successful match are given by: IP [Matched | X0 = i] = ( N Q )i2 , E [ Match Time | X0 = i, Matched ] =  N 2Q 
+
+> i2
+
+/ (N Q )i2 .
+
+4.4. Stylized Simulation Setup to Analyze Algorithmic Equilibrium 
+
+We consider a marketplace populated by R0 riders and D0 drivers. We make the assumption that these agents are geographically distributed in a two-dimensional Euclidean plane. The coordinates (x, y ) of all agents are drawn independently from a standard normal distribution N (0 , 1) , reflecting the clustering of demand and supply in urban centers (Figure 10). The utility of a match is modeled as a decaying function of distance. Specifically, the score S(d) for a match between a driver and rider separated by Euclidean distance d is defined as S(d) = 11+ d .14   
+
+> 14 Similar to Section 3, this stylized choice is due to the fact that we cannot use Lyft’s original scoring system in a simulation with counterfactual pairs, due to certain technical limitations beyond the scope of this work. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+29  
+
+> Figure 10 Spatial distribution of 10 riders and 20 drivers in the stylized simulation setup.
+
+Given any dispatch policy (notification packing and contention resolution) and fixing the market size parameters (R0, D 0), we first define a mapping from (R0, D 0) to a probability distribution over notification sizes, denoted by the vector q = [ q1, . . . , q U ] (as described Section 4.3; see also Figure 9). This mapping is implicitly constructed via running a simulation in the above stylized marketplace . More specifically, we focus on the algorithms we discussed in Section EC.2.1—including OPT NED, optimal ED, Greedy and ED+— under contention resolution protocols FA and BA. For each of these dispatch procedures, given input market size (R0, D 0), we run a Monte-Carlo simulation, where in each iteration we sample the spatial locations of 
+
+R0 riders and D0 drivers to create a static snapshot of the market. Based on these locations and hence the scoring function S(d), we simulate the policy for a single cycle using the framework in Section 3, and take the average over samples to obtain an estimated distribution over notification sizes q.Having query access to the above mapping, we plug it into our iterative fixed-point approach described in Section 4.3, which in turn uses the theoretical fixed-point equations established in Section 4.1 and Section 4.2 as explained earlier. This allows us to calculate the resulting long-term steady-state market thickness (R0, D 0)
+
+for that specific dispatch policy, and to compute the induced equilibrium outcomes. Somewhat interestingly, we observe quite fast convergence in our simulations. For example, see Figure 11 for the convergence trajec-tories of optimal NED and ED under FA/BA to their respective equilibria. 
+
+The impact of algorithmic choices on market equilibrium. Changing the core notification packing algo-rithm of the dispatch policy itself (alongside its key parameters, such as the maximum notification set size U
+
+and the optimization threshold θ), and, critically, the contention resolution protocol, fundamentally alters the notification distribution q. As shown in Figure 12, this ultimately drives a shift in the market equilibrium—i.e., the equilibrium size/thickness of the market on both riders and drivers side, specified by parameters (R0, D 0)
+
+as detailed earlier. A notable managerial observation concerns the equilibrium driver count under the BA protocol. Intuitively, since the BA notification process is sequential and thus slower per request, one might expect a larger backlog Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+30    
+
+> Figure 11 Convergence trajectory of optimal NED policies and ED to their respective equilibria. Starting from a common initial state, the paths trace the iterative evolution of ( (R0, D 0)) market sizes under different algorithmic configurations ( U∈ { 3,5}, FA vs. BA). The markers denote the state at each iteration of the fixed-point computation.
+
+of busy drivers, resulting in lower availability ( D0) compared to FA. However, our results show the opposite. The FA protocol achieves a higher match rate, meaning it successfully transitions more drivers from the “idle” state to the “en-route/busy” state. In the regime we studied, this higher throughput dominates the latency effect: FA depletes the idle driver pool more aggressively than BA, resulting in a lower equilibrium D0.
+
+Performance landscape. Figure 12 illustrates the performance trade-offs associated with various policies we described in Section EC.2.1 across the ( U, θ ) parameter space. (Refer to Section EC.3.1 for a sensitivity analysis with respect to these parameters.) It is important to note the hybrid methodology used to generate these insights: the “Score” is an empirical metric derived from the spatial utility of matches in the equilibrium, whereas the “Match Probability” and “Match Time” are theoretical values computed by evaluating the steady-state expressions from Proposition 4.4 at the induced equilibrium. Consistent with the trends observed in Figure 4, the equilibrium results confirm two key insights. First, the NED strategy consistently outperforms exclusive dispatch across nearly all parameter settings. Second, the incorporation of long-term market dynamics does not alter the fundamental operational trade-off: the BA Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+31                   
+
+> Figure 12 Equilibrium outcome of {OPT NED, Greedy, ED+ }under different parameters and contention-resolution protocols. Note that Rejection-aware will be ED as p > 0.2. Parameters:
+> ˜ηN= 0 ,˜ηI=η= 0 .01 ,p= 0 .4,μ= 0 .1, and λ= 1 .2,˜λ= 1 .
+
+protocol remains the optimal choice for maximizing match quality (score), whereas the FA protocol dominates in terms of service speed and market liquidity/matching throughput. 
+
+Model limitations. We note a structural limitation of this stylized model compared to the high-fidelity simu-lation in Section 3. To evaluate system performance, we first determine the equilibrium market size using the iterative procedure outlined in Figure 9. Once the steady-state pool size is established, we compute the aver-age match score by halting new arrivals and running the algorithms on the resulting fixed graph—accounting for potential reneging—until all viable edges have been evaluated. We explicitly design this exhaustive, multi-cycle approach to avoid the severe optimistic bias inherent in a single-cycle evaluation. Because our macroscopic model samples a fresh graph for each evaluation, calculating a single-cycle average score would naively assume that when algorithms like ED successfully make a match, they always pair riders with their absolute closest drivers on the first attempt. By forcing the algorithms to process rejections and secondary matches on a static graph until no edges remain, we attempt to strip away this unrealistic upper bound and obtain a much fairer approximation of true algorithmic performance. Yet, this approach is still not ideal. Furthermore, while the macroscopic model effectively captures steady-state pool sizes for both riders and drivers, it relies on independent draws between samples. Whether this abstraction disproportionately favors NED or ED remains ambiguous due to two opposing forces. First, in reality, ED operates sequentially: if a primary driver rejects a dispatch, that driver remains in the system and may still be available for subsequent requests. The stylized model’s assumption of independent draws abstracts away this temporal persistence, potentially biasing (upward or downward) ED’s true efficiency. On the other hand, the model assumes that a larger, “thicker” market uniformly improves match probability. In practice, however, part of the excess market thickness often manifests as an accumulation of drivers and riders that were difficult to match in previous cycles—for instance, drivers located at the spatial peripheries of a city where matches are inherently more Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+32 
+
+difficult to form. Because ED tends to maintain a thicker overall market due to its slower matching dynamics, our macroscopic model likely overvalues the practical utility of ED’s larger pool size, which will be more skewed toward the borders of the city. Consequently, these two spatial and temporal abstractions pull in opposite directions, making the theoretical comparison structurally balanced. 
+
+## 5. Conclusions & Future Directions 
+
+In this work—part of our collaboration with Lyft and paired with our companion paper Ekbatani et al. (2026)—we study how dispatch policies shape long-run performance in ride-hailing. We combine two com-plementary approaches—first an empirical approach based on a large-scale simulations driven by Lyft data and second a theoretical approach based on a stylized Markovian macro model that isolates equilibrium forces. This combination allowed us to validate our conclusions in both complex, real-world scenarios and controlled theoretical environments. Our analysis yields several key takeaways, and we highlight some of them here (see the full list with more details in Section 3 and Section 4). First, non-exclusive dispatch (NED) consistently outperforms tra-ditional exclusive dispatch (ED) across a wide range of market conditions. Crucially, this advantage remains robust even when the platform has only coarse estimates of driver acceptance probabilities, indicating that the benefits of NED are not contingent on perfect behavioral estimation. Second, we quantify a fundamental trade-off between contention-resolution protocols: First-Accept (FA) maximizes speed and liquidity, whereas Best-Accept (BA) is required to maximize per-match quality. Third, both the equilibrium analysis and the simulations show sharply diminishing returns to increasing the notification bound U , suggesting that small notification sets can capture most of NED’s value while limiting communication overhead. Several avenues for future research remain. First, while we modeled driver acceptance as stochastic, future work should consider strategic behavior, where drivers might gamify their response times under different protocols. Second, our findings suggest the potential for adaptive policies that dynamically toggle between FA and BA or adjust notification bounds based on real-time market states. Finally, developing simple, inter-pretable packing heuristics (or algorithms with theoretical performance guarantees) that capture the core dynamic effects remains an interesting direction. 
+
+## References       
+
+> Sachin Adlakha, Ramesh Johari, and Gabriel Y Weintraub. Equilibria of dynamic games with many players: Existence, approximation, and market structure. Journal of Economic Theory , 156:269–316, 2015. Nikhil Agarwal, Charles Hodgson, and Paulo Somaini. Choices and outcomes in assignment mechanisms: The allocation of deceased donor kidneys. Econometrica , 93(2):395–438, 2025. Mohammad Akbarpour, Shengwu Li, and Shayan Oveis Gharan. Dynamic matching market design. In Proceedings of the fifteenth ACM conference on Economics and computation , pages 355–355, 2014. Aydin Alptekinoglu and Gerdus Benad` e. Achieving rawlsian justice in food rescue. Available at SSRN 4992842 , 2024. Alireza AmaniHamedani, Ali Aouad, Tristan Pollner, and Amin Saberi. Improved approximations for stationary bipartite matching: Beyond probabilistic independence. arXiv preprint arXiv:2411.08218 , 2024. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+33 
+
+Ali Aouad and ¨ Omer Sarıtac ¸. Dynamic stochastic matching under limited time. Operations Research , 70(4), 2022. Waqar Aqeel, Debopam Bhattacherjee, Balakrishnan Chandrasekaran, P Brighten Godfrey, Gregory Laughlin, Bruce Maggs, and Ankit Singla. Untangling header bidding lore: Some myths, some truths, and some hope. In International Conference on Passive and Active Network Measurement , pages 280–297. Springer, 2020. Itai Ashlagi, Maximilien Burq, Chinmoy Dutta, Patrick Jaillet, Amin Saberi, and Chris Sholley. Edge-weighted online windowed matching. Mathematics of Operations Research , 48(2):999–1016, 2023. Baris Ata, Nasser Barjesteh, and Sunil Kumar. Dynamic dispatch and centralized relocation of cars in ride-hailing platforms. Available at SSRN 3675888 , 2020. Rosemonde Ausseil, Jennifer A Pazour, and Marlin W Ulmer. Supplier menus for dynamic matching in peer-to-peer transportation platforms. Transportation Science , 56(5):1304–1326, 2022. Angelos Aveklouris, Levi DeValve, Maximiliano Stock, and Amy Ward. Matching impatient and heterogeneous demand and supply. 
+
+Operations Research , 73(3):1637–1658, 2025. Xabi Azagirre, Akshay Balwally, Guillaume Candeli, Nicholas Chamandy, Benjamin Han, Alona King, Hyungjun Lee, Martin Lon-caric, S´ ebastien Martin, Vijay Narasiman, et al. A better match for drivers and riders: Reinforcement learning at lyft. INFORMS Journal on Applied Analytics , 54(1):71–83, 2024. Kirk Bansak, Soonbong Lee, Vahideh Manshadi, Rad Niazadeh, and Elisabeth Paulson. Dynamic matching with post-allocation service and its application to refugee resettlement. In Proceedings of the 25th ACM Conference on Economics and Computation ,pages 673–673, 2024. Fuat Basık, Bu˘ gra Gedik, Hakan Ferhatosmano˘ glu, and Kun-Lung Wu. Fair task allocation in crowdsourced delivery. IEEE Transac-tions on Services Computing , 14(4):1040–1053, 2018. Juan Camilo Castillo, Dan Knoepfle, and E Glen Weyl. Matching and pricing in ride hailing: Wild goose chases and how to solve them. Management Science , 71(5):4377–4395, 2025. Francisco Castro, Peter Frazier, Hongyao Ma, Hamid Nazerzadeh, and Chiwei Yan. Matching queues, flexibility and incentives. arXiv preprint arXiv:2006.08863 , 2020a. Francisco Castro, Hamid Nazerzadeh, and Chiwei Yan. Matching queues with reneging: a product form solution. Queueing Systems ,96(3):359–385, 2020b. Francisco Castro, Hongyao Ma, Hamid Nazerzadeh, and Chiwei Yan. Randomized fifo mechanisms. In Proceedings of the 23rd ACM Conference on Economics and Computation , pages 60–60, 2022. Francisco Castro, Jian Gao, and Sebastien Martin. Autonomous vehicles in ride-hailing and the threat of spatial inequalities. Available at SSRN 4332493 , 2024. Taijie Chen, Zijian Shen, Siyuan Feng, Linchuan Yang, and Jintao Ke. Dynamic adjustment of matching radii under the broadcasting mode: A novel multitask learning strategy and temporal modeling approach. arXiv preprint arXiv:2312.05576 , 2023. Taijie Chen, Jian Liang, Ya Zhao, and Jintao Ke. To grab or not? revealing determinants of drivers’ willingness to grab orders in on-demand ride services. Travel Behaviour and Society , 41:101093, 2025a. Taijie Chen, Zijian Shen, Siyuan Feng, Linchuan Yang, and Jintao Ke. Dynamic matching radius decision model for on-demand ride services: A deep multi-task learning approach. Transportation Research Part E: Logistics and Transportation Review , 193:103822, 2025b. Nico Dellaert, Loe Schlicher, Janneke Hillenaar, and C Jagtenberg. Do community first responder networks have potential, 2024. Farbod Ekbatani, Rad Niazadeh, Mehdi Golari, Romain Camilleri, Titouan Jehl, Chris Sholley, Matthew Leventi, Theresa Calderon, Angela Lam, Paul Havard Duclos, Tim Holland, James Koch, and Shreya Reddy. Non-exclusive notifications for ride-hailing at lyft i: Single-cycle approximation algorithms. Available at SSRN 6273539 , 2026. Siyuan Feng, Jintao Ke, Feng Xiao, and Hai Yang. Approximating a ride-sourcing system with block matching. Transportation Research Part C: Emerging Technologies , 145:103920, 2022. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+34 
+
+Yiding Feng and Rad Niazadeh. Batching and optimal multistage bipartite allocations. Management Science , 71(5):4108–4130, 2025. Yiding Feng, Rad Niazadeh, and Amin Saberi. Two-stage stochastic matching and pricing with applications to ride hailing. Operations Research , 72(4):1574–1594, 2024. Daniel Freund, Ilan Lobel, and Jiayu Zhao. On the supply of autonomous vehicles in platforms. Manufacturing & Service Operations Management , 2025. N. Garg and H. Nazerzadeh. Driver surge pricing. Management Science , 68(5):3219–3235, 2022. doi: 10.1287/mnsc.2021.4069. Shane G Henderson, Pieter L van den Berg, Caroline J Jagtenberg, and Hemeng Li. How should volunteers be dispatched to out-of-hospital cardiac arrest cases? Queueing Systems , 100(3):437–439, 2022. Hannah Horner, Jennifer Pazour, and John E Mitchell. Optimizing driver menus under stochastic selection behavior for ridesharing and crowdsourced delivery. Transportation Research Part E: Logistics and Transportation Review , 153:102419, 2021. Hannah Horner, Jennifer Pazour, and John E Mitchell. Increasing driver flexibility through personalized menus and incentives in ridesharing and crowdsourced delivery platforms. Naval Research Logistics (NRL) , 72(1):3–23, 2025. S Ali Husain, Kristen L King, Stephen Pastan, Rachel E Patzer, David J Cohen, Jai Radhakrishnan, and Sumit Mohan. Association between declined offers of deceased donor kidney allograft and outcomes in kidney transplant candidates. JAMA network open , 2 (8):e1910312–e1910312, 2019. Y. Jiao, S. Lin, F. Chen, X. Tang, Z. Li, and J. Ye. Modeling and optimizing multi-modal on-demand ride services with ridesharing and re-positioning. Transportation Research Part C: Emerging Technologies , 128:103289, 2021. doi: 10.1016/j.trc.2021.103289. Jintao Ke, Feng Xiao, Hai Yang, and Jieping Ye. Optimizing online matching for ride-sourcing services with multi-agent deep reinforcement learning. arXiv preprint arXiv:1902.06228 , 2019. Soonbong Lee, Vahideh Manshadi, and Daniela Saban. Who to offer, and when: Redesigning feeding america’s real-time donation tool. Available at SSRN 5592190 , 2025. Zhen Lian and Garrett van Ryzin. Capturing the benefits of autonomous vehicles in ride hailing: The role of market configuration. 
+
+Management Science , 71(7):5491–5510, 2025. Bar Light and Gabriel Y Weintraub. Mean field equilibrium: Uniqueness, existence, and comparative statics. Operations Research ,70(1):585–605, 2022. Haoyue Liu, Sheng Liu, and Mingyao Qi. Recommend-to-match with random supply rejections: Formulation, approximation, and analysis. arXiv preprint arXiv:2510.19122 , 2025. Ilan Lobel and Sebastien Martin. Detours in shared rides. Management Science , 71(2):1716–1736, 2025. Seyed Shahab Mofidi and Jennifer A Pazour. When is it beneficial to provide freelance suppliers with choice? a hierarchical approach for peer-to-peer logistics platforms. Transportation Research Part B: Methodological , 126:1–23, 2019. Erhun ¨ Ozkan and Amy R Ward. Dynamic matching for real-time ride sharing. Stochastic Systems , 10(1):29–70, 2020. Michalis Pachilakis, Panagiotis Papadopoulos, Evangelos P Markatos, and Nicolas Kourtellis. No more chasing waterfalls: a mea-surement study of the header bidding ad-ecosystem. In Proceedings of the Internet Measurement Conference , pages 280–293, 2019. Xiaoran Qin, Hai Yang, and Yuhan Liu. A two-round broadcasting matching mechanism in ride-sourcing markets: Implication and optimization. Transportation Research Part C: Emerging Technologies , 180:105318, 2025. Z. Qin, X. Tang, Y. Jiao, F. Xu, H. Zhu, and J. Ye. Efficient ride-sharing order dispatching with mean field multi-agent reinforcement learning. In Proceedings of The Web Conference (WWW) , 2019. doi: 10.1145/3308558.3313433. Z. Qin, X. Tang, Y. Jiao, F. Xu, H. Zhu, and J. Ye. Ride-sharing order dispatching at DiDi via reinforcement learning. INFORMS Journal on Applied Analytics , 50(5):272–286, 2020. doi: 10.1287/inte.2020.1056. Duncan Rheingans-Yoo, Scott Duke Kominers, Hongyao Ma, and David C Parkes. Ridesharing with driver location preferences. In 
+
+Proceedings of the 28th International Joint Conference on Artificial Intelligence , pages 557–564, 2019. Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+35 
+
+Zheyuan Ryan Shi, Yiwen Yuan, Kimberly Lo, Leah Lizarondo, and Fei Fang. Improving efficiency of volunteer-based food rescue operations. In Proceedings of the AAAI Conference on Artificial Intelligence , volume 34, pages 13369–13375, 2020. Luoyi Sun, Ruud H Teunter, Guowei Hua, and Tian Wu. Taxi-hailing platforms: Inform or assign drivers? Transportation Research Part B: Methodological , 142:197–212, 2020. Sushil Mahavir Varma, Francisco Castro, and Siva Theja Maguluri. Near optimal control in ride hailing platforms with strategic servers. In Proceedings of the ACM SIGMETRICS / International Conference on Measurement and Modeling of Computer Systems ,2021. doi: 10.1145/3410220.3456272. Jan Vondr´ ak. Optimal approximation for the submodular welfare problem in the value oracle model. In Proceedings of the fortieth annual ACM symposium on Theory of computing , pages 67–74, 2008. Andrew Wey, Nicholas Salkowski, Bertram L Kasiske, Ajay K Israni, and Jon J Snyder. Influence of kidney offer acceptance behavior on metrics of allocation efficiency. Clinical transplantation , 31(9):e13057, 2017. Z. Xu, Z. Li, Q. Guan, T. Li, H. Jin, H. Zhang, Z. Wang, X. Wang, and J. Liu. Large-scale order dispatch in on-demand ride-hailing platforms: A learning and planning approach. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining (KDD) , pages 905–913, 2018a. doi: 10.1145/3219819.3219824. Zhe Xu, Zhixin Li, Qingwen Guan, Dingshui Zhang, Qiang Li, Junxiao Nan, Chunyang Liu, Wei Bian, and Jieping Ye. Large-scale order dispatch in on-demand ride-hailing platforms: A learning and planning approach. In Proceedings of the 24th ACM SIGKDD international conference on knowledge discovery & data mining , pages 905–913, 2018b. Julia Yan, S´ ebastien Martin, and Sean J Taylor. Trading flexibility for adoption: From dynamic to static walking in ride-sharing. 
+
+Management Science , 71(7):5875–5892, 2025. Q. Yan, X. Xie, J. Wu, V. Kulkarni, and H. Wang. Dynamic pricing and matching in ride-hailing platforms. Naval Research Logistics ,67, 2020. doi: 10.1002/nav.21872. Yue Yang and Mohsen Ramezani. Addressing supply and demand heterogeneity: Trip order menus in ride-hailing platforms. In 
+
+TRISTAN XI: Triennial Symposium on Transportation Analysis , 2022. Lingyu Zhang, Tao Hu, Yue Min, Guobin Wu, Junying Zhang, Pengcheng Feng, Pinghua Gong, and Jieping Ye. A taxi order dispatch model based on combinatorial optimization. In Proceedings of the 23rd ACM SIGKDD international conference on knowledge discovery and data mining , pages 2151–2159, 2017. e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis ec1 
+
+# This page is intentionally blank. The e-companion (EC) starts next page. ec2 e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+## EC.1. Related Work 
+
+This appendix provides a more detailed discussion of how our work relates to existing research in operations research, economics, and computer science. 
+
+Dynamic matching and matching queues. A parallel stream of work analyzes dispatch as a dynamic match-ing or matching-queue problem in transportation and ride-hailing platforms. Classical and recent models study steady-state performance and design of matching policies under stochastic arrivals, waiting costs, abandon-ment, and post-allocation services; see, e.g., ¨ Ozkan and Ward (2020); Aouad and Sarıtac ¸ (2022); Ashlagi et al. (2023); AmaniHamedani et al. (2024); Aveklouris et al. (2025); Akbarpour et al. (2014); Ata et al. (2020); Bansak et al. (2024) and references therein. These works typically focus on designing dynamic policies and analyzing steady-state performance under binding allocations. Our paper shares their long-run view but dif-fers structurally: driver participation is explicitly stochastic at the dispatch stage, and the platform can issue multiple notifications for the same ride. Our aim is not to propose an optimal policy for a stylized queueing model, but to quantify and explain the long-run trade-offs induced by simple, implementable design choices. Closest in spirit in the above literature are models that treat offers as non-binding and incorporate reneg-ing and acceptance frictions. For instance, Castro et al. (2020b) analyze matching queues with reneging; Castro et al. (2022) propose randomized FIFO-style mechanisms for sequential offer processes; and Castro et al. (2020a) study flexibility incentives in matching queues. Related models also incorporate strategic and preference-driven acceptance (with abandonment and randomized priority rules), such as strategic servers in ride-hailing Varma et al. (2021) and driver location preferences Rheingans-Yoo et al. (2019). While these papers share with us the emphasis on long-run marketplace effects, our setting differs from these sequential-offer models by emphasizing simultaneous broadcast notifications in each cycle and by explicitly comparing contention-resolution protocols that map multiple acceptances to a single match. 
+
+Non-exclusive dispatch, broadcasting, and order-grabbing in ride-hailing. A growing transportation sci-ence literature studies variants of non-exclusive (broadcast) dispatch in ride-hailing and taxi-hailing systems, in which requests are broadcast or “informed” to multiple drivers without immediate commitment, and drivers decide whether to grab the order. For example, on the modeling side, Sun et al. (2020) study whether a plat-form should inform multiple drivers or assign a ride to a single driver, and study their operational implications. More recent work in transportation literature study richer broadcast and multi-round procedures in which a request can be offered to multiple drivers and refined over time; for example, Qin et al. (2025) propose a two-round broadcasting mechanism to reduce idle driving time, and Feng et al. (2022) study multi-driver dis-patch via block matching. Other empirical and learning-oriented work studies how the matching radius and driver response behavior interact under broadcasting, including dynamic matching radii and order-grabbing behavior Chen et al. (2025b,a, 2023). These papers share with our setting the key feature that notifications are non-binding and acceptance behav-ior is uncertain. Our focus differs in two ways. First, we explicitly model the contention-resolution step that e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis ec3 
+
+follows broadcast notifications and compare two canonical protocols used in practice (First-Accept versus Best-Accept). Second, we study long-run marketplace effects: we combine a high-fidelity discrete-event sim-ulator calibrated to Lyft data with a stylized macro model that explains why the FA–BA trade-off persists at equilibrium. 
+
+Matching and pricing at ride-hailing platforms. Our study is motivated by operational questions at Lyft and complements a growing body of research on marketplace mechanisms developed for ride-hailing plat-forms to handle high-volume dispatch. Recent work analyzes design trade-offs such as the Pareto frontier between shared-ride value and detours Lobel and Martin (2025), the adoption benefits of static versus dynamic pickup locations Yan et al. (2025), the effect of batching in matching and pricing Feng et al. (2024); Feng and Niazadeh (2025), and the use of reinforcement learning to move from greedy heuristics to global value maximization Azagirre et al. (2024). More broadly, the systems and ML communities have proposed large-scale dispatch and repositioning methods for ride-hailing platforms, including learning-and-planning dispatch pipelines Xu et al. (2018a), mean-field and multi-agent reinforcement learning for dispatch and matching Qin et al. (2019, 2020); Ke et al. (2019), and reinforcement-learning repositioning policies Jiao et al. (2021). Com-plementary OR research studies matching and pricing interactions Yan et al. (2020); Garg and Nazerzadeh (2022); Castillo et al. (2025). Parallel streams of research—often in collaboration with ride-hailing services and Autonomous Vehicle (AV) platforms—study the economic and operational integration of mixed fleets; see, for instance, Castro et al. (2024); Freund et al. (2025); Lian and van Ryzin (2025). Our work comple-ments this literature by isolating the notification layer of the stack its long-run implications when acceptance is imperfect. We analyze how the choice of packing algorithm and contention-resolution protocol (FA vs. BA) determines whether downstream objectives can be realized in a stochastic environment characterized by imperfect driver acceptance behavior. 
+
+Supplier menus and choice-based dispatch. Another related thread studies menus in dynamic matching markets, where the platform presents a set of options to a strategic supplier (e.g., a driver) who then chooses an assignment. In the ride-sourcing and logistics context, Ausseil et al. (2022) formulate the platform problem as designing supplier menus that maximize expected performance under stochastic choice. Hierarchical and assortment-style menu designs have also been proposed in peer-to-peer logistics and on-demand matching Mofidi and Pazour (2019); Horner et al. (2021, 2025); Yang and Ramezani (2022). While our NED mechanism presents at most one offer to each driver (to reflect practical UI constraints), the menu literature is conceptually aligned in that it gives more options to drivers. Also, compared to our setting, these models often place additional emphasis on strategic choice and incentive effects of the menu design. Our focus is different: we treat acceptance behavior as an exogenous stochastic input that comes from estimations (and also consider homogeneous-acceptance policies for fairness and practicality that use the same global estimate). 
+
+FA/BA-style broadcast allocation beyond ride-hailing. Broadcast-offer allocation with stochastic participation—where allocation goes to the first responder (FA) or to the best among (timely) responders ec4 e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+(BA)—also appears in several other application domains. Examples include food rescue and donation plat-forms Alptekinoglu and Benad` e (2024); Lee et al. (2025); Shi et al. (2020), community first-responder dis-patch Henderson et al. (2022); Dellaert et al. (2024), and spatial crowdsourcing systems that multicast tasks and then finalize among responders Basık et al. (2018). Another possible application is deceased-donor trans-plantation, where organ offers are extended to candidates and centers whose acceptance behavior is hetero-geneous and time-sensitive Wey et al. (2017); Husain et al. (2019); Agarwal et al. (2025). A closely related BA instantiation arises in online advertising “header bidding,” where impressions are broadcast to multiple exchanges and the highest timely bid wins Pachilakis et al. (2019); Aqeel et al. (2020). Closest to us in terms of the model and technical framework is the concurrent work by Liu et al. (2025) that studies a two-stage “recommend-to-match” problem for crowd-sourcing logistics/freight platforms under stochastic supplier rejections. Their formulation coincides with the Best-Accept objective in our model (up to an additional constraint that each request is recommended to at most some number of suppliers) and enforces the same supply-side exclusivity (each supplier receives at most one recommendation). The focus of this paper is different from ours, as they consider tractable mathematical programming approaches, giv-ing an exact MILP for the homogeneous-acceptance special case and proposing a mixed-integer exponential cone approximation with parametric performance bounds and extensive numerical evaluation. Our compan-ion paper Ekbatani et al. (2026) looks at a similar algorithmic problem. In contrast to this paper, we provide an exact polynomial-time algorithm for the BA homogeneous-acceptance special case in this companion work. Also, our companion work provides complexity results and worst-case approximation algorithms for both Best-Accept and First-Accept contention protocols in the general case, including a PTAS/constant-factor guarantees and improved approximation beyond 1 − 1/e for BA via demand-oracle methods. 
+
+## EC.2. Missing Details of Section 3 
+
+EC.2.1. NED Packing Algorithms 
+
+Throughout our simulations, we evaluate the performance of several distinct algorithmic strategies. 
+
+EC.2.1.1. Optimal packing (NED OPT) The first approach we consider involves solving the opti-mization problem defined in (W ELFARE -M AX ) to optimality. As previously noted, while this problem is computationally demanding in the general case, the sparsity inherent in practical ride-sharing graphs (as detailed in Appendix 3.1.2) renders it solvable within seconds for typical instances. Efficient implementation also requires specific data preprocessing steps. This algorithm is governed by two key parameters: the maximum notification batch size U and the oppor-tunity cost threshold θ. Varying these parameters allows us to modulate the system’s behavior along the spectrum of temporal foresight. Specifically, large values of U combined with low values of θ induce a more 
+
+myopic policy, prioritizing immediate match probability over the conservation of driver supply for future intervals. A particularly significant special case arises when U = 1 and θ = 0 . Under this parameterization, e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis ec5 
+
+the formulation reduces to a standard Maximum Weight Matching problem. This configuration effectively models the classical exclusive dispatch system (ED), serving as a baseline to quantify the specific efficiency gains derived from NED notifications. 
+
+EC.2.1.2. Greedy heuristic (Algorithm 1) Motivated by the greedy algorithm for submodular wel-fare maximization, we employ a sequential heuristic to solve the packing problem. This approach iterates through the available drivers and tentatively assigns each to the ride that yields the highest marginal increase in expected welfare, provided the notification batch size does not exceed U . To ensure efficiency, the assignment is finalized only if the marginal gain outweighs the weighted opportunity cost θp d.
+
+EC.2.1.3. Rejection-aware heuristic (Algorithm 2) We evaluate another heuristic designed to approximate practical dispatch logic. Unlike the previous approach, which processes drivers sequentially, this algorithm processes rides sequentially. For each request, it greedily constructs a notification set by selecting the highest-quality available drivers. This aggregation continues until a reliability condition is met, specifi-cally, until a driver with a sufficiently low rejection probability (e.g., < 0.8) is included, or until the batch reaches a hard cap of U . Any agents remaining after this sequential pass are matched using a standard one-to-one Maximum Weight Matching algorithm. The rationale behind this heuristic is to prevent over-notification, that is, notifying a large set of drivers for the same ride, for easy-to-match rides. By ensuring that a request does not unnecessarily tie up multiple drivers with high acceptance likelihoods, the algorithm reduces the inefficiency associated with resolving contention among multiple accepting drivers. 
+
+EC.2.1.4. Enhanced Exclusive Dispatch (ED+) We also consider the Enhanced Exclusive Dispatch (ED+) (Algorithm 3) algorithm, a hybrid strategy that improves upon the standard ED baseline. The algorithm operates in two distinct phases. First, it computes a global Maximum Weight Matching (the standard ED solution) to assign one available driver d∗ 
+
+> r
+
+to ride r in a one-to-one fashion. In the second phase, the algorithm attempts to enhance these assignments by identifying a second-best driver from the remaining unassigned pool. If adding this secondary driver increases the expected welfare by more than the threshold θp d, the notification set is expanded; otherwise, the original single assignment is preserved. This ensures that the system retains the efficiency of the standard global matching while selectively reinforcing specific high-value or high-risk requests. 
+
+EC.2.2. Homogeneous-Acceptance Policies: Simulations & Results 
+
+We consider homogeneous-acceptance setting in this section, and run a new set of experiments. In these experiments, we replace the true probabilities in the optimization model with a static value ¯p = 0 .4. A critical observation here is the discrepancy between the population average and the effective pool average. While the arithmetic mean of the true acceptance probabilities across the entire driver population is approximately 0.58 ,the effective average observed in the idle pool typically hovers around 0.4. This gap arises from a survival bias ec6 e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+in the system dynamics: drivers with high acceptance probabilities are matched and leave the pool rapidly, whereas drivers with low acceptance probabilities remain idle for longer durations. Consequently, “picky” drivers are systematically over-sampled in the available set at any given time t. The comparative performance of these homogenized policies is illustrated in Figure EC.1. 
+
+(a) NED OPT under FA (homogeneous-acceptance) (b) NED OPT under BA (homogeneous-acceptance)       
+
+> Figure EC.1 Acceptance-unaware OPT (static ¯p= 0 .4) with U= 3 , θ = 0 , comparing FA and BA contention rules.
+
+Remarkably, our results demonstrate that even under this information deficit—using a homogenized ¯p—both the FA and BA protocols outperform the baseline ED algorithm, even though ED utilizes the true under-lying probabilities. This finding highlights a robust conclusion: the structural advantage of NED notifications outweighs the benefit of having perfect information in ED setting. 
+
+## EC.3. Missing Details of Section 4 
+
+EC.3.1. Sensitivity to Notification Bounds 
+
+First, we isolate the impact of the notification upper bound U on the equilibrium by holding the reservation threshold fixed at θ = 0 . As illustrated in Figure EC.2, increasing U fundamentally shifts the market’s steady state. This shift is particularly pronounced when transitioning from U = 1 to U = 2 , revealing a dynamic trade-off between match quality and market efficiency. By relaxing the notification constraint, algorithms can concurrently evaluate a broader set of options. Consequently, this significantly reduces the size of the available driver pool, leading to noticeably faster match times and higher match probabilities.         
+
+> Figure EC.2 Sensitivity of the market equilibrium to the notification upper bound Uwith fixed θ= 0 .e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+ec7 
+
+Next, we explore the market’s sensitivity to the outside option θ, keeping the notification bound fixed at 
+
+U = 3 . In Figure EC.3, we observe that raising the reservation threshold θ naturally enforces stricter matching criteria. This follows from the fact that participants become more selective, requiring a higher baseline score to accept a dispatch. As a result, the probability of a successful match per interaction drops, causing unmatched riders and drivers to remain in the system longer. This accumulates into a thicker steady-state market pool but inevitably increases the average match time, highlighting the cost of waiting for higher-quality matches.      
+
+> Figure EC.3 Sensitivity of the market equilibrium to the opportunity cost threshold θwith fixed U= 3 .
+
+Finally, Figure EC.4 examines the impact of spatial density on the system’s equilibrium. For this analysis, we fix the notification bound at U = 3 and the outside option at θ = 0 , evaluating the ED and NED OPT algo-rithms under both FA and BA contention resolution protocols. To model varying city sizes, we sample rider and driver locations from a two-dimensional Gaussian distribution, N (0 , σ 2). By modulating the standard deviation σ, we effectively expand or contract the geographic footprint of the market. The figure demonstrates how these changes in spatial dispersion dictate the final equilibrium outcomes, explicitly showing how a less dense market (a larger σ) impacts the algorithms’ overall efficiency and pool sizes.         
+
+> Figure EC.4 Sensitivity of the market equilibrium to the city density σwith fixed U= 3 and θ= 0 .
+
+ec8 e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+EC.3.2. Missing Proofs in Section 4 
+
+Proof of Proposition 4.1. By summing the first two balance equations, and adding to the third equation the first equation weighted by ℓ, we obtain the following aggregate flow identities: 
+
+λ|{z} 
+
+> Arrival Rate
+
+= η R0 +
+
+> U
+
+X
+
+> ℓ=1
+
+Rℓ
+
+!| {z }
+
+> Churn Rate
+
++ μp 
+
+> U
+
+X
+
+> ℓ=1
+
+ℓR ℓ
+
+| {z }
+
+> Match Rate
+
+˜λ|{z} 
+
+> Arrival Rate
+
+= D0 ˜ηI + ˜ ηN
+
+> U
+
+X
+
+> ℓ=1
+
+Dℓ
+
+| {z }
+
+> Churn Rate
+
++ μp 
+
+> U
+
+X
+
+> ℓ=1
+
+Dℓ
+
+| {z }
+
+> Match Rate
+
+.
+
+Intuitively speaking, this line shows that each arrived driver and rider are either matched and left the platform or churned after a while. Solving for Rℓ we get: 
+
+Rℓ = R0
+
+ℓ (μ(1 − p) + ˜ ηN)
+
+" UX
+
+> i=ℓ
+
+qiiY
+
+> j=ℓ
+
+j (μ(1 − p) + ˜ ηN)
+
+η + j(μ + ˜ ηN)
+
+!# 
+
+Note that the above term has a Little’s law interpretation: the average waiting time in state Rℓ is 1 
+
+> η+ℓ(μ+˜ ηN)
+
+,and the riders who started from i drivers reach this state with rate: 
+
+R0qiiY
+
+> j=ℓ+1
+
+j (μ(1 − p) + ˜ ηN)
+
+η + j(μ + ˜ ηN) .
+
+Therefore, we can go further and solve for R0:
+
+R0 = λ + R1 (μ(1 − p) + ˜ ηN)
+
+η + PUi=1 qi
+
+=
+
+λ + R0
+
+PUi=1 qi
+
+Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+η + PUi=1 qi
+
+= λη + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+Finally we have 
+
+˜λ − D0 ˜ηI
+
+μp + ˜ ηN
+
+=
+
+> U
+
+X
+
+> ℓ=1
+
+ℓR ℓ
+
+= R0
+
+μ(1 − p) + ˜ ηN
+
+> U
+
+X
+
+> ℓ=1
+> U
+
+X
+
+> i=ℓ
+
+qiiY
+
+> j=ℓ
+
+j (μ(1 − p) + ˜ ηN)
+
+η + j(μ + ˜ ηN)
+
+!
+
+=
+
+> λμ(1 −p)+˜ ηN
+
+PUℓ=1 
+
+PUi=ℓ qi
+
+Qij=ℓj(μ(1 −p)+˜ ηN)
+
+> η+j(μ+˜ ηN)
+
+
+
+η + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+ .
+
+□
+
+Proof of Proposition 4.2. By simple algebra (similar to proof of Proposition 4.1) we can get aggregate equa-tions: 
+
+λ|{z} 
+
+> Arrival Rate
+
+= η R0 +
+
+> U
+
+X
+
+> ℓ=1
+
+Rℓ +
+
+> U
+
+X
+
+> ℓ=2
+
+Aℓ
+
+!| {z }
+
+> Churn Rate
+
++ μp 
+
+> U
+
+X
+
+> ℓ=1
+
+Rℓ +
+
+> U
+
+X
+
+> ℓ=2
+
+Aℓ
+
+!
+
++ ( μ(1 − p) + ˜ ηN) A2
+
+| {z }   
+
+> Match Rate e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis
+
+ec9 
+
+˜λ|{z} 
+
+> Arrival Rate
+
+= D˜ηI + ˜ ηN
+
+> U
+
+X
+
+> ℓ=1
+
+Dℓ
+
+| {z }
+
+> Churn Rate
+
++ ˜A2(μ(1 − p) + ˜ ηN) + μpD 1
+
+| {z }
+
+> Match Rate
+
+.
+
+Intuitively speaking, the above two lines shows that each driver or rider is either matched or left the platform because of being idle for too long. By solving for Rℓ we get the same formulas as FA: 
+
+R0 = λη + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+Rℓ = R0
+
+ℓ (μ(1 − p) + ˜ ηN)
+
+> U
+
+X
+
+> i=ℓ
+
+qiiY
+
+> j=ℓ
+
+j (μ(1 − p) + ˜ ηN)
+
+η + j(μ + ˜ ηN)
+
+!
+
+=
+
+> λℓ(μ(1 −p)+˜ ηN)
+
+PUi=ℓ
+
+
+
+qi
+
+Qij=ℓj(μ(1 −p)+˜ ηN)
+
+> η+j(μ+˜ ηN)
+
+
+
+η + PUi=1 qi
+
+
+
+1 − Qij=1 
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+Getting a closed form for Aℓ is much harder, in order to do that we will use the recursions for Dℓ. Note that the flow constraint for Dℓ will be: 
+
+R0
+
+> U
+
+X
+
+> i=ℓ
+
+qi + ℓD ℓ+1 (μ(1 − p) + ˜ ηN) = Dℓ (η + ℓ(˜ ηN + μ)) 
+
+And we get: 
+
+Dℓ = R0
+
+> U
+
+X
+
+> j=ℓ
+
+Qji=ℓi(μ(1 −p)+˜ ηN)
+
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+
+
+Using this we can calculate Ai:
+
+Aℓ = ˜Aℓ = Dℓ−1 − Dℓ − Rℓ−1
+
+=R0
+
+> U
+
+X
+
+> j=ℓ−1
+
+Qji=ℓ−1
+
+> i(μ(1 −p)+˜ ηN)
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+ −
+
+> U
+
+X
+
+> j=ℓ
+
+Qji=ℓi(μ(1 −p)+˜ ηN)
+
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+
+
+−
+
+PUi=ℓ−1
+
+
+
+qi
+
+Qij=ℓ−1
+
+> j(μ(1 −p)+˜ ηN)
+> η+j(μ+˜ ηN)
+
+
+
+(ℓ − 1) ( μ(1 − p) + ˜ ηN)
+
+!
+
+=R0
+
+PUi=ℓ−1 qi
+
+
+
+1 − Qij=ℓj(μ(1 −p)+˜ ηN)
+
+> η+j(μ+˜ ηN)
+
+
+
+η + ( ℓ − 1)(˜ ηN + μ) −
+
+> U
+
+X
+
+> j=ℓ
+
+
+
+> η+( ℓ−1) μp η+( ℓ−1)(˜ ηN+μ)
+
+Qji=ℓi(μ(1 −p)+˜ ηN)
+
+> η+i(˜ ηN+μ)
+
+ PUi=j qi
+
+j(μ(1 − p) + ˜ ηN)
+
+
+
+□
+
+Proof of Proposition 4.4. We analyze the lifecycle of a ride request as an absorbing continuous-time Markov chain using the matrices M and Q defined in the proposition statement. Recall that the diagonal elements of the transient rate matrix M satisfy the conservation constraint Mℓℓ =
+
+− P  
+
+> j̸=ℓ
+
+Mℓj − (Qℓ1 + Qℓ2). Let N be the fundamental matrix, where Nij represents the expected time spent in transient state j given a start in state i. Standard first-step analysis yields the relation: 
+
+Nij = − X
+
+> ℓ̸=i
+
+Miℓ 
+
+Mii 
+
+Nℓj (for i̸ = j), Njj = − 1
+
+Mjj 
+
+− X
+
+> ℓ̸=j
+
+Mjℓ 
+
+Mjj 
+
+Nℓj .ec10 e-companion to Ekbatani et al.: Non-Exclusive Notifications for Ride-Hailing at Lyft II: Simulations and Marketplace Analysis 
+
+This implies M N = −I, or N = −M −1.Next, let Piu denote the probability that a rider starting in state i is eventually absorbed into state u. The balance equations yield: 
+
+Piu = Qiu + P 
+
+> ℓ̸=i
+
+Miℓ Pℓu 
+
+−Mii 
+
+.
+
+In matrix form, this rearranges to −M P = Q, or equivalently: 
+
+P = N Q. (EC.1) Finally, let Tiu denote the expected cumulative time until absorption into state u, unconditioned on the event occurring (if absorption into u never occurs, the contribution is zero). Recursive analysis gives: 
+
+Tiu = Piu 
+
+−Mii 
+
++ X 
+
+> j̸=i
+
+Mij 
+
+−Mii 
+
+Tju .
+
+Multiplying by −Mii and rearranging leads to the matrix equation M T = −P . Substituting P = N Q and 
+
+M = −N −1, we obtain: 
+
+T = −M −1P = N (N Q ) = N 2Q. 
+
+To find the expected match time conditioned on a successful match, we normalize the accumulated time Ti2
+
+by the probability of success Pi2:
+
+E [ Match Time | X0 = i, Matched ] = Ti2
+
+Pi2
+
+= (N 2Q)i2
+
+(N Q )i2
+
+.
+
+□
