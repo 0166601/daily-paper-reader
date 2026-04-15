@@ -1,0 +1,728 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-15T20:23:46.055343+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 17,
+    "deep_cap": 6,
+    "deep_selected": 7,
+    "quick_candidates": 50,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2604.05195v1",
+      "source": "arxiv",
+      "title": "Vehicle-as-Prompt: A Unified Deep Reinforcement Learning Framework for Heterogeneous Fleet Vehicle Routing Problem",
+      "abstract": "Unlike traditional homogeneous routing problems, the Heterogeneous Fleet Vehicle Routing Problem (HFVRP) involves heterogeneous fixed costs, variable travel costs, and capacity constraints, rendering solution quality highly sensitive to vehicle selection. Furthermore, real-world logistics applications often impose additional complex constraints, markedly increasing computational complexity. However, most existing Deep Reinforcement Learning (DRL)-based methods are restricted to homogeneous scenarios, leading to suboptimal performance when applied to HFVRP and its complex variants. To bridge this gap, we investigate HFVRP under complex constraints and develop a unified DRL framework capable of solving the problem across various variant settings. We introduce the Vehicle-as-Prompt (VaP) mechanism, which formulates the problem as a single-stage autoregressive decision process. Building on this, we propose VaP-CSMV, a framework featuring a cross-semantic encoder and a multi-view decoder that effectively addresses various problem variants and captures the complex mapping relationships between vehicle heterogeneity and customer node attributes. Extensive experimental results demonstrate that VaP-CSMV significantly outperforms existing state-of-the-art DRL-based neural solvers and achieves competitive solution quality compared to traditional heuristic solvers, while reducing inference time to mere seconds. Furthermore, the framework exhibits strong zero-shot generalization capabilities on large-scale and previously unseen problem variants, while ablation studies validate the vital contribution of each component.",
+      "authors": [
+        "Shihong Huang",
+        "Shengjie Wang",
+        "Lei Gao",
+        "Hong Ma",
+        "Zhanluo Zhang",
+        "Feng Zhang",
+        "Weihua Zhou"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-06T21:48:52+00:00",
+      "link": "https://arxiv.org/pdf/2604.05195v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Deep reinforcement learning for heterogeneous fleet vehicle routing problem",
+      "llm_evidence_cn": "深度强化学习用于异构车队路径规划问题",
+      "llm_evidence": "深度强化学习用于异构车队路径规划问题",
+      "canonical_evidence": "深度强化学习用于异构车队路径规划问题",
+      "llm_tldr_en": "Develops a unified DRL framework for solving heterogeneous fleet vehicle routing problems with complex constraints.",
+      "llm_tldr_cn": "开发了一个统一的深度强化学习框架，用于解决带复杂约束的异构车队路径规划问题。",
+      "llm_tldr": "开发了一个统一的深度强化学习框架，用于解决带复杂约束的异构车队路径规划问题。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09049v1",
+      "source": "arxiv",
+      "title": "{\\sf TriDeliver}: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles",
+      "abstract": "Instant delivery, shipping items before critical deadlines, is essential in daily life. While multiple delivery agents, such as couriers, Unmanned Aerial Vehicles (UAVs), and crowdsourced agents, have been widely employed, each of them faces inherent limitations (e.g., low efficiency/labor shortages, flight control, and dynamic capabilities, respectively), preventing them from meeting the surging demands alone. This paper proposes {\\sf TriDeliver}, the first hierarchical cooperative framework, integrating human couriers, UAVs, and crowdsourced ground vehicles (GVs) for efficient instant delivery. To obtain the initial scheduling knowledge for GVs and UAVs as well as improve the cooperative delivery performance, we design a Transfer Learning (TL)-based algorithm to extract delivery knowledge from couriers' behavioral history and transfer their knowledge to UAVs and GVs with fine-tunings, which is then used to dispatch parcels for efficient delivery. Evaluated on one-month real-world trajectory and delivery datasets, it has been demonstrated that 1) by integrating couriers, UAVs, and crowdsourced GVs, {\\sf TriDeliver} reduces the delivery cost by $65.8\\%$ versus state-of-the-art cooperative delivery by UAVs and couriers; 2) {\\sf TriDeliver} achieves further improvements in terms of delivery time ($-17.7\\%$), delivery cost ($-9.8\\%$), and impacts on original tasks of crowdsourced GVs ($-43.6\\%$), even with the representation of the transferred knowledge by simple neural networks, respectively.",
+      "authors": [
+        "Junhui Gao",
+        "Yan Pan",
+        "Qianru Wang",
+        "Wenzhe Hou",
+        "Yiqin Deng",
+        "Liangliang Jiang",
+        "Yuguang Fang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.HC"
+      ],
+      "published": "2026-04-10T07:18:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.09049v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Cooperative air-ground instant delivery framework",
+      "llm_evidence_cn": "空地协同即时配送框架",
+      "llm_evidence": "空地协同即时配送框架",
+      "canonical_evidence": "空地协同即时配送框架",
+      "llm_tldr_en": "Proposes a hierarchical framework integrating UAVs and couriers for efficient instant delivery.",
+      "llm_tldr_cn": "提出了一个整合无人机、骑手和众包车辆的层级协同即时配送框架。",
+      "llm_tldr": "提出了一个整合无人机、骑手和众包车辆的层级协同即时配送框架。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.09049v2",
+      "source": "arxiv",
+      "title": "TriDeliver: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles",
+      "abstract": "Instant delivery, shipping items before critical deadlines, is essential in daily life. While multiple delivery agents, such as couriers, Unmanned Aerial Vehicles (UAVs), and crowdsourced agents, have been widely employed, each of them faces inherent limitations (e.g., low efficiency/labor shortages, flight control, and dynamic capabilities, respectively), preventing them from meeting the surging demands alone. This paper proposes TriDeliver, the first hierarchical cooperative framework, integrating human couriers, UAVs, and crowdsourced ground vehicles (GVs) for efficient instant delivery. To obtain the initial scheduling knowledge for GVs and UAVs as well as improve the cooperative delivery performance, we design a Transfer Learning (TL)-based algorithm to extract delivery knowledge from couriers' behavioral history and transfer their knowledge to UAVs and GVs with fine-tunings, which is then used to dispatch parcels for efficient delivery. Evaluated on one-month real-world trajectory and delivery datasets, it has been demonstrated that 1) by integrating couriers, UAVs, and crowdsourced GVs, TriDeliver reduces the delivery cost by $65.8\\%$ versus state-of-the-art cooperative delivery by UAVs and couriers; 2) TriDeliver achieves further improvements in terms of delivery time ($-17.7\\%$), delivery cost ($-9.8\\%$), and impacts on original tasks of crowdsourced GVs ($-43.6\\%$), even with the representation of the transferred knowledge by simple neural networks, respectively.",
+      "authors": [
+        "Junhui Gao",
+        "Yan Pan",
+        "Qianru Wang",
+        "Wenzhe Hou",
+        "Yiqin Deng",
+        "Liangliang Jiang",
+        "Yuguang Fang"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO",
+        "cs.HC"
+      ],
+      "published": "2026-04-10T07:18:10+00:00",
+      "link": "https://arxiv.org/pdf/2604.09049v2",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "hierarchical cooperative framework for instant delivery with UAVs and couriers",
+      "llm_evidence_cn": "无人机与骑手协同的即时配送分层协作框架",
+      "llm_evidence": "无人机与骑手协同的即时配送分层协作框架",
+      "canonical_evidence": "无人机与骑手协同的即时配送分层协作框架",
+      "llm_tldr_en": "TriDeliver integrates UAVs, couriers, and crowdsourced vehicles for efficient instant delivery scheduling.",
+      "llm_tldr_cn": "TriDeliver整合无人机、骑手和众包车辆，实现高效的即时配送调度。",
+      "llm_tldr": "TriDeliver整合无人机、骑手和众包车辆，实现高效的即时配送调度。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.10664v1",
+      "source": "arxiv",
+      "title": "Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching",
+      "abstract": "Multi-objective optimization (MOO) has been widely studied in literature because of its versatility in human-centered decision making in real-life applications. Recently, demand for dynamic MOO is fast-emerging due to tough market dynamics that require real-time re-adjustments of priorities for different objectives. However, most existing studies focus either on deterministic MOO problems which are not practical, or non-sequential dynamic MOO decision problems that cannot deal with some real-life complexities. To address these challenges, a preference-agile multi-objective optimization (PAMOO) is proposed in this paper to permit users to dynamically adjust and interactively assign the preferences on the fly. To achieve this, a novel uniform model within a deep reinforcement learning (DRL) framework is proposed that can take as inputs users' dynamic preference vectors explicitly. Additionally, a calibration function is fitted to ensure high quality alignment between the preference vector inputs and the output DRL decision policy. Extensive experiments on challenging real-life vehicle dispatching problems at a container terminal showed that PAMOO obtains superior performance and generalization ability when compared with two most popular MOO methods. Our method presents the first dynamic MOO method for challenging \\rev{dynamic sequential MOO decision problems",
+      "authors": [
+        "Jiahuan Jin",
+        "Wenhao Zhao",
+        "Rong Qu",
+        "Jianfeng Ren",
+        "Xinan Chen",
+        "Qingfu Zhang",
+        "Ruibin Bai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-12T14:39:41+00:00",
+      "link": "https://arxiv.org/pdf/2604.10664v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "multi-objective optimization for real-time vehicle dispatching with dynamic preference adjustment",
+      "llm_evidence_cn": "具有动态偏好调整的实时车辆调度多目标优化",
+      "llm_evidence": "具有动态偏好调整的实时车辆调度多目标优化",
+      "canonical_evidence": "具有动态偏好调整的实时车辆调度多目标优化",
+      "llm_tldr_en": "Introduces a preference-agile multi-objective optimization framework for real-time vehicle dispatching.",
+      "llm_tldr_cn": "引入了一种用于实时车辆调度的偏好敏捷多目标优化框架。",
+      "llm_tldr": "引入了一种用于实时车辆调度的偏好敏捷多目标优化框架。",
+      "llm_tags": [
+        "query:q2"
+      ],
+      "matched_query_tag": "query:q2",
+      "matched_query_text": "Meituan instant delivery dispatching system and algorithms",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.05254v1",
+      "source": "arxiv",
+      "title": "EAGLE: Edge-Aware Graph Learning for Proactive Delivery Delay Prediction in Smart Logistics Networks",
+      "abstract": "Modern logistics networks generate rich operational data streams at every warehouse node and transportation lane -- from order timestamps and routing records to shipping manifests -- yet predicting delivery delays remains predominantly reactive. Existing predictive approaches typically treat this problem either as a tabular classification task, ignoring network topology, or as a time-series anomaly detection task, overlooking the spatial dependencies of the supply chain graph. To bridge this gap, we propose a hybrid deep learning framework for proactive supply chain risk management. The proposed method jointly models temporal order-flow dynamics via a lightweight Transformer patch encoder and inter-hub relational dependencies through an Edge-Aware Graph Attention Network (E-GAT), optimized via a multi-task learning objective. Evaluated on the real-world DataCo Smart Supply Chain dataset, our framework achieves consistent improvements over baseline methods, yielding an F1-score of 0.8762 and an AUC-ROC of 0.9773. Across four independent random seeds, the framework exhibits a cross-seed F1 standard deviation of only 0.0089 -- a 3.8 times improvement over the best ablated variant -- achieving the strongest balance of predictive accuracy and training stability among all evaluated models.",
+      "authors": [
+        "Zhiming Xue",
+        "Menghao Huo",
+        "Yujue Wang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-06T23:35:15+00:00",
+      "link": "https://arxiv.org/pdf/2604.05254v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "proactive delivery delay prediction in smart logistics networks using graph learning",
+      "llm_evidence_cn": "利用图学习在智能物流网络中进行主动配送延迟预测",
+      "llm_evidence": "利用图学习在智能物流网络中进行主动配送延迟预测",
+      "canonical_evidence": "利用图学习在智能物流网络中进行主动配送延迟预测",
+      "llm_tldr_en": "Proposes a deep learning framework for proactive delivery delay prediction by modeling spatial-temporal dynamics.",
+      "llm_tldr_cn": "提出一种深度学习框架，通过建模时空动态来主动预测物流配送延迟。",
+      "llm_tldr": "提出一种深度学习框架，通过建模时空动态来主动预测物流配送延迟。",
+      "llm_tags": [
+        "query:q3"
+      ],
+      "matched_query_tag": "query:q3",
+      "matched_query_text": "real-time order assignment problem in logistics",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.07514v1",
+      "source": "arxiv",
+      "title": "Energy-Efficient Drone Logistics for Last-Mile Delivery: Implications of Payload-Dependent Routing Strategies",
+      "abstract": "Drone delivery is rapidly emerging as a cost-effective and energy efficient alternative for last-mile delivery. Unlike ground vehicles, a drone's energy consumption depends on its payload in addition to travel distance. This creates a unique environmental challenge for multi-stop delivery tours, as the drone's total weight, and therefore its energy consumption rate, dynamically changes after each delivery. This paper investigates a novel green drone routing problem focused on maximizing energy efficiency. Through a series of motivating examples and numerical experiments, we demonstrate that energy-aware routing leads to several counter-intuitive routing strategies that contradict traditional distance-minimization delivery: a longer route may actually consume less energy than a shorter one; separate single-customer tours can be superior to a multi-stop tour; and a heterogeneous fleet, with drones of varying sizes, can achieve greater efficiency by matching drone capacity to specific delivery demands. In the numerical study, the green routing strategy shows energy savings in 67% of the instances. For these cases, the average energy saving is 2.17%, with a maximum saving of 5.97%, compared to minimum distance routing. These findings highlight the potential for green drone routing strategies to improve the sustainability of last-mile delivery.",
+      "authors": [
+        "Ziyue Li",
+        "Qianwen",
+        "Guo",
+        "Paul Schonfeld"
+      ],
+      "primary_category": "cs.ET",
+      "categories": [
+        "cs.ET"
+      ],
+      "published": "2026-04-08T18:50:20+00:00",
+      "link": "https://arxiv.org/pdf/2604.07514v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Drone logistics for last-mile delivery with payload-dependent routing",
+      "llm_evidence_cn": "考虑载荷相关路径规划的无人机末端物流配送",
+      "llm_evidence": "考虑载荷相关路径规划的无人机末端物流配送",
+      "canonical_evidence": "考虑载荷相关路径规划的无人机末端物流配送",
+      "llm_tldr_en": "Investigates energy-efficient drone routing strategies for last-mile delivery considering payload weight.",
+      "llm_tldr_cn": "研究了考虑载荷重量的末端配送无人机节能路径规划策略。",
+      "llm_tldr": "研究了考虑载荷重量的末端配送无人机节能路径规划策略。",
+      "llm_tags": [
+        "query:q4"
+      ],
+      "matched_query_tag": "query:q4",
+      "matched_query_text": "dynamic pick-up and delivery problem optimization",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.10652v1",
+      "source": "arxiv",
+      "title": "Enhancing Cross-Problem Vehicle Routing via Federated Learning",
+      "abstract": "Vehicle routing problems (VRPs) constitute a core optimization challenge in modern logistics and supply chain management. The recent neural combinatorial optimization (NCO) has demonstrated superior efficiency over some traditional algorithms. While serving as a primary NCO approach for solving general VRPs, current cross-problem learning paradigms are still subject to performance degradation and generalizability decay, when transferring from simple VRP variants to those involving different and complex constraints. To strengthen the paradigms, this paper offers an innovative \"Multi-problem Pre-train, then Single-problem Fine-tune\" framework with Federated Learning (MPSF-FL). This framework exploits the common knowledge of a federated global model to foster efficient cross-problem knowledge sharing and transfer among local models for single-problem fine-tuning. In this way, local models effectively retain common VRP knowledge from up-to-date global model, while being efficiently adapted to downstream VRPs with heterogeneous complex constraints. Experimental results demonstrate that our framework not only enhances the performance in diverse VRPs, but also improves the generalizability in unseen problems.",
+      "authors": [
+        "Xiangchi Meng",
+        "Jianan Zhou",
+        "Jie Gao",
+        "Yifan Lu",
+        "Yaoxin Wu",
+        "Gonglin Yuan",
+        "Yaqing Hou"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-12T13:58:47+00:00",
+      "link": "https://arxiv.org/pdf/2604.10652v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Neural combinatorial optimization for vehicle routing problems in logistics",
+      "llm_evidence_cn": "物流车辆路径规划问题的神经组合优化",
+      "llm_evidence": "物流车辆路径规划问题的神经组合优化",
+      "canonical_evidence": "物流车辆路径规划问题的神经组合优化",
+      "llm_tldr_en": "Proposes a federated learning framework to enhance the generalizability of neural combinatorial optimization for VRPs.",
+      "llm_tldr_cn": "提出一种联邦学习框架，旨在增强神经组合优化在解决各类车辆路径问题时的泛化能力。",
+      "llm_tldr": "提出一种联邦学习框架，旨在增强神经组合优化在解决各类车辆路径问题时的泛化能力。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.05153v1",
+      "source": "arxiv",
+      "title": "A column-generation approach for an electricity technician routing and scheduling problem with a lexicographic objective",
+      "abstract": "Electric utility companies perform numerous technical interventions every day. Since it is generally not possible to complete all planned interventions within a single day, companies face two objectives: maximizing the total duration of completed interventions (primary objective) and minimizing the associated operational cost (secondary objective). In this paper, we introduce a multi-objective variant of the technician routing and scheduling problem in which both objectives are optimized in lexicographic order. We propose a compact mixed-integer linear formulation and an extended set-packing-based formulation. To handle the objectives within a single-objective framework, we consider weighted-sum reformulations that preserve lexicographic priorities as well as sequential reformulations that individually optimize each objective while maintaining the optimal value of higher-priority ones. For the extended formulation, we develop an exact column-generation-based algorithm, in which the pricing subproblems are solved via a labeling algorithm based on dynamic programming. As technician schedules are typically generated on a daily basis, the algorithm is designed to deliver high-quality solutions within short computation times (e.g., 5 minutes). Computational experiments on real-life instances provided by the French electric utility company show that the CG-based algorithm proves optimality on a larger number of small instances than the compact formulation and consistently outperforms it on larger instances. In particular, the sequential CG-based variant finds the best-known solutions on more instances and achieves lower mean gaps relative to the best solution found in each instance category.",
+      "authors": [
+        "Elise Bangerter",
+        "David Schindl",
+        "Meritxell Pacheco Paneque",
+        "Nour Elhouda Tellache",
+        "Rodolphe Griset"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.DM"
+      ],
+      "published": "2026-04-06T20:29:14+00:00",
+      "link": "https://arxiv.org/pdf/2604.05153v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "multi-objective technician routing and scheduling with lexicographic optimization",
+      "llm_evidence_cn": "具有词典序优化的多目标技术人员路径规划与调度",
+      "llm_evidence": "具有词典序优化的多目标技术人员路径规划与调度",
+      "canonical_evidence": "具有词典序优化的多目标技术人员路径规划与调度",
+      "llm_tldr_en": "Uses column generation for a multi-objective technician routing problem balancing duration and cost.",
+      "llm_tldr_cn": "使用列生成算法解决平衡时长和成本的多目标技术人员路径规划问题。",
+      "llm_tldr": "使用列生成算法解决平衡时长和成本的多目标技术人员路径规划问题。",
+      "llm_tags": [
+        "query:q9"
+      ],
+      "matched_query_tag": "query:q9",
+      "matched_query_text": "multi objective optimization for balancing efficiency and user experience in logistics",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.05663v2",
+      "source": "arxiv",
+      "title": "CuraLight: Debate-Guided Data Curation for LLM-Centered Traffic Signal Control",
+      "abstract": "Traffic signal control (TSC) is a core component of intelligent transportation systems (ITS), aiming to reduce congestion, emissions, and travel time. Recent approaches based on reinforcement learning (RL) and large language models (LLMs) have improved adaptivity, but still suffer from limited interpretability, insufficient interaction data, and weak generalization to heterogeneous intersections.   This paper proposes CuraLight, an LLM-centered framework where an RL agent assists the fine-tuning of an LLM-based traffic signal controller. The RL agent explores traffic environments and generates high-quality interaction trajectories, which are converted into prompt-response pairs for imitation fine-tuning. A multi-LLM ensemble deliberation system further evaluates candidate signal timing actions through structured debate, providing preference-aware supervision signals for training.   Experiments conducted in SUMO across heterogeneous real-world networks from Jinan, Hangzhou, and Yizhuang demonstrate that CuraLight consistently outperforms state-of-the-art baselines, reducing average travel time by 5.34 percent, average queue length by 5.14 percent, and average waiting time by 7.02 percent. The results highlight the effectiveness of combining RL-assisted exploration with deliberation-based data curation for scalable and interpretable traffic signal control.",
+      "authors": [
+        "Qing Guo",
+        "Xinhang Li",
+        "Junyu Chen",
+        "Zheng Guo",
+        "Shengzhe Xu",
+        "Lin Zhang",
+        "Lei Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-07T10:05:43+00:00",
+      "link": "https://arxiv.org/pdf/2604.05663v2",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "RL and LLM-centered framework for traffic signal control in intelligent transportation",
+      "llm_evidence_cn": "智能交通中基于强化学习和LLM的交通信号控制框架",
+      "llm_evidence": "智能交通中基于强化学习和LLM的交通信号控制框架",
+      "canonical_evidence": "智能交通中基于强化学习和LLM的交通信号控制框架",
+      "llm_tldr_en": "Uses RL and LLMs to improve traffic signal control, enhancing adaptivity and interpretability in transportation.",
+      "llm_tldr_cn": "结合强化学习与大语言模型优化交通信号控制，提升智能交通系统的自适应性与可解释性。",
+      "llm_tldr": "结合强化学习与大语言模型优化交通信号控制，提升智能交通系统的自适应性与可解释性。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.05663v1",
+      "source": "arxiv",
+      "title": "CuraLight: Debate-Guided Data Curation for LLM-Centered Traffic Signal Control",
+      "abstract": "Traffic signal control (TSC) is a core component of intelligent transportation systems (ITS), aiming to reduce congestion, emissions, and travel time. Recent approaches based on reinforcement learning (RL) and large language models (LLMs) have improved adaptivity, but still suffer from limited interpretability, insufficient interaction data, and weak generalization to heterogeneous intersections.   This paper proposes CuraLight, an LLM-centered framework where an RL agent assists the fine-tuning of an LLM-based traffic signal controller. The RL agent explores traffic environments and generates high-quality interaction trajectories, which are converted into prompt-response pairs for imitation fine-tuning. A multi-LLM ensemble deliberation system further evaluates candidate signal timing actions through structured debate, providing preference-aware supervision signals for training.   Experiments conducted in SUMO across heterogeneous real-world networks from Jinan, Hangzhou, and Yizhuang demonstrate that CuraLight consistently outperforms state-of-the-art baselines, reducing average travel time by 5.34 percent, average queue length by 5.14 percent, and average waiting time by 7.02 percent. The results highlight the effectiveness of combining RL-assisted exploration with deliberation-based data curation for scalable and interpretable traffic signal control.",
+      "authors": [
+        "Qing Guo",
+        "Xinhang Li",
+        "Junyu Chen",
+        "Zheng Guo",
+        "Shengzhe Xu",
+        "Lin Zhang",
+        "Lei Li"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-07T10:05:43+00:00",
+      "link": "https://arxiv.org/pdf/2604.05663v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "RL-based traffic signal control for intelligent transportation systems",
+      "llm_evidence_cn": "基于强化学习的智能交通系统信号控制",
+      "llm_evidence": "基于强化学习的智能交通系统信号控制",
+      "canonical_evidence": "基于强化学习的智能交通系统信号控制",
+      "llm_tldr_en": "CuraLight uses RL and LLMs to improve traffic signal control adaptivity and generalization in transportation.",
+      "llm_tldr_cn": "CuraLight结合强化学习与大模型，提升交通信号控制的自适应性与泛化能力。",
+      "llm_tldr": "CuraLight结合强化学习与大模型，提升交通信号控制的自适应性与泛化能力。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.06940v1",
+      "source": "arxiv",
+      "title": "A First Guess is Rarely the Final Answer: Learning to Search in the Travelling Salesperson Problem",
+      "abstract": "Most neural solvers for the Traveling Salesperson Problem (TSP) are trained to output a single solution, even though practitioners rarely stop there: at test time, they routinely spend extra compute on sampling or post-hoc search. This raises a natural question: can the search procedure itself be learned? Neural improvement methods take this perspective by learning a policy that applies local modifications to a candidate solution, accumulating gains over an improvement trajectory. Yet learned improvement for TSP remains comparatively immature, with existing methods still falling short of robust, scalable performance. We argue that a key reason is design mismatch: many approaches reuse state representations, architectural choices, and training recipes inherited from single-solution methods, rather than being built around the mechanics of local search. This mismatch motivates NICO-TSP (Neural Improvement for Combinatorial Optimization): a 2-opt improvement framework for TSP. NICO-TSP represents the current tour with exactly $n$ edge tokens aligned with the neighborhood operator, scores 2-opt moves directly without tour positional encodings, and trains via a two-stage procedure: imitation learning to short-horizon optimal trajectories, followed by critic-free group-based reinforcement learning over longer rollouts. Under compute-matched evaluations that measure improvement as a function of both search steps and wall-clock time, NICO-TSP delivers consistently stronger and markedly more step-efficient improvement than prior learned and heuristic search baselines, generalizes far more reliably to larger out-of-distribution instances, and serves both as a competitive replacement for classical local search and as a powerful test-time refinement module for constructive solvers.",
+      "authors": [
+        "Andoni Irazusta Garmendia"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-08T11:04:45+00:00",
+      "link": "https://arxiv.org/pdf/2604.06940v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "Learning to search for the Traveling Salesperson Problem (TSP)",
+      "llm_evidence_cn": "学习旅行商问题（TSP）中的搜索策略",
+      "llm_evidence": "学习旅行商问题（TSP）中的搜索策略",
+      "canonical_evidence": "学习旅行商问题（TSP）中的搜索策略",
+      "llm_tldr_en": "Explores neural improvement methods to learn search policies for solving the Traveling Salesperson Problem.",
+      "llm_tldr_cn": "探索神经改进方法，通过学习搜索策略来解决旅行商问题。",
+      "llm_tldr": "探索神经改进方法，通过学习搜索策略来解决旅行商问题。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.06522v1",
+      "source": "arxiv",
+      "title": "Constrained Policy Optimization for Provably Fair Order Matching",
+      "abstract": "Automated matching engines execute millions of orders per session, yet systematic asymmetries in latency, order size, and market access compound into persistent execution disparities that erode participant trust. We formulate provably fair order matching as a Constrained Markov Decision Process and propose CPO-FOAM (Constrained Policy Optimization with Feedback-Optimized Adaptive Margins). An inner loop computes an analytic trust-region step on the Fisher information manifold; a PID-controlled outer loop dynamically tightens safety margins, suppressing the sawtooth oscillations endemic to Lagrangian methods under non-stationary dynamics. Group fairness (demographic parity, equalized odds) enters the CMDP cost vector while individual Lipschitz fairness is enforced deterministically via spectral normalization. We prove BIBO stability and that the integral term drives steady-state violations to zero. On LOBSTER NASDAQ data across six market regimes, CPO-FOAM recovers 95.9% of unconstrained throughput at 2.5% constraint violation frequency; on crypto-asset LOB data under MEV injection it captures 98.4% of the reward envelope at 3.2% CVF. The method scales sub-linearly to M=8 constraints, settles on-chain within one Ethereum block, and yields a 2.1X reward improvement on Safety-Gymnasium, confirming domain-agnostic generalization.",
+      "authors": [
+        "Zehua Cheng",
+        "Zhipeng Wang",
+        "Wei Dai",
+        "Wenhu Zhang",
+        "Vadzim Mahilny",
+        "David Shi",
+        "Elena Jia",
+        "Jiahao Sun"
+      ],
+      "primary_category": "cs.GT",
+      "categories": [
+        "cs.GT",
+        "math.DS",
+        "math.OC"
+      ],
+      "published": "2026-04-07T23:28:45+00:00",
+      "link": "https://arxiv.org/pdf/2604.06522v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Provably fair order matching using Constrained Markov Decision Process",
+      "llm_evidence_cn": "使用约束马尔可夫决策过程实现可证明公平的订单匹配",
+      "llm_evidence": "使用约束马尔可夫决策过程实现可证明公平的订单匹配",
+      "canonical_evidence": "使用约束马尔可夫决策过程实现可证明公平的订单匹配",
+      "llm_tldr_en": "Introduces CPO-FOAM for fair order matching in high-frequency environments using constrained policy optimization.",
+      "llm_tldr_cn": "引入 CPO-FOAM，通过约束策略优化在动态环境中实现公平的订单匹配。",
+      "llm_tldr": "引入 CPO-FOAM，通过约束策略优化在动态环境中实现公平的订单匹配。",
+      "llm_tags": [
+        "query:q3"
+      ],
+      "matched_query_tag": "query:q3",
+      "matched_query_text": "real-time order assignment problem in logistics",
+      "matched_requirement_id": "req-3",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.06406v1",
+      "source": "arxiv",
+      "title": "Augmented Graphs of Convex Sets and the Traveling Salesman Problem",
+      "abstract": "We present a trajectory optimization algorithm for the traveling salesman problem (TSP) in graphs of convex sets (GCS). Our framework uses an augmented graph of convex sets to encode the TSP specification and solve it exactly as a shortest path problem in GCS. We establish a precise relationship between the landmark Bellman-Held-Karp algorithm and the augmented graph of convex sets with a TSP specification. Additionally, we present a branch and bound heuristic that uses minimum 1-trees to obtain certifiably optimal or near optimal solutions and scales to problems far larger than the exact framework can handle. To assess and certify performance, we explore several alternative lower bounds.",
+      "authors": [
+        "Gael Luna",
+        "Tyler Summers"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY"
+      ],
+      "published": "2026-04-07T19:39:24+00:00",
+      "link": "https://arxiv.org/pdf/2604.06406v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "trajectory optimization for traveling salesman problem in convex sets",
+      "llm_evidence_cn": "凸集图中旅行商问题的轨迹优化",
+      "llm_evidence": "凸集图中旅行商问题的轨迹优化",
+      "canonical_evidence": "凸集图中旅行商问题的轨迹优化",
+      "llm_tldr_en": "Presents an exact algorithm and branch-and-bound heuristic for TSP in graphs of convex sets.",
+      "llm_tldr_cn": "提出了凸集图中旅行商问题的精确算法和分支定界启发式算法。",
+      "llm_tldr": "提出了凸集图中旅行商问题的精确算法和分支定界启发式算法。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.07872v1",
+      "source": "arxiv",
+      "title": "PyVRP$^+$: LLM-Driven Metacognitive Heuristic Evolution for Hybrid Genetic Search in Vehicle Routing Problems",
+      "abstract": "Designing high-performing metaheuristics for NP-hard combinatorial optimization problems, such as the Vehicle Routing Problem (VRP), remains a significant challenge, often requiring extensive domain expertise and manual tuning. Recent advances have demonstrated the potential of large language models (LLMs) to automate this process through evolutionary search. However, existing methods are largely reactive, relying on immediate performance feedback to guide what are essentially black-box code mutations. Our work departs from this paradigm by introducing Metacognitive Evolutionary Programming (MEP), a framework that elevates the LLM to a strategic discovery agent. Instead of merely reacting to performance scores, MEP compels the LLM to engage in a structured Reason-Act-Reflect cycle, forcing it to explicitly diagnose failures, formulate design hypotheses, and implement solutions grounded in pre-supplied domain knowledge. By applying MEP to evolve core components of the state-of-the-art Hybrid Genetic Search (HGS) algorithm, we discover novel heuristics that significantly outperform the original baseline. By steering the LLM to reason strategically about the exploration-exploitation trade-off, our approach discovers more effective and efficient heuristics applicable across a wide spectrum of VRP variants. Our results show that MEP discovers heuristics that yield significant performance gains over the original HGS baseline, improving solution quality by up to 2.70\\% and reducing runtime by over 45\\% on challenging VRP variants.",
+      "authors": [
+        "Manuj Malik",
+        "Jianan Zhou",
+        "Shashank Reddy Chirra",
+        "Zhiguang Cao"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE",
+        "cs.AI"
+      ],
+      "published": "2026-04-09T06:36:15+00:00",
+      "link": "https://arxiv.org/pdf/2604.07872v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "LLM-driven heuristic evolution for hybrid genetic search in VRP",
+      "llm_evidence_cn": "大模型驱动的启发式进化算法用于车辆路径规划的混合遗传搜索",
+      "llm_evidence": "大模型驱动的启发式进化算法用于车辆路径规划的混合遗传搜索",
+      "canonical_evidence": "大模型驱动的启发式进化算法用于车辆路径规划的混合遗传搜索",
+      "llm_tldr_en": "Uses LLMs to strategically evolve metaheuristics for solving NP-hard vehicle routing problems.",
+      "llm_tldr_cn": "利用大语言模型战略性地进化元启发式算法，以解决车辆路径规划等难题。",
+      "llm_tldr": "利用大语言模型战略性地进化元启发式算法，以解决车辆路径规划等难题。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.07171v1",
+      "source": "arxiv",
+      "title": "Smart Commander: A Hierarchical Reinforcement Learning Framework for Fleet-Level PHM Decision Optimization",
+      "abstract": "Decision-making in military aviation Prognostics and Health Management (PHM) faces significant challenges due to the \"curse of dimensionality\" in large-scale fleet operations, combined with sparse feedback and stochastic mission profiles. To address these issues, this paper proposes Smart Commander, a novel Hierarchical Reinforcement Learning (HRL) framework designed to optimize sequential maintenance and logistics decisions. The framework decomposes the complex control problem into a two-tier hierarchy: a strategic General Commander manages fleet-level availability and cost objectives, while tactical Operation Commanders execute specific actions for sortie generation, maintenance scheduling, and resource allocation. The proposed approach is validated within a custom-built, high-fidelity discrete-event simulation environment that captures the dynamics of aircraft configuration and support logistics.By integrating layered reward shaping with planning-enhanced neural networks, the method effectively addresses the difficulty of sparse and delayed rewards. Empirical evaluations demonstrate that Smart Commander significantly outperforms conventional monolithic Deep Reinforcement Learning (DRL) and rule-based baselines. Notably, it achieves a substantial reduction in training time while demonstrating superior scalability and robustness in failure-prone environments. These results highlight the potential of HRL as a reliable paradigm for next-generation intelligent fleet management.",
+      "authors": [
+        "Yong Si",
+        "Mingfei Lu",
+        "Jing Li",
+        "Yang Hu",
+        "Guijiang Li",
+        "Yueheng Song",
+        "Zhaokui Wang"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG"
+      ],
+      "published": "2026-04-08T15:00:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.07171v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "hierarchical reinforcement learning for fleet-level logistics and scheduling decisions",
+      "llm_evidence_cn": "分层强化学习用于车队级物流和调度决策",
+      "llm_evidence": "分层强化学习用于车队级物流和调度决策",
+      "canonical_evidence": "分层强化学习用于车队级物流和调度决策",
+      "llm_tldr_en": "Proposes a hierarchical RL framework for large-scale fleet maintenance and logistics optimization.",
+      "llm_tldr_cn": "提出了一种用于大规模车队维护和物流决策优化的分层强化学习框架。",
+      "llm_tldr": "提出了一种用于大规模车队维护和物流决策优化的分层强化学习框架。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.06696v1",
+      "source": "arxiv",
+      "title": "AgentGate: A Lightweight Structured Routing Engine for the Internet of Agents",
+      "abstract": "The rapid development of AI agent systems is leading to an emerging Internet of Agents, where specialized agents operate across local devices, edge nodes, private services, and cloud platforms. Although recent efforts have improved agent naming, discovery, and interaction, efficient request dispatch remains an open systems problem under latency, privacy, and cost constraints. In this paper, we present AgentGate, a lightweight structured routing engine for candidate-aware agent dispatch. Instead of treating routing as unrestricted text generation, AgentGate formulates it as a constrained decision problem and decomposes it into two stages: action decision and structural grounding. The first stage determines whether a query should trigger single-agent invocation, multi-agent planning, direct response, or safe escalation, while the second stage instantiates the selected action into executable outputs such as target agents, structured arguments, or multi-step plans. To adapt compact models to this setting, we further develop a routing-oriented fine-tuning scheme with candidate-aware supervision and hard negative examples. Experiments on a curated routing benchmark with several 3B--7B open-weight models show that compact models can provide competitive routing performance in constrained settings, and that model differences are mainly reflected in action prediction, candidate selection, and structured grounding quality. These results indicate that structured routing is a feasible design point for efficient and privacy-aware agent systems, especially when routing decisions must be made under resource-constrained deployment conditions.",
+      "authors": [
+        "Yujun Cheng",
+        "Enfang Cui",
+        "Hao Qin",
+        "Zhiyuan Liang",
+        "Qi Xu"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-08T05:22:16+00:00",
+      "link": "https://arxiv.org/pdf/2604.06696v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "efficient request dispatch as a constrained decision problem for AI agents",
+      "llm_evidence_cn": "将AI代理的高效请求调度建模为受限决策问题",
+      "llm_evidence": "将AI代理的高效请求调度建模为受限决策问题",
+      "canonical_evidence": "将AI代理的高效请求调度建模为受限决策问题",
+      "llm_tldr_en": "Presents AgentGate, a routing engine for efficient agent dispatch under latency and cost constraints.",
+      "llm_tldr_cn": "提出AgentGate，一种在延迟和成本约束下实现高效代理调度的路由引擎。",
+      "llm_tldr": "提出AgentGate，一种在延迟和成本约束下实现高效代理调度的路由引擎。",
+      "llm_tags": [
+        "query:q7"
+      ],
+      "matched_query_tag": "query:q7",
+      "matched_query_text": "industrial applications of machine learning in instant delivery scheduling",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.07912v1",
+      "source": "arxiv",
+      "title": "ParkSense: Where Should a Delivery Driver Park? Leveraging Idle AV Compute and Vision-Language Models",
+      "abstract": "Finding parking consumes a disproportionate share of food delivery time, yet no system addresses precise parking-spot selection relative to merchant entrances. We propose ParkSense, a framework that repurposes idle compute during low-risk AV states -- queuing at red lights, traffic congestion, parking-lot crawl -- to run a Vision-Language Model (VLM) on pre-cached satellite and street view imagery, identifying entrances and legal parking zones. We formalize the Delivery-Aware Precision Parking (DAPP) problem, show that a quantized 7B VLM completes inference in 4-8 seconds on HW4-class hardware, and estimate annual per-driver income gains of 3,000-8,000 USD in the U.S. Five open research directions are identified at this unexplored intersection of autonomous driving, computer vision, and last-mile logistics.",
+      "authors": [
+        "Die Hu",
+        "Henan Li"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV",
+        "cs.RO"
+      ],
+      "published": "2026-04-09T07:28:57+00:00",
+      "link": "https://arxiv.org/pdf/2604.07912v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "identifying legal parking zones for food delivery drivers using VLMs",
+      "llm_evidence_cn": "利用视觉语言模型为外卖骑手识别合法停车区域",
+      "llm_evidence": "利用视觉语言模型为外卖骑手识别合法停车区域",
+      "canonical_evidence": "利用视觉语言模型为外卖骑手识别合法停车区域",
+      "llm_tldr_en": "ParkSense uses VLMs to help delivery drivers find parking, reducing delivery time and increasing income.",
+      "llm_tldr_cn": "ParkSense利用视觉语言模型帮助外卖骑手寻找停车位，减少配送时间并提高收入。",
+      "llm_tldr": "ParkSense利用视觉语言模型帮助外卖骑手寻找停车位，减少配送时间并提高收入。",
+      "llm_tags": [
+        "query:q7"
+      ],
+      "matched_query_tag": "query:q7",
+      "matched_query_text": "industrial applications of machine learning in instant delivery scheduling",
+      "matched_requirement_id": "req-7",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.07218v1",
+      "source": "arxiv",
+      "title": "Improving Feasibility in Quantum Approximate Optimization Algorithm for Vehicle Routing via Constraint-Aware Initialization and Hybrid XY-X Mixing",
+      "abstract": "The Quantum Approximate Optimization Algorithm (QAOA) is a leading framework for quantum combinatorial optimization. The Vehicle Routing Problem (VRP), a core problem in logistics and transportation, is a natural application target, but it poses a major feasibility challenge for standard QAOA because feasible solutions occupy only a tiny fraction of the search space, and the conventional Pauli-$X$ mixer can disrupt partial solution structures that satisfy key local constraints. To address this issue, we propose a constraint-aware QAOA framework with two complementary components. First, we design a lightweight initialization strategy that encodes a selected subset of simple yet informative local one-hot constraints into the initial state, thereby reducing the initial superposition space and increasing the probability mass on states with important local structure. Second, we introduce a hybrid XY-$X$ mixer that preserves the constraint structure imposed at initialization while retaining exploratory flexibility over the remaining unconstrained degrees of freedom during QAOA evolution. We evaluate the proposed framework against standard QAOA under three progressively more realistic regimes: ideal statevector simulation, finite-shot sampling, and noisy finite-shot sampling. Across all regimes, the proposed method consistently achieves lower average energy and higher feasible-solution ratios than standard QAOA, indicating more effective guidance toward structurally valid, lower-cost VRP solutions. However, the performance gap narrows in the noisy regime. Because this setting adopts a hardware-inspired error model based on near-best-reported laboratory-level qubit gate and readout fidelities, the observed attenuation suggests that the practical advantage of the more structured mixer is likely to grow as quantum hardware improves and error rates decline.",
+      "authors": [
+        "Yuan-Zheng Lei",
+        "Yaobang Gong",
+        "Xianfeng Terry Yang",
+        "Nii Attoh-Okine"
+      ],
+      "primary_category": "cs.ET",
+      "categories": [
+        "cs.ET",
+        "quant-ph"
+      ],
+      "published": "2026-04-08T15:39:22+00:00",
+      "link": "https://arxiv.org/pdf/2604.07218v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "quantum approximate optimization algorithm for vehicle routing problems",
+      "llm_evidence_cn": "用于车辆路径规划问题的量子近似优化算法",
+      "llm_evidence": "用于车辆路径规划问题的量子近似优化算法",
+      "canonical_evidence": "用于车辆路径规划问题的量子近似优化算法",
+      "llm_tldr_en": "Improves QAOA feasibility for vehicle routing problems through constraint-aware initialization and mixing.",
+      "llm_tldr_cn": "通过约束感知初始化和混合算子，提高了量子近似优化算法在车辆路径规划中的可行性。",
+      "llm_tldr": "通过约束感知初始化和混合算子，提高了量子近似优化算法在车辆路径规划中的可行性。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "vehicle routing problem with stochastic requests",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}
