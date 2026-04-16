@@ -1,0 +1,729 @@
+Title: {\sf TriDeliver}: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles
+
+URL Source: https://arxiv.org/pdf/2604.09049v1
+
+Published Time: Mon, 13 Apr 2026 00:35:35 GMT
+
+Number of Pages: 12
+
+Markdown Content:
+> 1
+
+# TriDeliver : Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles 
+
+Junhui Gao, Yan Pan, Qianru Wang, Wenzhe Hou, Yiqin Deng, Liangliang Jiang, and Yuguang Fang, Fellow, IEEE .
+
+Abstract —Instant delivery, shipping items before critical dead-lines, is essential in daily life. While multiple delivery agents, such as couriers, Unmanned Aerial Vehicles (UAVs), and crowdsourced agents, have been widely employed, each of them faces inherent limitations (e.g., low efficiency/labor shortages, flight control, and dynamic capabilities, respectively), preventing them from meeting the surging demands alone. This paper proposes TriDe-liver , the first hierarchical cooperative framework, integrating human couriers, UAVs, and crowdsourced ground vehicles (GVs) for efficient instant delivery. To obtain the initial scheduling knowledge for GVs and UAVs as well as improve the cooperative delivery performance, we design a Transfer Learning (TL)-based algorithm to extract delivery knowledge from couriers’ behavioral history and transfer their knowledge to UAVs and GVs with fine-tunings, which is then used to dispatch parcels for efficient delivery. Evaluated on one-month real-world trajectory and delivery datasets, it has been demonstrated that 1) by integrating couriers, UAVs, and crowdsourced GVs, TriDeliver 
+
+reduces the delivery cost by 65 .8% versus state-of-the-art cooper-ative delivery by UAVs and couriers; 2) TriDeliver achieves further improvements in terms of delivery time (−17 .7% ), delivery cost ( −9.8% ), and impacts on original tasks of crowdsourced GVs ( −43 .6% ), even with the representation of the transferred knowledge by simple neural networks, respectively. 
+
+Index Terms —UAV, Crowdsourcing, Air-Ground Cooperative Delivery, Transfer Learning, Mobile Edge Computing. 
+
+I. I NTRODUCTION 
+
+Instant delivery aims to deliver an item (e.g., food [1] and emergency medicine [2]) within a very short timeframe (e.g., 30 minutes), fulfilling a fundamental daily service. Taking food delivery as an example, about 27.4% of customers ordered food online rather than dining in restaurants in 2023, with a projected increase to 33.3% in 2027 [3]. This implies that about 2.64 billion people will rely on instant delivery. Meituan Group, one of the largest instant delivery companies in China, delivers over 28 million parcels daily [4]. In 2023, 
+
+Junhui Gao and Yuguang Fang are with Hong Kong JC STEM Lab of Smart City and Department of Computer Science, City University of Hong Kong, Kowloon, Hong Kong, China. E-mail: {junhui.gao, my.Fang }@cityu.edu.hk. Yan Pan is with State Key Laboratory of Complex & Critical Software Envi-ronment, and College of Computer Science and Technology, National Univer-sity of Defense Technology, Changsha, China. E-mail: panyan@nudt.edu.cn. Qianru Wang is with the School of Computer Science and Technology, Xidian University, Xi’an, China, and Hong Kong JC STEM Lab of Smart City and Department of Computer Science, City University of Hong Kong, Kowloon, Hong Kong, China. E-mail: wangqianru@xidian.edu.cn. Wenzhe Hou is with National Key Laboratory of Big Data and Decision, National University of Defense Technology, China. E-mail: wzhou@nudt.edu.cn. Yiqin Deng is with School of Data Science, Lingnan University, Hong Kong, China. E-mail: yiqindeng@ln.edu.hk. Liangliang Jiang is with School of Accounting and Finance, Hong Kong Polytechnic University, Kowloon, Hong Kong, China. E-mail: lian-gliang.jiang@polyu.edu.hk 
+
+the market size of food delivery surpassed 46 billion dollars in China [5], along with 17 billion dollars in the US and 9 billion dollars in Europe. The growing demand on instant delivery exposes a fun-damental mismatch: no single delivery model can reliably meet peek-time requirements on its own. Leading delivery companies, such as JD Logistics [6], Meituan [7], [8], and Amazon [9], [10], have been investigating multiple delivery approaches, which can be roughly divided into three cate-gories: unmanned aerial delivery (i.e., UAV delivery) [11]– [13], courier delivery [14], and crowdsourcing delivery [15]– [17]. Different delivery methods have different pros and cons. Specifically, unmanned aerial delivery by UAVs is fast and flexible. However, this approach faces limitations in capacity and range due to no-fly zones and limited battery capacities, despite being unaffected by traffic conditions [18]–[20]. The regular courier delivery is mature and widely deployed [14], which, however, suffers from low efficiency, high cost, and labor shortage [21]–[23]. Additionally, the crowdsourcing de-livery by GVs relies on private cars like taxis or public transportation to participate in delivery in an opportunistic manner [16], [24], which is not sustainable and reliable, although it can reduce labor costs [25]. Due to their inherent drawbacks, the delivery performance of each method alone is greatly limited, especially in city-scale scenarios. Therefore, the cooperative delivery, which focuses on integrating two of the three delivery approaches, has been proposed, including UAV-courier cooperation [18], [26] and UAV-GV coopera-tion [25], [27], [28]. However, the former is limited by the high expense on hiring a large number of dedicated couriers for the city-scale delivery during rush hours [26], while the latter suffers from the unstable supply of crowdsourced GVs in normal times [18], [27]. To tackle these issues and achieve more efficient instant delivery, this paper proposes a novel air-ground cooperative delivery scheme called TriDeliver , which integrates the three delivery agents. TriDeliver leverages dedicated UAVs and couriers, as well as crowdsourced GVs to save the delivery cost and maintain the stable delivery capability in normal times and meet the soaring demands during rush hours. Specifically, relying on a single delivery mode often leads to either high costs or insufficient capacity. TriDeliver addresses this by strategically leveraging the complementary strengths of three agents. Instead of maintaining a massive fleet of dedicated couriers to meet peak demands—which is cost-prohibitive during off-peak hours—we employ a small number of couriers to handle the stable base load in normal times. For surging demands during rush hours, crowdsourced GVs provide a     
+
+> arXiv:2604.09049v1 [cs.RO] 10 Apr 2026 2TriDeliver Engine
+> Parcel Assignment
+> & Planned Paths
+> Real -Time Status
+> Taxi Courier
+> UAV
+> Restaurant Destination
+> Fig. 1. The Workflow of TriDeliver .
+
+scalable and cost-effective capacity boost without additional fixed investments. Furthermore, to overcome the ground traffic congestion that limits both couriers and GVs, UAVs are utilized to bypass jams and ensure the rapid delivery of urgent parcels. This hybrid approach minimizes operational costs while maximizing delivery efficiency and reliability across varying conditions. However, the effective city-scale cooperative instant deliv-ery by UAVs, couriers, and GVs is highly challenging. The city-scale parcel assignment is commonly considered as an NP-hard problem [29], [30], which is more complicated in tripartite cooperation. Especially, UAVs and GVs have no prior knowledge about city-scale instant delivery [31], [32], making it difficult for parcel assignment at the initial stage in the city scale. It would take a long time to train the parcel assignment algorithm for GVs and UAVs, slowing down the tripartite cooperation. By contrast, as the most common delivery agents, couriers’ behaviors, specifically, their choices for parcel deliveries, imply specific intelligence and knowledge for instant delivery. This intelligence and knowledge stem from both their wisdom as human beings and the well-trained assignment algorithms deployed by delivery companies [29]. This brings opportunities to address the mentioned challenges: we can utilize a transfer-learning based model to extract the knowledge behind couriers’ behaviors, and improve delivery efficiency of UAVs and crowdsourced GVs by fine-tuning the assignment model while applying the prior knowledge. This method not only improves the delivery efficiency of UAVs and GVs in city-scale scenarios, but also enhances the cooperative delivery performance. This is because these delivery agents consider the macro picture rather than blindly pursuing the best strategy for themselves. Subsequently, parcels are assigned based on the models with human’s knowledge inside for couri-ers, UAVs, and GVs. The parcels that miss the model-based assignment are finally assigned by solving an optimization problem afterwards. Fig. 1 illustrates the workflow of the proposed TriDeliver 
+
+system. The agents (UAVs, couriers, and GVs) function as mobile sensing terminals, reporting real-time status informa-tion, such as geolocation, battery levels, and delivery progress, via cellular/V2X networks. Upon receiving these data streams, the system orchestrates the optimal task assignment. Note that the dispatch service is designed as a logical functional entity following the flexible provisioning framework proposed in [33]. This allows the service to be instantiated either at the network edge or on the cloud depending on latency requirements, without altering the core cooperative scheduling logic. The major contributions of this paper include three parts:  
+
+> •
+
+TriDeliver is the first work on the cooperation of the three typical delivery methods: UAV delivery, courier delivery, and crowdsourced delivery by GVs, which aims to fully take advantage of the three delivery methods to optimize their cooperative delivery performance.  
+
+> •
+
+A Transfer Learning based (TL-based) algorithm is de-signed. Specifically, the delivery knowledge behind couri-ers’ behaviors is first extracted to train the model repre-senting couriers’ preferences. To enhance the delivery ef-ficiency of UAVs and GVs, this model is then transferred to them with fine-tunings, respectively. Finally, parcels are cooperatively assigned based on the three models with couriers’ knowledge inside.  
+
+> •
+
+Results of the comprehensive evaluation using one-month, real-world datasets show that 1) TriDeliver sig-nificantly reduces the delivery cost by −65 .8% compared to the SOTA air-ground cooperative scheme, 2) TL-based 
+
+TriDeliver further improves the cooperative delivery per-formance in terms of reducing delivery time ( −17 .7% ), delivery cost ( −9.8% ), and negative impacts on traveling experiences of the GVs ( −43 .6% ), with simple neural networks representing the knowledge transferred. The remainder of the paper is organized as follows. Sec. II reviews the related literature, followed by Sec. III, which conducts the data-driven analyses and demonstrates the frame-work of this paper. Delivery models are proposed in Sec. IV, while Sec. V introduces the TL-based parcel assignment strategies. The proposed method is evaluated and compared with baselines in Sec. VI. Sec. VII concludes this paper. II. R ELATED WORK 
+
+In this section, we review the related literature in terms of delivery methods, including UAV-based, courier-based, crowd-sourced, and cooperative deliveries. 
+
+UAV-based Delivery. To improve delivery efficiency, UAV delivery has been proposed. Chen et al. [34] implemented control strategies for autonomous target pick-up by UAVs. However, handling diverse parcel shapes remains challenging. Gawel et al. [35] addressed this with a system enabling UAVs’ pick-ups for variably-shaped parcels with partly ferrous sur-faces. Path planning is another focus: Du et al. [36] optimized delivery paths using probabilistic geo-fences, while Dorling et al. [37] formulated vehicle routing problems to minimize delivery costs and time. Battery capacities limit flight range, which was tackled by the optimized deployment of charging stations (e.g., Huang et al. [38]) and fast-charging technologies (e.g., Cai et al.’s [39] 500-Watt wireless charging system). 
+
+Courier-based Delivery. Courier delivery dominates instant parcel delivery, where efficiency improvements yield signifi-cant benefits. Sungur et al. [40] applied stochastic program-ming to handle uncertainty in time-constrained daily schedul-ing. Chen and Hu [41] compared dedicated versus pooling dispatching policies, showing that optimal strategy depends 3
+
+on service area, customer patience, and demand endogeneity. Parcel assignment critically impacts performance: Auad et al. [42] balanced courier costs and service quality via Deep Q-Learning, while Bozanta et al. [43] evaluated three assignment strategies. For highly time-sensitive emergency delivery, Xia et al. [44] scheduled over 10,000 couriers across 170 zones for 100 million tasks. Zhu et al. [45] leveraged crowdsourced couriers alongside dedicated ones during peak sales. Lyu et al. [46] addressed long-distance delays using relay couriers and delivery couriers across zones. 
+
+Crowdsourced Delivery. Crowdsourced delivery leverages idle resources like public transport passengers or taxis for shipments. Ding et al. [16] proposed time-constrained multi-hop delivery via public transport. Liu et al. [47] investigated food delivery using crowdsourced taxis with passenger oc-cupancy data. To maximize task allocation ratio, fairness-based methods were also leveraged [48]. Devari et al. [49] recruited friends to address privacy concerns in crowdsourcing delivery. For food delivery, Wang et al. [15] presented a recommendation system using couriers’ preferences. Sun et al. [50] examined route recommendations to maximize courier income. However, over 14,000 taxis could only ship fewer than 20,000 parcels daily due to matching failures [51]. 
+
+Cooperative Delivery. Practical limitations of individual methods (i.e., UAVs, couriers, and crowdsourcing) drive re-search into cooperative delivery. For example, crowdsourc-ing faces unstable capacity due to agent willingness [27], while UAVs encounter high costs and battery limits [20]. To enhance performance, hybrid methods emerged: Gao et al. [25] combined UAVs with crowdsourced taxis exploiting taxi trajectories; Pan et al. [18] recruited crowdsourced couri-ers to complement UAVs. Physical-interaction cooperation leverages GVs to extend UAV range: Choudhury et al. [52] used public transit networks to boost UAV fleet range by 450% via task allocation and path planning; Huang et al. [53] minimized energy-constrained paths via Dijkstra routing in UAV-transit networks. Energy efficiency was addressed by Pan et al. [13], where crowdsourced buses were recruited with wireless charging for energy-neutral plans. In summary, while extensive research on delivery ap-proaches leverages the strengths of UAVs, couriers, and crowd-sourced agents, most studies improve these methods separately or with simple cooperation, achieving limited performance in practical scenarios. This paper focuses on cooperative inte-gration to mutually compensate shortcomings, and introduces 
+
+TriDeliver , the first work integrating three delivery methods to maximize overall performance. III. P RELIMINARY 
+
+A. Dataset Description 
+
+Two real-world datasets on the delivery orders and trajec-tories of GVs are leveraged in this paper. 
+
+Delivery Order Dataset. Ding et al. [54] and Yang et al. [55] released the aBeacon dataset in cooperation with Alibaba Group, which owns one of the largest delivery companies in China. In this dataset, more than 31,000 regular couriers delivered over 802,000 parcels in Shanghai during a month. Each delivery order can be represented by a 4-parameter tuple, including times and locations of a pick-up and a drop-off, respectively. 
+
+Trajectory Dataset of GVs. Due to privacy concerns, large-scale trajectory of private cars is not publicly available. Therefore, we leverage an open-sourced taxi trajectory dataset as the trajectories of GVs in this paper. This dataset on GitHub [56] describes the trajectories of over 13,000 taxis in Shanghai during one month, in which each record consists of a timestamp, a location, passenger status, velocity, and driving orientation. The recording interval is only 10 seconds. Over 3.4 billion trajectory records of 13,000 taxis are included. 
+
+B. Motivation 
+
+Limited by energy capacity, UAVs cannot deliver parcels for a long distance [53], [57]. Moreover, delivery compa-nies should apply for flight paths for flying UAVs [58], which further limits the available number of UAVs in ur-ban areas for instant delivery. To tackle these issues, Pan et al. [18] proposed a cooperative delivery scheme with UAVs and couriers, showing the optimized delivery per-formance by enabling collaboration among a small num-ber of UAVs and couriers with significant delivery cost reduction compared to traditional courier delivery methods.             
+
+> 
+> 
+> 
+>       ×10
+> 3
+> 
+>  ! 
+>      
+> Fig. 2. The Numbers of Delivery Or-ders and Trips of GVs.
+
+However, the unstable sup-ply of crowdsourced couri-ers would lead to delayed delivery and degrade de-livery performance in their work. Therefore, in this paper, we propose to re-cruit dedicated couriers to collaborate with dedicated UAVs for parcel delivery. Fig. 2 illustrates the number of parcels ordered in each half hour during the daytime (i.e., 8:00-20:00), where we observe that the delivery demands vary significantly. There are two peaks of delivery demands during the lunch hour (around 11:00) and the dinner time (around 18:00). Thus, it is wasteful to recruit too many couriers and UAVs based on peak demands, and hence we need a stable and cost-effective delivery method to complete the delivery tasks with guaranteed delivery efficiency during rush hours. GVs, which are widely and densely distributed around the city, have great potentials to participate in parcel delivery [47], [51], [59], [60]. As shown in Fig. 2, the candidate pool of car trips is extra large for parcel delivery at any time, providing great capacity for instant delivery if there is sufficient incentive on the table. In summary, this paper proposes an air-ground instant delivery scheme by leveraging dedicated UAVs, couriers, and crowdsourced GVs. It takes advantage of these three delivery methods according to their inherent pros and cons to achieve better overall delivery performance. 
+
+C. Framework 
+
+The proposed delivery framework, which is called TriDe-liver , is illustrated in Fig. 3. The delivery models of UAVs, 4GV Delivery Model      
+
+> (Sec . IV -C)
+> Courier Delivery
+> Preference Extraction and
+> Model Training (Sec . V -A)
+> Remaining Parcel
+> Assignment ( Sec .V -C)
+> Data
+> UAV Delivery Model
+> (Sec .IV -A)
+> Delivery Models TL -based Parcel Assignment
+> Courier Delivery
+> Model (Sec . IV -B)
+> Historical GV
+> Trajectory Data
+> Model Transfer and Fine -
+> tuning for Deliveries by
+> GVs and UAVs (Sec . V -B)
+> Historical Delivery Data by
+> Couriers
+> Fig. 3. The Framework of TriDeliver .
+> Fig. 4. Delivery Models of (a) UAVs and (b) couriers.
+
+couriers, and GVs are presented in Sec. IV-A, IV-B, and IV-C, respectively. To leverage human’s knowledge, the courier delivery preferences in historical delivery data are first ex-tracted and then used to train a delivery preference model for them in Sec. V-A. This model is then transferred and fine-tuned based on delivery models of UAVs and GVs in Sec. V-B, respectively, where parcels are assigned according to their preference models. The remaining parcels that are not preferred by any of the three methods, are then assigned by an optimization problem in Sec. V-C. IV. D ELIVERY MODELS 
+
+A. UAV Delivery Model 
+
+UAVs’ great potential in delivering instant parcels stems from the fact that they can bypass ground traffic and fly flexibly at high speed. The typical delivery process of a UAV involves [8], [61]: Departing (from charging stations to restaurants); Delivering (from restaurants to destination cabinets while searching for other parcels); and Returning 
+
+(from destination cabinets back to charging stations while searching for other parcels). Fig. 4(a) illustrates the delivery process of a UAV, where the green solid curves represent the determined flight path and the dotted lines indicate the potential flight path of the UAV if it can deliver other parcels. To avoid collisions, a sampling-based path planning algorithm is utilized to plan the flying path of UAVs [18]. One of the vital factors limiting the delivery capability of UAVs is energy consumption. Existing works [18], [25] revealed the linear relations between the energy consumption rate of UAVs and the payload (i.e., parcel weight) by leverag-ing a commercial drone from DJI. According to their works, we have σ(w) = 90 .3 × w + 320 .9, where σ(w) denotes the energy consumption rate (in Watts) of UAVs for carrying parcels weighing w kg. Let U and P(u) denote the set of UAVs and the set of parcels assigned to a UAV u ∈ U, respectively. To deliver parcels in P(u), the flight path of u is planned, denoted as Γ( u, P(u)) . The path consists of a sequence of way-points as Γ( u, P(u)) = {γ(u, i )|i ∈ [0 , I ]}, where I + 1 
+
+is the path length and UAVs are in charging stations at 
+
+γ(0) and γ(I). Each waypoint γ(u, i ) is a 6-parameter tu-ple: ⟨t(i), l (i), P(u, i ), μ (i), w (i), E (u, i )⟩, where t(i) and l(i)
+
+indicate the timestamp and location of γ(u, i ), respectively, 
+
+P(u, i ) represents the set of parcels picked up or dropped off at γ(u, i ), the binary parameter μ(i) indicates the type of performed by u at γ(u, i ) (1 for pick-ups and -1 for drop-offs), w(i) denotes the carrying weight of u at γ(u, i ), and 
+
+E(u, i ) is the remaining energy of u at γ(u, i ). Note that 
+
+P(u) = ∪{ P(u, i )|μ(i) = 1} = ∪{ P(u, i )|μ(i) = −1}.Therefore, the energy consumed by u after departing from the charging station is given by 
+
+∆E(u) = 
+
+> I−1
+
+X
+
+> i=0
+
+σ(w(i)) × Dist U (l(i), l (i + 1)) 
+
+v(u) , (1) where v(u) is the flying velocity of UAVs, and 
+
+Dist U (l(i), l (i + 1)) indicates the flying distance from 
+
+l(i) to l(i + 1) , avoiding collisions and no-fly zones. Specifically, UAVs carry no parcels when departing from and returning to charging stations, which means that σ(w(0)) and 
+
+σ(w(I)) are both equal to 0. Delivery time t(p) for the parcel 
+
+p ∈ P(u) can be easily calculated by t(p) = ts(p) − to(p),where ts(p) and to(p) denote the shipping time and ordering time of p, respectively, and ts(p) is defined as 
+
+{t(i)|p ∈ P(u, i ) ∧ μ(i) = −1}. Notably, when UAVs arrive at scheduled waypoints, their status will be reported to the scheduling center for the assessment of delivery capabilities and the future parcel allocation. When a parcel is assigned to a UAV u, a new flight path of 
+
+u involving the pick-up and drop-off of the parcel is generated by the scheduling center and its feasibility is checked in terms of energy consumption and delivery time as follows. Due to the safety consideration, UAVs should always maintain sufficient energy level for emergencies, namely, UAVs must retain minimal energy when returning to charging stations. Moreover, the re-estimated delivery times of all assigned parcels should be shorter than the delivery time constraint, which is required by instant delivery. The UAV will fly along the new path and deliver the new parcel only if energy and de-livery time constraints are met. Specifically, let Emax represent the maximum energy capacity of UAVs. The remaining energy of u when returning to the charge station is Emax − ∆E(u).The sufficient energy level of UAVs is αE max after finishing the path, where α is a coefficient around 0.1. Therefore, the energy limit of UAVs is 
+
+Emax − ∆E(u) ≥ αE max . (2) Let p′ indicate the parcel assigned to u. The re-planned flight path of u involving the pick-up and drop-off of p′ is 
+
+Γ( u, P(u) ∪ { p′}). Therefore, the delivery time limit is as Eq.(3). 
+
+t(p) ≤ ∆t, ∀p ∈ P(u) ∪ { p′}. (3) In summary, the newly ordered parcel p′, which satisfies 5
+
+the energy limit (Eq.(2)) and the delivery time limit (Eq.(3)), is considered deliverable for the UAV u. Additionally, the previous deployment of UAVs makes their delivery capacity valuable, since delivery companies no longer need to pay for UAV delivery services. Therefore, we use additional UAV time as the potential delivery cost of u for delivering p, given by: 
+
+s(u, p ) = t(i′) − t(i), (4) where i and i′ indicate the last waypoint of Γ( u, P(u)) and 
+
+Γ( u, P(u) ∪ { p′}), respectively. 
+
+B. Courier Delivery Model 
+
+The delivery process of couriers also includes three steps: departing, delivering, and returning. However, they only return to courier stations for rest after finishing all delivery tasks assigned. Every courier c in the courier set C has his/her own path to deliver parcels in P(c), which are assigned to him/her. Let Γ( c, P(c)) = {γ(c, i )|i ∈ [0 , I ]} indicate the delivery path of c. A delivery path of a courier is illustrated in Fig. 4(b), where the courier picks up 3 parcels at different restaurants and drops them off one by one. Every waypoint γ(c, i ) in 
+
+Γ( c, P(c)) represents a stop at a restaurant for pick-ups or a destination cabinet for drop-offs, which includes the timestamp 
+
+t(i), the location l(i), the set of parcels processed P(c, i ),binary indicator μ(i), and the current payload (i.e., the number of parcels carried) n(i). To reduce the burdens and improve the delivery efficiency of couriers, n(i) is limited to nmax along the path. Couriers are also required to report their status when arriving at a new waypoint for the instant delivery allocation. Once a new parcel p′ is assigned to the courier c, it will be inserted into P(c) and the delivery path of c will be re-planned. This leads to the recalculation of delivery times for all parcels in P(c) ∪ { p′} and the payload along the new path (i.e., Γ( c, P(c) ∪ { p′})). The feasibility of the new path is determined by the payload limit (Eq. 5) and the delivery time limit (Eq. 6). If both of them are met, the delivery path is feasible for c to follow. 
+
+n(i) ≤ nmax , ∀i ∈ [0 , |P(c) ∪ { p′}| − 1] . (5) 
+
+t(p) ≤ ∆t, ∀p ∈ P(c) ∪ { p′}. (6) Specifically, n(i) is updated when c arrives at γ(c, i ) as follows. 
+
+n(i) = n(i − 1) + μ(i) × | P(c, i )|, (7) where |P(c, i )| indicates the number of parcels operated at 
+
+γ(c, i ). The delivery cost s(c, p ) of the parcel p by the courier 
+
+c is determined by the distance that c travels [62]: 
+
+s(c, p ) = 3 .15 × Dist C (lo(p), l s(p)) , (8) where Dist C (lo(p), l s(p)) denotes the Manhattan distance between the ordering location and the shipping location of 
+
+p, and 3.15 is the delivery cost coefficient from Meituan [62]. 
+
+C. GV Delivery Model 
+
+The wide spatial-temporal coverage of GVs in cities lays a solid foundation for their participation in instant delivery. In this paper, we present three cases of delivery by GVs [47], [60], [63], considering spatial distributions of delivery orders and the original tasks of these vehicles (e.g., passenger transfer   
+
+> Fig. 5. Delivery Cases of GVs. (a) OD-pair Delivery ; (b) Halfway Delivery ;(c)
+> Unoccupied Delivery .
+
+by taxis). These delivery cases by GVs are Origin-Destination (OD)-pair Delivery , Halfway Delivery , and Unoccupied De-livery , respectively, shown in Fig. 5. In OD-pair Delivery [60], a parcel p, whose origin and destination are close to those of the original task of a GV, respectively, can be delivered by the GV. Fig. 5(a) illustrates the OD-pair Delivery process. The red and black dots indi-cate the starting locations of parcels and the original tasks, respectively. Accordingly, the red and black triangles represent their destinations. Specifically, a GV b first picks up p before starting the original task. After finishing the original task (i.e., arriving at the end point of the original task), b drives to the destination cabinet and drops off p. GVs will not perform parcel delivery when the original tasks are in progress due to the highest priority of original tasks. OD-pair Delivery should have the following spatial and temporal limits.  
+
+> •
+
+Spatial Limit. A GV b should never drive for an extra distance longer than dmax when picking up parcel p. Let 
+
+d(b, p ) indicate the detour distance for b to pick up p.The spatial limit is that d(b, p ) ≤ dmax must hold.  
+
+> •
+
+Temporal Limit. The temporal limit in OD-pair De-livery sets the timeline for pickup time of p by b
+
+(denoted as tpu (b, p )). Every parcel should be picked within ∆tpu after being ordered to maintain its freshness (i.e., tpu (b, p ) ≤ ∆tpu ). This is not only to maintain passengers’ experience but also to consider delivery per-formance. 
+
+Halfway Delivery [63] also requires spatiotemporal corre-lations between the starts of original tasks and parcel orders. In this case, GVs first pick parcels up before starting original tasks, and drop parcels off when passing the destinations rather than delivering them after finishing original tasks as shown in Fig. 5(b). Considering both the efficiencies of deliveries and original tasks, a micro detour d′(b, p ) shorter than ∆d is permitted when dropping off parcels in this case. Note that other spatial and temporal limitations in OD-pair Delivery 
+
+should also apply in this case except for the drop-off detour. In this paper, delivery companies can also recruit GVs roam-ing the streets for instant delivery, which is called Unoccupied Delivery [25], [47]. It is a win-win situation because it not only improves the utilization of GVs but also increases the income of the recruited drivers. An unoccupied vehicle is recruited if it can deliver parcels within the delivery time limit (i.e., 
+
+∆t). Specifically, the detour distance is the driving distance for delivering parcel p.In summary, a GV can deliver parcels within a delivery time limit (i.e., ∆t), if the spatiotemporal limits hold in OD-pair Delivery or Halfway Delivery ; otherwise, the GV is considered 6
+
+for Unoccupied Delivery . To keep consistency, we use Γ( b, p )
+
+to denote the driving path for delivering p by b. If b can deliver 
+
+p in any case in the three, Γ( b, p ) is feasible. Additionally, unlike the two types of full-time agents, GVs should report their status only when a new trip is determined for OD-pair Delivery or Halfway Delivery , or when they become available for Unoccupied Delivery . Since delivering parcels by GVs inevitably has negative impacts on their original tasks, we need to compensate them for parcel deliveries, for example, by doubling the unit price (i.e., price per kilometer, 2.7 CNY) of taxi drivers in Shanghai [64]: half of the cost is paid as the reward for the parcel delivery, and the other half is paid as the compensation for the delay of their original tasks. Thus, the delivery cost of a parcel p delivered by a GV b is as follows. 
+
+s(b, p ) = 2 × 2.7 × (d(b, p ) + d′(b, p )) . (9) Additionally, d′(b, p ) is equal to 0 for parcels delivered in OD-pair Delivery , since the detour for dropping off parcels has been already counted in d(b, p ). The cost is not doubled in the case of Unoccupied Delivery since the GVs have nothing to do but deliver parcels. V. T RANSFER LEARNING -BASED PARCEL ASSIGNMENT 
+
+In this section, we propose the TL-based delivery assign-ment strategies as shown in Fig. 6 to improve collaborative delivery performance by learning from human’s behavioral history. 
+
+A. Courier Preference Extraction and Representation 
+
+Couriers’ preferences for parcels (i.e., delivery choices) are influenced by multiple factors. For example, couriers always prefer delivering parcels around or those with higher pay. The more parcels are to be delivered, the higher the standards for deliveries accepted by couriers are, especially in Central Busi-ness Districts (CBDs). Therefore, we collect several features of parcels affecting couriers’ preferences, including ordering time 
+
+to(p), restaurant location lo(p), detour distance d(c, p ), riding velocity v(c), delivery distance Dist C (lo(p), l s(p)) , delivery cost s(c, p ), courier’s payload n(c), and the remaining delivery time for the last parcel tre (c) from the aBeacon dataset. The set of these features is called the feature space of courier delivery, which is denoted as XC as follows: 
+
+XC = {x(c, p ) | x(c, p ) =[ to(p), l o(p), d (c, p ), v (c),
+
+Dist C (lo(p), l s(p)) , s (c, p ), n (c),tre (c)] , ∀c ∈ C, ∀p ∈ P}.
+
+(10) Let NC denote the number of samples collected. We have 
+
+|X C | = NC .Let YC denote the label space. Since couriers can accept or reject any parcel assignment, a binary indicator is leveraged to represent the label (i.e., 1 for acceptance, 0 for rejection). Therefore, we have 
+
+YC = {y(c, p ) | y(c, p ) ∈ { 0, 1}, ∀c ∈ C, ∀p ∈ P} . (11) Specifically, the length of YC is also NC . To learn how the features in XC influence the couriers’ choices in YC ,Preference      
+
+> Extraction
+> Delivery Data Source Domain: Courier Delivery
+> Target Domains: GV/UAV Delivery
+> Decision Function Transfer Delivery Orders
+> GV/UAV Delivery
+> Models & Behavior
+> Preference
+> Extraction
+> of Taxis
+> Preference
+> Extraction
+> of UAVs
+> FT Network: the fine -tuned networks with the same structure as Shared Network.
+> Fig. 6. Transfer and Fine-tuning of Decision Functions.
+
+we feed the extracted samples of courier delivery into a network to represent the decision function of couriers (i.e., 
+
+fC (x)) as shown in the Shared Network in Fig. 6. We have 
+
+y = fC (x), ∀y ∈ Y C , ∀x ∈ X C . Let HC (i) indicate the input of the i-th layer in the network with M layers, which is updated as follows: 
+
+HC (i + 1) = ψ(HC (i) × WC (i) + βC (i)) , (12) where ψ(·) is the vector of activation functions, and WC (i)
+
+and βC (i) denote the weight and offset parameters in the i-th layer, respectively. We use ReLU as the activation functions of all hidden layers, while that of the output layer is sigmoid function. This is because the preferences are expected to be decimal numbers from 0 to 1. Specifically, a preference of 0 indicates an extremely negative situation, in which the courier will not pick up the parcel, while 1 denotes that the courier is very happy to accept the delivery task. We use Binary Cross Entropy Loss (refer to Eq.(13)) to measure the deviation between the output and the true label from YC , which are represented by ˆy and y, respectively. 
+
+L = − 1
+
+NCNCX
+
+> i=1
+
+(yi × log(ˆ yi) + (1 − yi) × log(1 − ˆyi)) . (13) We apply the Adam optimizer to minimize the loss, which offers adaptive learning rates and momentum-based optimiza-tion [65], ensuring efficient convergence during the training process. 
+
+B. Knowledge Transfer and Fine-tuning for GVs and UAVs 
+
+To learn and leverage the knowledge behind couriers’ be-haviors, we transfer and fine-tune their decision functions to those of GVs and UAVs. However, due to different delivery patterns among couriers, GVs, and UAVs, the feature spaces of them are different accordingly. Let XB and XU denote the feature spaces of GV delivery and UAV delivery, respectively. Considering the original tasks of GVs and their unawareness of payloads, n(c)
+
+in XC indicating the payloads of couriers is replaced with a binary indicator n(b) reflecting the status of a GV (1 indicates 7
+
+having original work to do, while 0 means idle). Therefore, the feature space of GV, XB , is: 
+
+XB = {x(b, p ) | x(b, p ) =[ to(p), l o(p), d (b, p ), v (b),
+
+Dist C (lo(p), l s(p)) , s (b, p ), n (b),tre (b)] , ∀b ∈ B, ∀p ∈ P},
+
+(14) where tre (b) indicates the remaining time till the scheduled completion of the original task. Since GVs’ trajectories are along streets, Dist C (lo(p), l s(p)) indicating the Manhattan distance remains in XB . In contrast, we replace n(c) in XC
+
+with the carrying weight w(u) of UAVs in XU , since UAVs are sensitive to the weight rather than the number of parcels carried. The feature space of UAVs thus is, 
+
+XU = {x(u, p ) | x(u, p ) =[ to(p), l o(p), d (u, p ), v (u),
+
+Dist U (lo(p), l s(p)) , s (u, p ), w (u),tre (u)] , ∀u ∈ U, ∀p ∈ P},
+
+(15) where tre (u) denotes the remaining flying time before running out of energy for the UAV u. Same as the label space of courier delivery, those of GVs and UAVs are defined as YB
+
+and YU , respectively. Both of them consist of binary labels as Eq.(11). To obtain samples in their feature spaces and label spaces, we simulate the cost-oriented delivery process by GVs and UAVs via the heuristic algorithms proposed by Gao et al. [25] using the historical delivery data, respectively. Let 
+
+NB and NU represent the numbers of samples obtained for GV delivery and UAV delivery, respectively. By learning from the couriers’ knowledge, we obtain the decision functions of GV delivery (i.e., y = fB (x) as the FT Network I in Fig. 6) by first transferring the well-trained network of couriers to GVs, then modifying the parameters inside using simulated samples in XB and YB as follows. 
+
+Wi,k = Wi,k − η × ∂L pref 
+
+∂W i,k 
+
+= Wi,k − η(δi,k × H′Tk−1), (16) 
+
+βi,k = βi,k − η × ∂L pref 
+
+∂β i,k 
+
+= βi,k − η × 1
+
+Nb
+
+X δi,k , (17) where η represents the learning rate, δi,k is the deviation back-propagated to the k-th layer in the i-th epoch, and H′Tk−1
+
+denotes the transpose matrix of the output of the previous layer (i.e., H′
+
+> k−1
+
+). Different from couriers and GVs, UAVs neglect the traf-fic conditions on the ground when delivering parcels. This promotes the delivery efficiency, while leading to different delivery patterns compared to couriers and GVs. To capture the differences, we add a sub-network (i.e., Specific Network) after the fine-tuning network, which is transferred from the decision function of couriers as shown in Fig. 6 to get the decision function of UAV delivery. The transferring process is the same as that of GVs, consisting of the initialization of the network and the modification of parameters inside by Eq.(16) and (17). The decision functions of couriers, GVs, and UAVs combine the knowledge of human couriers and delivery patterns of their own. Assigning parcels with high preferences can directly gain benefits. Let ρ(c, p ), ρ(b, p ), and ρ(u, p ) represent the preferences of the courier c, the GV b, and the UAV u for delivering the parcel p, respectively. By setting preference thresholds, the parcel set P can be divided into 4 parts: PC ,
+
+PB , PU , and P′, where PC , PB , and PU indicate the sets of parcels assigned to couriers, GVs, and UAVs, respectively, by judging the preferences as follows. 
+
+ρ(c, p ) = fC (c, p ) > ϵ C , ∀p ∈ PC , ∃c ∈ C
+
+ρ(b, p ) = fB (c, p ) > ϵ B , ∀p ∈ PB , ∃b ∈ B
+
+ρ(u, p ) = fU (c, p ) > ϵ U , ∀p ∈ PU , ∃u ∈ U
+
+, (18) where ϵC , ϵB , and ϵU are the preference thresholds of couriers, GVs, and UAVs, respectively. The set of remaining parcels is 
+
+P′, which is equal to P − (PC ∪ PB ∪ PU ). For parcels that are preferred by multiple delivery agents, they are assigned to the agent with the lowest delivery cost. 
+
+C. Remaining Parcel Assignment 
+
+The delivery companies pay the most attention to the number of parcels delivered and the delivery cost. Therefore, the objectives for remaining parcel assignment are to maximize the number of parcels delivered while minimizing the delivery cost. Let the binary parameters x(u, p ), x (c, p ), and x(b, p )
+
+denote the assignment of the parcel p ∈ P′ to the UAV u,the courier c, and the crowdsourced GV b, respectively. For instance, if parcel p is assigned to u ∈ U, x(u, p ) = 1;
+
+x(u, p ) = 0 , otherwise. Then, the optimization problem is formulated as: 
+
+max X
+
+> u∈U
+
+x(u, p ) + X
+
+> c∈C
+
+x(c, p ) + X
+
+> b∈B
+
+x(b, p ), (19) 
+
+min X
+
+> c∈C,p ∈P
+
+x(c, p ) × s(c, p ) + X
+
+> b∈B,p ∈P
+
+x(b, p ) × s(b, p ), (20) s.t. x(u, p ), x (c, p ), x (b, p ) ∈ { 0, 1},
+
+∀p ∈ P, ∀u ∈ U, ∀c ∈ C, ∀b ∈ B (21) 
+
+X
+
+> u∈U
+
+x(u, p ) + X
+
+> c∈C
+
+x(c, p ) + X
+
+> b∈B
+
+x(b, p ) ≤ 1, ∀p ∈ P, (22) 
+
+Γ( u, P(u)) , Γ( c, P(c)) , and Γ( b, p ) are feasible, 
+
+∀u ∈ U, ∀c ∈ C, ∀b ∈ B. (23) Here, the first objective (Eq.(19)) is to maximize the number of parcels delivered, which is customer-oriented and reveals the key delivery performance. The second objective is to minimize the delivery cost in Eq.(20), which is pursued by delivery companies. The three binary parameters indicating parcel assignment strategy are presented in Eq.(21). All parcels should be delivered only once by a UAV, a courier, or a crowd-sourced GV, which is stated in Eq.(22). All agents, including UAVs, couriers, and GVs, should finish the assigned delivery tasks within their allowed timelines discussed in Sec. IV, namely, their delivery paths must be feasible as stated in Eq.(23). The formulated problem is a Generalized Assignment Problem with Assignment Restriction (GAPAR). Thus, the heuristic greedy algorithm in [25] can be leveraged to find an efficient suboptimal solution with the time complexity of 
+
+O (MN log N ) [66]. Notice that M represents the number of delivery agents (i.e., M = |U| + |C| + |B|), and N denotes the number of parcels to be delivered (i.e., N = |P|). 8
+
+VI. P ERFORMANCE EVALUATION 
+
+A. Evaluation Settings 1) Evaluation Implementation: Due to privacy concerns, we utilize taxis as illustrative examples for GVs in this paper, with 30-day trajectories already released to the public. We divide the 30-day datasets of delivery orders and taxi trajectories into two parts: the first part includes data from the first 23 days, which is used to extract delivery prefer-ences of couriers and train or fine-tune the decision functions while the data from the remaining 7 days is leveraged to evaluate the delivery performance of TriDeliver and baselines. Furthermore, the numerical results in this section are the average values over 7 days, with error bars capturing the standard deviation. Considering different deployment costs of UAV charging stations and courier stations, we randomly generate 15 and 50 stations of UAVs and couriers, respectively. According to the characteristics of DJI Mavic 3 Pro [67], the flying speed of UAVs is set to 16 m/s , which is 80% of the maximum flying speed of this commercial drone, and the endurance of UAVs is set to 40 minutes. 
+
+2) Evaluated Parameters: To evaluate TriDeliver compre-hensively, we propose four parameters greatly influencing delivery performance and delivery costs as follows.  
+
+> •
+
+Delivery Demands. Various ratios of delivery demands, indicating different delivery burdens, are tested. TThe value of delivery demands varies from [70% , 80% , 90% , 100% ].  
+
+> •
+
+Ratio of Taxis Participating in Delivery. Taxis are not always willing to deliver parcels while transporting passengers. Therefore, only a small part of taxis can be recruited as the crowdsourced delivery taxis. This ratio takes values from [0.05,0.1,0.15,0.2].  
+
+> •
+
+The Number of UAVs per Station. Delivery capability of UAVs, which is directly influenced by the scale of UAV swarms, has a significant impact on delivery performance. Thus, we control the number of UAVs per station from [15,20,25,30].  
+
+> •
+
+The Number of Couriers per Station. The delivery ca-pability of couriers is also a key factor affecting delivery performance. We sample the number of couriers at each station from [10,15,20,25]. Note that the underlined values are viewed as the default values of these parameters. 
+
+3) Baselines: We compare TriDeliver (abbreviated as T-D) against three baselines as follows.  
+
+> •
+
+On-Demand Delivery (O-D). Intuitively, a parcel that is picked up earlier has the potential to be delivered sooner. This baseline assigns newly ordered parcels to vehicles or couriers who can pick them up as soon as possible.  
+
+> •
+
+Cooperative Delivery by UAVs and Crowdsourced Taxis (U-T) [25]. As the state-of-the-art method in air-ground cooperative instant delivery using UAVs and crowdsourced taxis, U-T shows its great performance in instant delivery.  
+
+> •
+
+Ground Truth by Couriers (G-T) [54]. This baseline is the practical solution for courier delivery and has been            
+
+> TABLE I RESULTS OF ABLATION STUDY .Delivery # Delivery Time Delivery Cost (by Couriers: by Taxis) Delivery Price by Taxis T-D 21,595 25.28 63,681 (65.2%:34.8%) 6.546 w/o TL 21,592 29.76 70,627 (70.7%:29.3%) 10.681
+
+used in delivery companies for years; its performance is extracted from the aBeacon dataset. 
+
+4) Metrics: To evaluate the overall performance of the proposed method T-D in terms of delivery performance and delivery cost, we utilize four metrics as follows.  
+
+> •
+
+The Number of Parcels Shipped. As the most direct index of parcel delivery, the number of parcels shipped represents the basic requirement in evaluating delivery performance.  
+
+> •
+
+Delivery Time. Delivery time is also very important for instant deliveries like food delivery. Faster delivery leads to better food quality. In this paper, all parcels should be delivered within 60 minutes.  
+
+> •
+
+Delivery Cost. For delivery companies, they must make a trade-off between delivery cost and delivery performance. The cost should not be too high for companies to remain profitable, nor too low for couriers to make a living.  
+
+> •
+
+Delivery Price by Taxis . Taxis, as the only agents re-sponsible for heterogeneous tasks, have to reach a balance between the performance for different missions. Delivery price (i.e., delivery cost per parcel) by taxis is the metric evaluating the detour distance of taxis, which will have direct impacts on traveling experiences for passengers. 
+
+B. Ablation Study 
+
+To evaluate the improvements brought by the transfer learning module, we compare the proposed method with the ablation variant on transfer learning (i.e., w/o TL). The results are shown in Table I. Although both the proposed method and w/o TL deliver almost all parcels ordered, the delivery time of our method is shorter than that of w/o TL by 15.1%. This is due to the highest priority of delivery cost in w/o TL. However, the highest priority of delivery cost in w/o TL does not lead to lower delivery cost compared to T-D, which spends less money (-9.8%) on delivery. This is because UAVs, couriers, and taxis can understand each other’s behaviors and consider future situations rather than always seeking temporary optima by learning from couriers’ knowledge. This also results in more severe negative impacts on original tasks of GVs in w/o TL compared to that in the proposed method, which is reflected by the higher delivery price by taxis (+63.2%). In summary, the transfer learning module helps UAVs, couriers, and GVs understand each other and achieve higher cooperative delivery performance in terms of shorter delivery time, lower delivery cost, and less severe negative impacts on GVs’ original tasks. 
+
+C. Numerical Results 1) Impacts of Delivery Demands: Fig. 7 illustrates the impacts of the delivery demands on the delivery performance. 9    " #  !  
+
+> 
+> 
+> 
+>     !   ×10
+> 3
+> 
+> 
+> 
+>  
+
+(a) Impact on the Number of Deliveries         
+
+> 
+> 
+> 
+> 
+> 
+> 
+>    
+> 
+> 
+>  
+
+(b) Impact on Delivery Time                
+
+> 
+> 
+> 
+> 
+>          ×10
+> 3
+> 
+> 
+> 
+>  
+>  
+> 
+>  
+
+(c) Impact on the Delivery Cost     !    
+
+> 
+> 
+> 
+> 
+> 
+> !  !      
+> 
+> 
+> 
+
+(d) Impact on Price by Taxis Fig. 7. Impact of Delivery Demands on Delivery Performance       "   #!  ""  
+
+> 
+> 
+> 
+>     !   ×10
+> 3
+> 
+> 
+> 
+>  
+
+(a) Impact on the Number of Deliveries             
+
+> 
+> 
+> 
+> 
+> 
+> 
+> !   
+> 
+> 
+> 
+
+(b) Impact on Delivery Time         "            
+
+> 
+> 
+> 
+> 
+> 
+> !#          ×10
+> 3
+> 
+> 
+> 
+>  
+>  
+> 
+>  
+
+(c) Impact on the Delivery Cost             
+
+> 
+> 
+> 
+> 
+> 
+> !    !      
+> 
+> 
+> 
+
+(d) Impact on Price by Taxis Fig. 8. Impact of Ratio of Taxis Participating in Delivery on Delivery Performance        "  ! ##  
+
+> 
+> 
+> 
+>   !"     ×10
+> 3
+> 
+> 
+> 
+>  
+
+(a) Impact on the Number of Deliveries            
+
+> 
+> 
+> 
+> 
+> 
+> 
+>   !   
+> 
+> 
+>  
+
+(b) Impact on Delivery Time        !   ""    
+
+> 
+> 
+> 
+> 
+> 
+> #  $ !"   ×10
+> 3
+> 
+> 
+> 
+> 
+> 
+> 
+> 
+
+(c) Impact on the Delivery Cost           !!  
+
+> 
+> 
+> 
+> 
+> "$  $  #     
+> 
+> 
+> 
+
+(d) Impact on Price by Taxis Fig. 9. Impact of the Number of UAVs at Each Station on Delivery Performance       "   !!  
+
+> 
+> 
+> 
+>        ×10
+> 3
+> 
+> 
+> 
+>  
+
+(a) Impact on the Number of Deliveries            
+
+> 
+> 
+> 
+> 
+> 
+> 
+>   !   
+> 
+> 
+>  
+
+(b) Impact on Delivery Time                  
+
+> 
+> 
+> 
+> 
+>          ×10
+> 3
+> 
+> 
+> 
+>  
+>  
+> 
+>  
+
+(c) Impact on the Delivery Cost            
+
+> 
+> 
+> 
+> 
+> !#  #  "   
+> 
+> 
+> 
+
+(d) Impact on Price by Taxis Fig. 10. Impact of the Number of Couriers at Each Station on Delivery Performance 
+
+Specifically, the delivery number and delivery cost of G-T decrease proportionally with the delivery demands. As shown in Fig. 7(a), more and more parcels are delivered via these methods with the increase in available parcels. When all instant parcels are to be delivered, T-D delivers over 21,500 items ( 97 .7% ) of them, which is 28 .3% more than that for U-T and the same as that for O-D. This is because T-D has sufficient delivery capacity. The limited number of UAVs and the lack of couriers’ participation are why U-T cannot deliver all parcels. As shown in Fig. 7(b), parcels are delivered within 25 .2 minutes after being ordered in T-D on average. Due to the high flying speed of UAVs and the limited detour distance for taxis, the average delivery time in U-T is only 9 minutes, which is 63 .9% shorter than the delivery time in our method. Additionally, with the increase in delivery demands, more and more couriers participate in parcel delivery, which explains why the delivery time in our method is only 4.4 minutes ( 14 .8% ) shorter than that in G-T. O-D assigns parcels to the agent with the shortest pick-up time, leading to the average delivery time of 25.3 minutes. According to Fig. 7(c), T-D costs the least with only 70% 
+
+parcels available, which is much cheaper than G-T ( −37 .8% ), 10 
+
+U-T ( −65 .8% ), and O-D ( −65 .7% ). This is because UAVs can deliver the majority of parcels when demand is low in T-D. Moreover, heavier delivery burden results in more expensive delivery in all methods. When the delivery demands increase from 70% to 100% , the delivery cost of T-D grows by 66 .7% ,and the smallest growth belongs to O-D by 38 .3% . This is because the UAVs are fully exploited in T-D, which forces our method to assign more parcels to couriers and taxis when demands increase. The delivery price by taxis is the metric evaluating the negative impacts on taxi passengers due to the linear correlation between delivery price and detour distance. Additionally, this metric directly influences the delivery cost. According to Fig. 7(d), the lowest average price by taxis is 5.27 CNY in T-D when 70% of parcels are available, which is 
+
+74 .6% and 71 .6% lower than O-D and U-T, respectively. This is because UAVs and couriers in T-D consider preferences of taxis when accepting delivery tasks according to the transfer learning model. In addition, delivery prices by taxis in T-D grows with the increase in delivery demands, which is because it must assign more parcels to taxis with longer detours under higher delivery burdens. 
+
+2) Impacts on Ratio of Taxis Participating in Delivery: 
+
+The increased willingness of taxis for participating in instant delivery improves the delivery capabilities of all methods involving GV delivery, especially for U-T. As shown in Fig. 8(a), the number of parcels delivered in U-T increases by 5,198 ( 37 .8% ), with more taxis participating in delivery. In contrast, the numbers of parcels delivered in T-D and O-D grow slightly (i.e., +1 .8% and 1.1% , respectively). This demonstrates the robustness and great delivery capacity of our method, characterized by its minimal reliance on delivery by crowdsourced taxis. Additionally, U-T, state-of-the-art method in air-ground instant delivery, delivers less than 12 .8% of parcels compared to T-D, although the number soars with the increasing ratio of taxis participating in delivery. The more taxis participate in delivery, the shorter the average delivery time is. According to Fig. 8(b), the delivery time in T-D decreases by 9.2% . When 20% of taxis are willing to deliver parcels, the average delivery time of T-D is 23.9 minutes. Since only UAVs and crowdsourced taxis with strict detour limitations are responsible for delivery in U-T, it achieves the shortest delivery time (i.e., 9.1 minutes when the taxi ratio is 
+
+20% ). Fig. 8(c) demonstrates the impacts on the delivery cost. With more taxis participating in delivery, O-D assigns more parcels to taxis since they are widely and densely distributed, which leads to shorter pick-up time. Additionally, the growth of taxis participating in delivery also increases the delivery capability of U-T, which results in higher delivery costs in O-D ( +96 .9% ) and U-T ( +70 .8% ), respectively. More taxis available lead to more parcel assignment to them with high preferences in T-D, further resulting in the reduction in the total delivery cost by taxis ( −10 .5% ) due to the slighter impacts on passengers. From Fig. 8(d), we observe that the average price by taxis drops by 21 .2% , reaching 5.80 CNY per parcel. This is because parcels would be assigned to candidate taxis due to higher preferences with the growth of candidate taxis. Especially when one-fifth taxis are willing to deliver parcels, the average price by taxis in T-D is only 28 .0% and 
+
+31 .8% of those for O-D and U-T, respectively. 
+
+3) Impacts on the Number of UAVs per Station: As shown in Fig. 9(a), the numbers of parcels delivered by all methods stay stable when the number of UAVs in each station grows from 5 to 20. 21,611 ( 97 .8% ) instant parcels are delivered in T-D when there are 20 UAVs at a station, which is −1.5% 
+
+and +27 .3% more than the parcels delivered by O-D and U-T, respectively. Since activities of UAVs are limited in areas around charging stations, more UAVs at a station reduces the delivery burden of couriers in these areas. Therefore, couriers can deliver more parcels outside these areas. However, the increasing delivery capacity of UAVs will not influence the taxi mobility. As shown in this figure, the capacities of delivery agents in T-D and O-D are sufficient for instant delivery, although there are only 15 UAVs at a station. Fig. 9(b) displays the impacts of the number of UAVs on the delivery time. With the increase in the number of UAVs, more and more parcels will be assigned to them which travel much faster than couriers. This reduces the delivery time in T-D by 8.0% and in O-D by 8.1% , respectively. Considering the preference models, a large number of parcels are assigned to couriers in T-D, who ship parcels much more slowly than UAVs and taxis do. This prolongs the delivery time by 1.7× in T-D compared to U-T. Moreover, thanks to the fast flying speed of UAVs and higher driving speed of taxis, the average delivery time in T-D is shorter than that in G-T by 17 .0% . The economic cost of UAV delivery is ignored as mentioned in Sec. IV-A, which results in the reduction in delivery cost for the methods involving UAV delivery as illustrated in Fig. 9(c). The delivery cost of T-D drops by 13,509 CNY ( −17 .9% ), reaching 34,229 CNY with 20 UAVs at each station. This number is 60 .0% , 62 .3% , and 
+
+31 .7% lower than those of O-D, U-T, and G-T, respectively. This is because delivery agents in T-D would not blindly pursue the best parcel for their own sake, but consider at a macro picture by transferring preference models. This helps it achieve the best economic effects. As shown in Fig. 9(d), the average detour distance of taxis in T-D is the shortest, which is indicated by the lowest average delivery price by taxis (i.e., around 6.5 CNY per parcel). However, the increase in the number of UAVs does not affect the average price by taxis greatly in all methods. This is because UAVs’ activities are limited around charging stations due to their battery capacity. 
+
+4) Impacts on the Number of Couriers per Station: 
+
+Since U-T does not involve courier delivery, the delivery performance of this method remains the values under the default settings of parameters. As demonstrated in Fig. 10(a), the increasing number of couriers stimulates the growth of the numbers of parcels delivered in O-D and, especially, T-D. 21,097 instant parcels ( 95 .5% ) are shipped in T-D with 10 couriers at each station. This number rises to 21,742 when the number of couriers at each station reaches 25 (i.e., 1,250 couriers in total), accounting for 98 .4% of all parcels. In comparison, G-T delivers these parcels using over 8,600 couriers. Furthermore, our method delivers 97 .7% of all parcels with default parameter settings, which is only 1,000 couriers with 375 UAVs and 10% crowdsourced taxis. The participation of couriers also leads to a huge improvement compared to U-T: More than 4,921 items ( +29 .3% ) of instant 11 
+
+delivery are successfully shipped in T-D compared to U-T. More couriers bring higher delivery capacities, leading to more parcels assigned to slow couriers in T-D. This is why the delivery times in T-D are prolonged by 3.6 minutes ( +16 .3% ), as illustrated in Fig. 10(b). In contrast, the growth of candidate couriers shortens the average pick-up distance when assigning parcels in O-D, resulting in the shorter delivery time ( −8.6% ). However, the average delivery time in T-D is still shorter than that in G-T ( −13 .2% ), and only 5.8% longer than the decreased time in O-D. This is because T-D assigns parcels according to agents’ preferences. From Fig. 10(c), we observe that having more available couriers decreases the number of parcels assigned to crowdsourced taxis. This is why the delivery price by taxis in all methods drops when the number of couriers grows. For instance, the cost of taxi delivery drops to 60 .8% in T-D when the cost of couriers increases by 
+
+47 .3% . Due to the higher delivery price by taxis, the overall delivery cost of T-D decreases by 11,031 CNY (a reduction of 15 .3% ) as the number of couriers increases. As illustrated in Fig. 10(d), the average delivery price by taxis drops in T-D (−21 .1% ), as the number of couriers increases. This is because the increase in the number of couriers brings more candidate couriers with higher preferences and lower cost, assigning more parcels to couriers rather than taxis. Because T-D takes the preferences of all delivery agents into consideration when assigning parcels, taxis do not need to detour for a long distance to pick up parcels, hence the traveling experience of taxi passengers is not significantly affected, which is reflected by the lowest delivery price by taxis compared with O-D (−71 .9% ) and U-T ( −64 .8% ), respectively. VII. C ONCLUSION 
+
+In this paper, we have presented TriDeliver , the first inte-grated air-ground cooperative instant delivery paradigm lever-aging couriers, UAVs, and crowdsourcing GVs. To optimize cooperative performance, we have designed a transfer learning (TL)-based strategy that extracts delivery knowledge from couriers’ behavioral history and utilizes it to optimize delivery strategies of UAVs and GVs (e.g., taxis) while respecting their delivery patterns. The comprehensive evaluations are conducted on large-scale real-world trajectory and delivery datasets. The results have demonstrated that TriDeliver outper-forms baselines, including: saving 65.8% cost versus state-of-the-art air-ground cooperation, and the TL enhancement that further reduces delivery time (17.7%), delivery cost (9.8%), and negative impacts on the original missions, e.g., taxi pas-senger service (43.6%), even with knowledge representation by a simple network. REFERENCES [1] L. Jiang, S. Wang, B. Guo, H. Wang, D. Zhang, and G. Wang, “Faircod: A fairness-aware concurrent dispatch system for large-scale instant delivery services,” in Proceedings of the 29th ACM SIGKDD Conference on knowledge discovery and data mining , 2023, pp. 4229–4238. [2] O. C. Kobusingye, A. A. Hyder, D. Bishai, M. Joshipura, E. R. Hicks, and C. Mock, “Emergency medical services,” Disease Control Priorities in Developing Countries. 2nd edition , 2006. [3] Otter. (2023) 41+ global online food delivery statistics (2023). [Online]. Available: https://www.tryotter.com/en-gb/blog/ industry/online-food-delivery-statistics [4] P. C. Group. Instant delivery market analysis. [Online]. Available: https://pmarketresearch.com/instant-delivery-market-analysis/ [5] D. Curry. Food delivery app revenue and usage statistics (2025). [Online]. Available: https://www.businessofapps.com/data/ food-delivery-app-market/ [6] Y. Wang. Jd’s self-developed logistics drone takes off in sichuan. [Online]. Available: https://jdcorporateblog.com/ jds-self-developed-logistics-drone-takes-off-in-sichuan/ [7] H. Zhang, K. Luo, Y. Xu, Y. Xu, and W. Tong, “Online crowdsourced truck delivery using historical information,” European Journal of Operational Research , vol. 301, no. 2, pp. 486–501, 2022. [Online]. Available: https://www.sciencedirect.com/science/article/pii/ S0377221721008869 [8] M. T. Review. (2023) Drone food delivery is now part of daily life in shenzhen. [Online]. Available: https://www.technologyreview.com/ 2023/05/23/1073500/drone-food-delivery-shenzhen-meituan/ [9] A. Flex. How delivering pakages with amazon flex works. [Online]. Available: https://flex.amazon.com/lets-drive [10] Amazon. Order with amazon prime drone delivery. [Online]. Avail-able: https://www.amazon.com/gp/help/customer/display.html?nodeId= TeqJgaugxFtL4Lj7hy [11] A. Gawel, M. Kamel, T. Novkovic, J. Widauer, D. Schindler, B. P. Von Altishofen, R. Siegwart, and J. Nieto, “Aerial picking and delivery of magnetic objects with mavs,” in 2017 IEEE international conference on robotics and automation (ICRA) . IEEE, 2017, pp. 5746–5752. [12] D. Dissanayaka, T. R. Wanasinghe, O. De Silva, A. Jayasiri, and G. K. Mann, “Review of navigation methods for uav-based parcel delivery,” 
+
+IEEE Transactions on Automation Science and Engineering , 2023. [13] Y. Pan, S. Li, Q. Chen, N. Zhang, T. Cheng, Z. Li, B. Guo, Q. Han, and T. Zhu, “Efficient schedule of energy-constrained uav using crowd-sourced buses in last-mile parcel delivery,” Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies , vol. 5, no. 1, pp. 1–23, 2021. [14] Y. Ding, Y. Yang, W. Jiang, Y. Liu, T. He, and D. Zhang, “Nationwide deployment and operation of a virtual arrival detection system in the wild,” in Proceedings of the 2021 ACM SIGCOMM 2021 Conference ,2021, pp. 705–717. [15] X. Wang, L. Wang, S. Wang, J. Pan, H. Ren, and J. Zheng, “Recommending-and-grabbing: A crowdsourcing-based order allocation pattern for on-demand food delivery,” IEEE Transactions on Intelligent Transportation Systems , vol. 24, no. 1, pp. 838–853, 2022. [16] Y. Ding, B. Guo, L. Zheng, M. Lu, D. Zhang, S. Wang, S. H. Son, and T. He, “A city-wide crowdsourcing delivery system with reinforcement learning,” Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies , vol. 5, no. 3, pp. 1–22, 2021. [17] Z. Xie, H. Luo, X. Zhang, H. Xiong, F. Zhao, Z. Li, Q. Ye, B. Rong, and J. Gao, “Transfloor: Transparent floor localization for crowdsourcing instant delivery,” Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies , vol. 6, no. 4, pp. 1–30, 2023. [18] Y. Pan, J. Gao, J. Duan, J. Shi, B. Guo, Y. Liang, and Y. Hu, “Pioneering cooperative air-ground instant delivery using uavs and crowdsourced couriers,” Proceedings of the ACM on Interactive, Mobile, Wearable and Ubiquitous Technologies , vol. 8, no. 4, pp. 1–26, 2024. [19] W. Wen, K. Luo, L. Liu, Y. Zhang, and Y. Jia, “Joint trajectory and pick-up design for uav-assisted item delivery under no-fly zone constraints,” 
+
+IEEE Transactions on Vehicular Technology , vol. 72, no. 2, pp. 2587– 2592, 2022. [20] D. Xu, Y. Sun, D. W. K. Ng, and R. Schober, “Multiuser miso uav communications in uncertain environments with no-fly zones: Robust trajectory and resource allocation design,” IEEE Transactions on Com-munications , vol. 68, no. 5, pp. 3153–3172, 2020. [21] CNBC. There are millions of jobs, but a short-age of workers: Economists explain why that’s wor-rying. [Online]. Available: https://www.cnbc.com/2021/10/20/ global-shortage-of-workers-whats-going-on-experts-explain.html [22] Y. Ao. (2022) Courier shortage: The insight of the poor and unfast delivery in multiple regions in china (in chinese). [Online]. Available: https://new.qq.com/rain/a/20221222A0404T00 [23] Shobserver. (2022) Why instant delivery is getting slower?(in chinese). [Online]. Available: https://new.qq.com/rain/a/20221220A08AAN00 [24] M. Behrend, F. Meisel, K. Fagerholt, and H. Andersson, “An exact solution method for the capacitated item-sharing and crowdshipping problem,” European Journal of Operational Research , vol. 279, no. 2, pp. 589–604, 2019. [25] J. Gao, Q. Wang, X. Zhang, J. Shi, X. Zhao, Q. Han, and Y. Pan, “Cooperative air-ground instant delivery by uavs and crowdsourced 12 
+
+taxis,” in 2024 IEEE 40th International Conference on Data Engineering (ICDE) , 2024, pp. 4153–4166. [26] H. Huang, A. V. Savkin, and C. Huang, “Drone routing in a time-dependent network: Toward low-cost and large-range parcel delivery,” 
+
+IEEE Transactions on Industrial Informatics , vol. 17, no. 2, pp. 1526– 1534, 2020. [27] S. Fatehi and M. R. Wagner, “Crowdsourcing last-mile deliveries,” 
+
+Manufacturing & Service Operations Management , vol. 24, no. 2, pp. 791–809, 2022. [28] J. Gao, Q. Wang, X. Zhang, J. Shi, X. Zhao, Y. Liang, B. Guo, Q. Han, and Y. Pan, “Cooperative air-ground instant delivery by uavs and crowdsourced taxis: Joint uav station deployment and delivery scheduling,” IEEE Transactions on Mobile Computing , pp. 1–17, 2025. [29] S. Duan, F. Lyu, X. Zhu, Y. Ding, H. Wang, D. Zhang, X. Liu, Y. Zhang, and J. Ren, “Velp: vehicle loading plan learning from human behavior in nationwide logistics system,” Proceedings of the VLDB Endowment ,vol. 17, no. 2, pp. 241–249, 2023. [30] X. Bai, Y. Ye, B. Zhang, and S. S. Ge, “Efficient package delivery task assignment for truck and high capacity drone,” IEEE Transactions on Intelligent Transportation Systems , 2023. [31] ePlane AI. First trial of drone parcel delivery con-ducted. [Online]. Available: https://www.eplaneai.com/nl/news/ first-trial-of-drone-parcel-delivery-conducted [32] C. Lemardel´ e, M. Estrada, L. Pag` es, and M. Bachofner, “Potentialities of drones and ground autonomous delivery devices for last-mile logistics,” Transportation Research Part E: Logistics and Transportation Review , vol. 149, p. 102325, 2021. [Online]. Available: https://www.sciencedirect.com/science/article/pii/S1366554521000995 [33] Y. Deng, Z. Fang, S. Hu, Y. Ma, X. Guo, H. Zhang, and Y. Fang, “UAV-enabled computing power networks: Design and performance analysis under energy constraints,” IEEE Transactions on Mobile Computing , p. 1–17, 2026. [Online]. Available: http: //dx.doi.org/10.1109/TMC.2026.3655118 [34] Y. Chen, Y. Wu, Z. Zhang, Z. Miao, H. Zhong, H. Zhang, and Y. Wang, “Image-based visual servoing of unmanned aerial manipulators for tracking and grasping a moving target,” IEEE Transactions on Industrial Informatics , 2022. [35] A. Gawel, M. Kamel, T. Novkovic, J. Widauer, D. Schindler, B. P. von Altishofen, R. Siegwart, and J. Nieto, “Aerial picking and delivery of magnetic objects with mavs,” in 2017 IEEE International Conference on Robotics and Automation (ICRA) , 2017, pp. 5746–5752. [36] B. Du, J. Chen, D. Sun, S. G. Manyam, and D. W. Casbeer, “Uav trajectory planning with probabilistic geo-fence via iterative chance-constrained optimization,” IEEE Transactions on Intelligent Transporta-tion Systems , vol. 23, no. 6, pp. 5859–5870, 2021. [37] K. Dorling, J. Heinrichs, G. G. Messier, and S. Magierowski, “Vehicle routing problems for drone delivery,” IEEE Transactions on Systems, Man, and Cybernetics: Systems , vol. 47, no. 1, pp. 70–85, 2017. [38] H. Huang and A. V. Savkin, “A method of optimized deployment of charging stations for drone delivery,” IEEE Transactions on Transporta-tion Electrification , vol. 6, no. 2, pp. 510–518, 2020. [39] C. Cai, S. Wu, L. Jiang, Z. Zhang, and S. Yang, “A 500-w wireless charging system with lightweight pick-up for unmanned aerial vehicles,” 
+
+IEEE Transactions on Power Electronics , 2020. [40] I. Sungur, Y. Ren, F. Ord´ o˜ nez, M. Dessouky, and H. Zhong, “A model and algorithm for the courier delivery problem with uncertainty,” 
+
+Transportation science , vol. 44, no. 2, pp. 193–205, 2010. [41] M. Chen and M. Hu, “Courier dispatch in on-demand delivery,” Man-agement Science , vol. 70, no. 6, pp. 3789–3807, 2024. [42] R. Auad, A. Erera, and M. Savelsbergh, “Dynamic courier capacity acquisition in rapid delivery systems: A deep q-learning approach,” 
+
+Transportation Science , vol. 58, no. 1, pp. 67–93, 2024. [43] A. Bozanta, M. Cevik, C. Kavaklioglu, E. M. Kavuk, A. Tosun, S. B. Sonuc, A. Duranel, and A. Basar, “Courier routing and assignment for food delivery service using reinforcement learning,” Computers And Industrial Engineering , vol. 164, p. 107871, 2022. [44] K. Xia, L. Lin, S. Wang, H. Wang, D. Zhang, and T. He, “A predict-then-optimize couriers allocation framework for emergency last-mile logistics,” in Proceedings of the 29th ACM SIGKDD Conference on Knowledge Discovery and Data Mining , ser. KDD ’23. New York, NY, USA: Association for Computing Machinery, 2023, p. 5237–5248. [45] G. Zhu, D. Zhao, Y. Wang, H. Wang, D. Zhang, and H. Ma, “Come: Learning to coordinate crowdsourcing and regular couriers for offline delivery during online mega sale days,” in 2023 IEEE 39th International Conference on Data Engineering (ICDE) , 2023, pp. 3126–3139. [46] W. Lyu, H. Wang, Z. Hong, G. Wang, Y. Yang, Y. Liu, and D. Zhang, “Rede: Exploring relay transportation for efficient last-mile delivery,” in 
+
+2023 IEEE 39th International Conference on Data Engineering (ICDE) ,2023, pp. 3003–3016. [47] Y. Liu, B. Guo, C. Chen, H. Du, Z. Yu, D. Zhang, and H. Ma, “Foodnet: Toward an optimized food delivery network based on spatial crowdsourcing,” IEEE Transactions on Mobile Computing , vol. 18, no. 6, pp. 1288–1301, 2018. [48] F. Basık, B. Gedik, H. Ferhatosmano˘ glu, and K.-L. Wu, “Fair task allocation in crowdsourced delivery,” IEEE Transactions on Services Computing , vol. 14, no. 4, pp. 1040–1053, 2018. [49] A. Devari, A. G. Nikolaev, and Q. He, “Crowdsourcing the last mile delivery of online orders by exploiting the social networks of retail store customers,” Transportation Research Part E: Logistics and Transporta-tion Review , vol. 105, pp. 105–122, 2017. [50] D. Sun, K. Xu, H. Cheng, Y. Zhang, T. Song, R. Liu, and Y. Xu, “Online delivery route recommendation in spatial crowdsourcing,” World Wide Web , vol. 22, pp. 2083–2104, 2019. [51] Y. Chen, D. Guo, M. Xu, G. Tang, and G. Cheng, “Measuring maximum urban capacity of taxi-based logistics,” IEEE Transactions on Intelligent Transportation Systems , vol. 22, no. 10, pp. 6449–6459, 2020. [52] S. Choudhury, K. Solovey, M. J. Kochenderfer, and M. Pavone, “Effi-cient large-scale multi-drone delivery using transit networks,” Journal of Artificial Intelligence Research , vol. 70, pp. 757–788, 2021. [53] H. Huang, A. V. Savkin, and C. Huang, “Drone routing in a time-dependent network: Toward low-cost and large-range parcel delivery,” 
+
+IEEE Transactions on Industrial Informatics , vol. 17, no. 2, pp. 1526– 1534, 2021. [54] Y. Ding, L. Liu, Y. Yang, Y. Liu, D. Zhang, and T. He, “From conception to retirement: A lifetime story of a 3-year-old wireless beacon system in the wild,” IEEE/ACM Transactions on Networking , vol. 30, no. 1, pp. 47–61, 2022. [55] Y. Yang, Y. Ding, D. Yuan, G. Wang, X. Xie, Y. Liu, T. He, and D. Zhang, “Transloc: Transparent indoor localization with uncertain human participation for instant delivery,” in Proceedings of the 26th Annual International Conference on Mobile Computing and Networking ,ser. MobiCom ’20. New York, NY, USA: Association for Computing Machinery, 2020. [56] cbdog94. Stl: Online detection of taxi trajectory anomaly based on spatial-temporal laws. [Online]. Available: https://github.com/cbdog94/ STL [57] Y. Pan, Q. Chen, N. Zhang, Z. Li, T. Zhu, and Q. Han, “Extending delivery range and decelerating battery aging of logistics uavs using public buses,” IEEE Transactions on Mobile Computing , vol. 22, no. 9, pp. 5280–5295, 2023. [58] S. B. of Justice. Management regulation for civil drones in shenzheng (in chinese). [Online]. Available: https://sf.sz.gov.cn/xxgk/xxgkml/gsgg/ content/post 9276739.html [59] X. Xu, A. Liu, G. Liu, Z. Li, and L. Zhao, “Drive less but finish more: Food delivery based on multi-level workers in spatial crowdsourcing,” in 
+
+Proceedings of the 31st ACM International Conference on Information & Knowledge Management , 2022, pp. 2331–2340. [60] C. Chen, D. Zhang, X. Ma, B. Guo, L. Wang, Y. Wang, and E. Sha, “crowddeliver: Planning city-wide package delivery paths leveraging the crowd of taxis,” IEEE Transactions on Intelligent Transportation Systems , vol. 18, no. 6, pp. 1478–1496, 2017. [61] C. Xiang, Y. Zhou, H. Dai, Y. Qu, S. He, C. Chen, and P. Yang, “Reusing delivery drones for urban crowdsensing,” IEEE Transactions on Mobile Computing , 2021. [62] L. Wang. Meituan adjusts takeout delivery commission draw: Billing by distance, price, time slot. [Online]. Available: https: //m.thepaper.cn/newsDetail forward 12619693 [63] B. Li, D. Krushinsky, H. A. Reijers, and T. Van Woensel, “The share-a-ride problem: People and parcels sharing taxis,” European Journal of Operational Research , vol. 238, no. 1, pp. 31–40, 2014. [64] S. M. T. Commission. Taxi fare structure and tariffs of shanghai. [Online]. Available: https://jtw.sh.gov.cn/czqcyj/20180605/0010-10460. html [65] D. P. Kingma and J. Ba, “Adam: A method for stochastic optimization,” 
+
+arXiv preprint arXiv:1412.6980 , 2014. [66] R. Cohen, L. Katzir, and D. Raz, “An efficient approximation for the generalized assignment problem,” Information Processing Letters , vol. 100, no. 4, pp. 162–166, 2006. [67] DJI. Characteristics of dji mavic 3 pro. [Online]. Available: https://www.dji.com/cn/mavic-3-pro/specs

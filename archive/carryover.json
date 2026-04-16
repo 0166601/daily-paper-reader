@@ -1,6 +1,6 @@
 {
-  "generated_at": "2026-04-15T20:23:46.056657+00:00",
-  "updated_date": "20260415",
+  "generated_at": "2026-04-16T19:44:56.084352+00:00",
+  "updated_date": "20260416",
   "carryover_days": 9,
   "tag_states": {
     "物流调度": {
@@ -9,7 +9,7 @@
       "items": []
     },
     "即时配送": {
-      "updated_date": "20260415",
+      "updated_date": "20260416",
       "carryover_days": 9,
       "items": []
     }
