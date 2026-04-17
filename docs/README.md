@@ -6,82 +6,76 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-16
-- 运行时间：2026-04-16 19:47:51 UTC
+- 最新运行日期：2026-04-17
+- 运行时间：2026-04-17 20:02:01 UTC
 - 运行状态：成功
-- 本次总论文数：20
-- 精读区：9
+- 本次总论文数：18
+- 精读区：7
 - 速读区：11
 
 ### 今日简报（AI）
-今日深度研读20篇前沿文献，重点聚焦无人机、快递员与众包车辆协同的空地即时配送新架构。
-满分论文《TriDeliver》定义的空地协同范式极具启发性，同时TSP搜索学习与车队PHM决策优化也是当日亮点。
-建议关注物流自动化与强化学习的交叉应用，从多智能体协同中寻找复杂调度问题的最优解。
-- 详情：[/202604/16/README](/202604/16/README)
+今日精选 18 篇前沿成果，深度解析了空地协同即时配送系统 TriDeliver 及多目标调度优化方案。
+核心结论指出，通过无人机与众包车辆的异构协作可大幅提升物流效率，而联邦学习正成为跨场景路径规划的新趋势。
+推荐关注复杂物流场景下的资源协同算法，并探索如何利用异构图网络优化长周期生产调度。
+- 详情：[/202604/17/README](/202604/17/README)
 
 ### 精读区论文标签
-1. [{\sf TriDeliver}: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/16/2604.09049v1-sf-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
+1. [{\sf TriDeliver}: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/17/2604.09049v1-sf-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
    标签：评分：10.0/10、query:q2
-   evidence：快递员与无人机协作的空地即时配送框架
-2. [TriDeliver: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/16/2604.09049v2-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
+   evidence：快递员与车辆的空地协同即时配送
+2. [TriDeliver: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/17/2604.09049v2-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
    标签：评分：10.0/10、query:q2
-   evidence：包含骑手和众包车辆的即时配送调度
-3. [Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching](/202604/16/2604.10664v1-preference-agile-multi-objective-optimization-for-real-time-vehicle-dispatching)  
+   evidence：涉及快递员、无人机和地面车辆的即时配送分层协作框架
+3. [Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching](/202604/17/2604.10664v1-preference-agile-multi-objective-optimization-for-real-time-vehicle-dispatching)  
    标签：评分：10.0/10、query:q9
-   evidence：针对实时车辆调度的多目标优化，支持动态偏好调整
-4. [Energy-Efficient Drone Logistics for Last-Mile Delivery: Implications of Payload-Dependent Routing Strategies](/202604/16/2604.07514v1-energy-efficient-drone-logistics-for-last-mile-delivery-implications-of-payload-dependent-routing-strategies)  
-   标签：评分：9.0/10、query:q4
-   evidence：无人机末端配送物流与载荷相关的路径规划策略
-5. [PyVRP$^+$: LLM-Driven Metacognitive Heuristic Evolution for Hybrid Genetic Search in Vehicle Routing Problems](/202604/16/2604.07872v1-pyvrp-llm-driven-metacognitive-heuristic-evolution-for-hybrid-genetic-search-in-vehicle-routing-problems)  
-   标签：评分：9.0/10、query:q5
-   evidence：大模型驱动的车辆路径规划问题(VRP)元启发式算法
-6. [ParkSense: Where Should a Delivery Driver Park? Leveraging Idle AV Compute and Vision-Language Models](/202604/16/2604.07912v1-parksense-where-should-a-delivery-driver-park-leveraging-idle-av-compute-and-vision-language-models)  
-   标签：评分：9.0/10、query:q2
-   evidence：外卖配送时间优化与骑手收入提升
-7. [Enhancing Cross-Problem Vehicle Routing via Federated Learning](/202604/16/2604.10652v1-enhancing-cross-problem-vehicle-routing-via-federated-learning)  
+   evidence：具有动态偏好的实时车辆调度的多目标优化
+4. [PyVRP$^+$: LLM-Driven Metacognitive Heuristic Evolution for Hybrid Genetic Search in Vehicle Routing Problems](/202604/17/2604.07872v1-pyvrp-llm-driven-metacognitive-heuristic-evolution-for-hybrid-genetic-search-in-vehicle-routing-problems)  
    标签：评分：9.0/10、query:profile-1
-   evidence：现代物流中跨问题车辆路径规划的联邦学习
-8. [Dynamic Multi-Robot Task Allocation under Uncertainty and Communication Constraints: A Game-Theoretic Approach](/202604/16/2604.11954v1-dynamic-multi-robot-task-allocation-under-uncertainty-and-communication-constraints-a-game-theoretic-approach)  
-   标签：评分：9.0/10、query:q10
-   evidence：不确定性和时间窗约束下的动态多机器人任务分配
-9. [Robust Energy-Aware Routing for Air-Ground Cooperative Multi-UAV Delivery in Wind-Uncertain Environments](/202604/16/2604.13441v1-robust-energy-aware-routing-for-air-ground-cooperative-multi-uav-delivery-in-wind-uncertain-environments)  
+   evidence：大模型驱动的车辆路径规划启发式演化
+5. [ParkSense: Where Should a Delivery Driver Park? Leveraging Idle AV Compute and Vision-Language Models](/202604/17/2604.07912v1-parksense-where-should-a-delivery-driver-park-leveraging-idle-av-compute-and-vision-language-models)  
+   标签：评分：9.0/10、query:q7
+   evidence：外卖配送时间优化与骑手停车位选择
+6. [Robust Energy-Aware Routing for Air-Ground Cooperative Multi-UAV Delivery in Wind-Uncertain Environments](/202604/17/2604.13441v1-robust-energy-aware-routing-for-air-ground-cooperative-multi-uav-delivery-in-wind-uncertain-environments)  
    标签：评分：9.0/10、query:q5
-   evidence：风力不确定环境下的卡车-无人机协同配送鲁棒路径规划
+   evidence：风力不确定环境下卡车辅助无人机配送的在线风险敏感规划
+7. [Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation](/202604/17/2604.15190v1-meituan-merchant-business-diagnosis-via-policy-guided-dual-process-user-simulation)  
+   标签：评分：9.0/10、query:q2
+   evidence：美团商家业务诊断与用户行为模拟
 
 ### 速读区论文标签
-1. [The Traveling Thief Problem with Time Windows: Benchmarks and Heuristics](/202604/16/2604.06724v1-the-traveling-thief-problem-with-time-windows-benchmarks-and-heuristics)  
-   标签：评分：8.0/10、query:q4
-   evidence：带时间窗的旅行窃贼问题及启发式算法
-2. [A First Guess is Rarely the Final Answer: Learning to Search in the Travelling Salesperson Problem](/202604/16/2604.06940v1-a-first-guess-is-rarely-the-final-answer-learning-to-search-in-the-travelling-salesperson-problem)  
-   标签：评分：8.0/10、query:q8
-   evidence：针对旅行商问题的学习搜索与神经改进方法
-3. [Smart Commander: A Hierarchical Reinforcement Learning Framework for Fleet-Level PHM Decision Optimization](/202604/16/2604.07171v1-smart-commander-a-hierarchical-reinforcement-learning-framework-for-fleet-level-phm-decision-optimization)  
+1. [Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems](/202604/17/2604.08296v1-robust-multi-objective-optimization-for-bicycle-rebalancing-in-shared-mobility-systems)  
+   标签：评分：8.5/10、query:q9
+   evidence：共享出行中平衡效率与需求满足的多目标优化
+2. [Graph-RHO: Critical-path-aware Heterogeneous Graph Network for Long-Horizon Flexible Job-Shop Scheduling](/202604/17/2604.10073v1-graph-rho-critical-path-aware-heterogeneous-graph-network-for-long-horizon-flexible-job-shop-scheduling)  
    标签：评分：8.0/10、query:profile-1
-   evidence：分层强化学习用于车队级物流与资源分配决策
-4. [Improving Feasibility in Quantum Approximate Optimization Algorithm for Vehicle Routing via Constraint-Aware Initialization and Hybrid XY-X Mixing](/202604/16/2604.07218v1-improving-feasibility-in-quantum-approximate-optimization-algorithm-for-vehicle-routing-via-constraint-aware-initialization-and-hybrid-xy-x-mixing)  
-   标签：评分：8.0/10、query:q5
-   evidence：物流中的车辆路径规划问题 (VRP) 优化
-5. [Constrained Policy Optimization for Provably Fair Order Matching](/202604/16/2604.06522v1-constrained-policy-optimization-for-provably-fair-order-matching)  
+   evidence：基于图的滚动时域优化用于复杂作业车间调度
+3. [Enhancing Cross-Problem Vehicle Routing via Federated Learning](/202604/17/2604.10652v1-enhancing-cross-problem-vehicle-routing-via-federated-learning)  
+   标签：评分：8.0/10、query:profile-1
+   evidence：针对复杂约束车辆路径问题的神经组合优化研究
+4. [Dynamic Multi-Robot Task Allocation under Uncertainty and Communication Constraints: A Game-Theoretic Approach](/202604/17/2604.11954v1-dynamic-multi-robot-task-allocation-under-uncertainty-and-communication-constraints-a-game-theoretic-approach)  
+   标签：评分：8.0/10、query:q3
+   evidence：不确定性和时间窗约束下的动态多机器人任务分配
+5. [Greedy Approaches for Packing While Travelling with Deterministic and Stochastic Constraints](/202604/17/2604.13469v1-greedy-approaches-for-packing-while-travelling-with-deterministic-and-stochastic-constraints)  
+   标签：评分：7.5/10、query:q5
+   evidence：具有随机约束和奖励函数的旅行包装问题
+6. [On the Use of Iterative Problem Solving for the Traveling Salesperson Problem with Changing Time Window Constraints](/202604/17/2604.14745v1-on-the-use-of-iterative-problem-solving-for-the-traveling-salesperson-problem-with-changing-time-window-constraints)  
+   标签：评分：7.5/10、query:q4
+   evidence：具有变化时间窗约束的旅行商问题与迭代求解
+7. [Distributive Perimetral Queue Balancing Mechanisms: Towards Equitable Urban Traffic Gating and Fair Perimeter Control](/202604/17/2604.07840v1-distributive-perimetral-queue-balancing-mechanisms-towards-equitable-urban-traffic-gating-and-fair-perimeter-control)  
+   标签：评分：7.0/10、query:q9
+   evidence：城市交通控制中平衡系统效率与公平性的多目标优化
+8. [Karma Mechanisms for Decentralised, Cooperative Multi Agent Path Finding](/202604/17/2604.07970v1-karma-mechanisms-for-decentralised-cooperative-multi-agent-path-finding)  
    标签：评分：7.0/10、query:q3
-   evidence：约束策略优化用于自动化引擎中的公平订单匹配
-6. [Karma Mechanisms for Decentralised, Cooperative Multi Agent Path Finding](/202604/16/2604.07970v1-karma-mechanisms-for-decentralised-cooperative-multi-agent-path-finding)  
-   标签：评分：7.0/10、query:profile-1
-   evidence：大规模机器人系统的分布式多智能体路径规划
-7. [Robust Multi-Objective Optimization for Bicycle Rebalancing in Shared Mobility Systems](/202604/16/2604.08296v1-robust-multi-objective-optimization-for-bicycle-rebalancing-in-shared-mobility-systems)  
-   标签：评分：7.0/10、query:q5
-   evidence：需求不确定性下的共享单车再平衡多目标优化
-8. [HTNav: A Hybrid Navigation Framework with Tiered Structure for Urban Aerial Vision-and-Language Navigation](/202604/16/2604.08883v1-htnav-a-hybrid-navigation-framework-with-tiered-structure-for-urban-aerial-vision-and-language-navigation)  
-   标签：评分：7.0/10、query:q4
-   evidence：城市空中物流配送的混合导航框架
-9. [Asynchronous Distributed Bandit Submodular Maximization under Heterogeneous Communication Delays](/202604/16/2604.06430v1-asynchronous-distributed-bandit-submodular-maximization-under-heterogeneous-communication-delays)  
-   标签：评分：6.0/10、query:q10
-   evidence：异构延迟下的异步分布式决策
-10. [TwinLoop: Simulation-in-the-Loop Digital Twins for Online Multi-Agent Reinforcement Learning](/202604/16/2604.06610v1-twinloop-simulation-in-the-loop-digital-twins-for-online-multi-agent-reinforcement-learning)  
+   evidence：实时系统中多智能体路径规划的去中心化协调
+9. [Integrated Routing and Intersection Control for Mixed Traffic](/202604/17/2604.13424v1-integrated-routing-and-intersection-control-for-mixed-traffic)  
+   标签：评分：6.5/10、query:profile-1
+   evidence：宏观路径规划与微观交通控制的分层框架
+10. [Beyond Conservative Automated Driving in Multi-Agent Scenarios via Coupled Model Predictive Control and Deep Reinforcement Learning](/202604/17/2604.13891v1-beyond-conservative-automated-driving-in-multi-agent-scenarios-via-coupled-model-predictive-control-and-deep-reinforcement-learning)  
+   标签：评分：6.5/10、query:q8
+   evidence：用于多智能体导航和效率平衡的深度强化学习
+11. [Value-Guidance MeanFlow for Offline Multi-Agent Reinforcement Learning](/202604/17/2604.08174v1-value-guidance-meanflow-for-offline-multi-agent-reinforcement-learning)  
    标签：评分：6.0/10、query:q8
-   evidence：用于信息物理系统自适应的在线多智能体强化学习
-11. [AgentGate: A Lightweight Structured Routing Engine for the Internet of Agents](/202604/16/2604.06696v1-agentgate-a-lightweight-structured-routing-engine-for-the-internet-of-agents)  
-   标签：评分：6.0/10、query:q2
-   evidence：延迟和成本约束下的高效请求调度
+   evidence：离线多智能体强化学习用于联合策略优化
 
 
 <div class="dpr-home-promo-card">

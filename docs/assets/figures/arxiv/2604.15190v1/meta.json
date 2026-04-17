@@ -1,0 +1,22 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.15190v1/fig-001.webp",
+      "caption": "Table 1: Baseline Comparison: Group Simulation Error (GSE%) across merchant tiers and categories. ML models achieve lower variance but struggle with semantic generalization; LLMs exhibit higher variance due to over-rationality.",
+      "page": 4,
+      "index": 1,
+      "width": 994,
+      "height": 386
+    },
+    {
+      "url": "assets/figures/arxiv/2604.15190v1/fig-002.webp",
+      "caption": "Figure 1: Overview of the PGHS framework. Phase A abstracts decision policies through macro-level persona clustering and micro-level rationale refinement. Phase B produces predictions via semantic reasoning and statistical fitting, both conditioned on the abstracted policies. Phase C aggregates dual-process outputs into a group-level estimate via population-aligned sampling.",
+      "page": 2,
+      "index": 2,
+      "width": 948,
+      "height": 452
+    }
+  ]
+}
