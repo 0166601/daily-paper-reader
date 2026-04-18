@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09131v1/fig-001.webp",
+      "caption": "Figure 5: Examples of problems with multimodal objectives and constraints. The legends (and the annotation of peaks’ optima in (d)) are removed for better visibility. Colors denote the constraints, while gray and black points show the unconstrained Pareto set and the Pareto set, respectively.",
+      "page": 18,
+      "index": 1,
+      "width": 1090,
+      "height": 268
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09131v1/fig-002.webp",
+      "caption": "Figure 4: Four constrained problem types. Type I (first row): The constraints do not change the front. Type II (second row): The Pareto front is a subset of the unconstrained front. Type II (third row): The Pareto front contains part of the unconstrained front plus additional solutions. Type IV (last row): The Pareto front of the constrained and the unconstrained problem are entirely different.",
+      "page": 17,
+      "index": 2,
+      "width": 927,
+      "height": 1030
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09131v1/fig-003.webp",
+      "caption": "Figure 3: Illustration of Theorem 3.5. Left: Search space with unconstrained (gray) and constrained (red, black and blue) Pareto set, together with the objectives’ level sets in light gray, one linear constraint (dashed blue) and one ellipsoidal constraint (dashed red). The projections of the objectives’ optima, c1 and c2 onto the feasible set are detailed by the two arrows. Right: The corresponding unconstrained (in gray) and constrained (red, black and blue) Pareto front. The colors indicate whether the corresponding Pareto-optimal solutions are projected onto the linear constraint (blue), ellipsoidal constraint (red), or not projected at all (black).",
+      "page": 9,
+      "index": 3,
+      "width": 555,
+      "height": 270
+    }
+  ]
+}

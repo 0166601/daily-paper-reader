@@ -1,0 +1,1893 @@
+Title: How to Use Prices for Efficient Online Matching
+
+URL Source: https://arxiv.org/pdf/2604.12181v1
+
+Published Time: Wed, 15 Apr 2026 00:42:58 GMT
+
+Number of Pages: 33
+
+Markdown Content:
+# How to Use Prices for Efficient Online Matching 
+
+# Terence Highsmith II 1
+
+# Version: April 15, 2026 
+
+Many matching markets feature unknown, dynamic arrivals of agents that must match immediately. A caseworker must match an abused child to a foster home, a hospital must assign a patient in critical condition to a room, or a city must place a homeless individual into a shelter. We design an online matching algorithm—the Sequential Equilibrium Mechanism (SEM)—that approximates large market equilibria to match arriving agents to objects. SEM is asymptoti-cally efficient, fair, and strategy-proof with probability one. Our application plans to deploy a lab-in-the-field experiment where real caseworkers match vulnerable children to host homes, and we provide simulation evidence that SEM can sub-stantially improve welfare. (JEL C78, D47, D71) 
+
+# 1 Introduction 
+
+Many matching markets feature stochastic, dynamic (”online”) arrivals of agents or ob-jects that a market designer (e.g. firm or government) must allocate. A caseworker must match an abused child to a foster home, a hospital must assign a patient in critical condi-tion to a room, or a city must place a homeless individual into a shelter. Unlike traditional online matching problems where the organization can discard arrivals, the settings refer-enced above feature arrivals that must be matched immediately upon arrival whenever possible. This constraint is known as greedy allocation . Greedy allocation problems may appear to be trivial: if an agent arrives, she must be matched, and allocating her most preferred object to her is constrained-efficient within the set of greedy allocations. In reality, agents often have indifferences in their preferences: two foster homes might be equally suitable for a child, two heterogeneous hospital rooms might be equally adequate for patient care, or two shelters might provide similar services to a homeless individual. Moreover, these preferences are often ordinal in lieu of a clear numeric objective. In these cases, randomly allocating one of the agent’s most preferred objects to her can unnecessarily jeopardize the welfare of future arrivals. Our online matching problem faces two core constraints: (1) greedy allocation and (2) coarse, ordinal preferences. Agents reveal their preferences upon arrival, and the goal is to find a matching that is greedy, fair (subject to the constraints), and ex-post efficient. Surprisingly, there is no online matching mechanism that satisfies any version of Pareto efficiency for ordinal preferences. We design a novel, randomized online matching mechanism that satisfies these constraints: the Sequential Equilibrium Mechanism (SEM). 1
+
+> arXiv:2604.12181v1 [econ.TH] 14 Apr 2026
+
+Our design is in two stages: (i) we solve a large market competitive equilibrium using a new equilibrium concept. We allot fake, token money to agents and solve for a competitive equilibrium that uses random prices to smooth agent demand. In stage (ii), SEM opens 
+
+spot markets in each period. The spot markets solve a large market equilibrium for the realized arrivals and expected future demand, and we allocate objects according to the equilibrium allocation. SEM is a randomized mechanism that allocates lotteries to arrivals and immediately realizes the lottery at the end of each time period. We refer to the realized lotteries as ex-post lottieres and the realized allocations as ex-post allocations. Under careful use of token money, SEM is greedy. It ensures that arriving agents are allocated lotteries containing their most preferred objects whenever possible. Equivalently, every ex-post allocation within a time period is efficient with respect to the current arrivals and object supply. Moreover, SEM’s lotteries are equal-type envy-free. Agents arriving at the same time period do not envy each other’s lotteries. SEM is strategyproof with probability one :an agent’s strategic incentives to manipulate vanish as the number of arrivals per period grows large. Finally, our main result is that SEM is asymptotically efficient . SEM’s ex-post lottery is ordinally efficient with probability one as the number of arrivals per period grows. In contrast, it is impossible to design a greedy mechanism that achieves ex-post ordinal efficiency when the market is finite. Our results for SEM are very encouraging, but they are not definitive. That is, although SEM is asymptotically efficient, its finite sample performance is unknown. To test SEM’s empirical effects, we apply our theoretical results in the context of a U.S.-based nonprofit (henceforth, the Firm) that places children into temporary homes. The Firm is a national organization that contracts with state child welfare departments to find temporary, emergency homes for children that are at risk of abuse or neglect. In addition, the Firm offers pro-bono services to parents that voluntarily request emergency hosting for their children. In the Firm’s problem, children stochastically arrive over time and must be matched to a host home. Their current matching process is rudimentary: upon an child’s arrival, every host home receives a text message about the child, and the first home to respond can host the child. The Firm’s objective is to efficiently allocate children to homes, but this process was unable to accomplish their goal because even homes that are perfectly aligned with the Firm’s objective can fail to coordinate on efficient allocations. We present simulation results that compare Serial Dictatorship with Random Tie-Breaking (SD-RTB) to SEM. Upon arrival of children, SD-RTB selects a random priority order over the arrivals. In order, SD-RTB allocates to a child a random home among her most preferred homes. Since we have not yet obtained data on observed matches from the Firm, we use SD-RTB as a simplification to represent their existing matching process and simulate a simple market to compare the mechanisms. Thus, our simulations only compare two theoretical mechanisms. They do not provide counterfactuals relative to the ground truth. Our ongoing work with the Firm hopes to implement an experimental approach to assess the empirical effects of SEM. Our simulations analyzes the number of matches while varying the number of arrivals to assess SEM’s rate of convergence to efficiency. The simulations show that SEM delivers approximately 10% more matches than SD-RTB, a finding that is steady regardless of the market size. In line with our theoretical predicts, both mechanisms’ performance experience less variance as the arrival rate in-creases, demonstrating that aggregate uncertainty smooths out in large markets. Overall, 2our simulations suggest that SEM can substantially improve welfare in practice. The success of SEM relies on a careful solution to the large market problem. Pseu-domarkets, originating with Hylland and Zeckhauser (1979), constitute the foundational approach to allocate indivisible objects to agents using competitive equilibria. In our case, agent preferences are ordinal with indifferences, making it technically challenging to prove equilibrium existence. An agent’s demand is a correspondence when agents have indifferences. Particularly, it is an ill-behaved correspondence that is fully discontinuous. However, restricting to prices that are not exactly equal to the budget constraint, the demand correspondence is upper hemicontinuous, suggesting that ”smoothing” over such prices could create upper hemicontinuous demand and allow the market designer to find prices that clear the market: D = S.Briefly, our technique is to solve a large-market allocation problem with random prices .Our equilibrium concept then focuses on setting expected demand equal to supply. Ex-pected demand is the Aumann integral: integration over selections from the demand correspondence. Expected demand is convex-valued and upper hemicontinuous. We leverage this to apply Kakutani’s Fixed Point Theorem ala traditional existence argu-ments. Combining this with asymmetric budgets–larger for earlier arrivals—guarantees that earlier agents have greater purchasing power and always receive their most preferred objects when possible, satisfying the greedy allocation constraint. Simultaneously, the expected demand of future arrivals imputes the value of objects into the price vector and allows it to guide current allocations efficiently. Random prices also allow us to implement random tie-breaking . We show how a naive approach to do so fails, but correctly specifying the price error term allows the market designer to find greedy, envy-free, and ordinally efficient allocations under a condition that can be verified ex-post in order to simplify computational complexity. 
+
+# Literature Contribution 
+
+Our work contributes to three separate, although sometimes interlocking, bodies of liter-ature: pseudomarkets, online matching, and large market analysis. 
+
+Pseudomarkets. Hylland and Zeckhauser (1979) first proposed utilizing competitive markets to allocate indivisible objects (jobs) to agents (employees). In this pseudomar-ket approach, agents receive token money to purchase probability shares of receiving an object; the market designer searches for a price vector that clears the market with-out transfers. Unlike the arguably most common class of allocation mechanisms, Serial Dictatorships, pseudomarkets are ex-ante efficient and ex-ante fair (envy-free) when the designer allots equal token money to all agents. Miralles and Pycia (2021) proves that the First and Second Welfare Theorems from general equilibrium theory extend to pseu-domarkets; Pycia (2023) offers a comprehensive overview of the standard model. Recently, many economists have followed up on Hylland and Zeckhauser (1979) to solve more complex allocation problems. Budish (2011) uses competitive equilibrium that approximately clear the market to efficiently allocate objects—course seats, in application— to agents with combinatorial demand. Further, unlike Hylland and Zeckhauser’s origi-nal proposal for agents to purchase probability shares, allocations are deterministic in Budish’s framework. Budish’s approximate competitive equilibrium from equal incomes (ACEEI) mechanism is approximately efficient, envy-bounded by one object, and strat-egyproof in the large. Kornbluth and Kushnir (2021) extend Budish (2011) for the case when courses have priorities over students, as is common in undergraduate course al-3location. Their mechanism satisfies the same properties, modulo priorities, and is also approximately stable. He et al. (2018) focuses on the school choice setting where agents have unit demand and schools (”objects”) have priorities over students. They construct a random mech-anism that is ex-ante stable, fair, constrained efficient, and ex-ante two-sided efficient. Echenique, Miralles, and Zhang (2021), Nguyen, Nguyen, and Teytelboym (2021), and Gul, Pesendorfer, and Zhang (2024) develop frameworks for more complex settings such as allocation problems with floor or ceiling constraints. Nguyen, Teytelboym, and Vardi (2025) design a pseudomarket mechanism for combi-natorial allocation with ordinal preferences that characterizes the set of ordinally efficient allocations. Their equilibrium concept, like ours, uses random perturbations of demand to guarantee existence. Their setting assumes that agents have strict preferences, whereas one of our key contributions is to extend their approach to allow for indifferences. Non-trivial technical problems arise that complicate applying fixed point theorems to show equilibrium existence. As a result, our proofs differ from Nguyen, Teytelboym, and Vardi (2025). In addition: while they introduce random budgets, we introduce random prices. While we conjecture that these two approaches are equivalent in the strict preference domain, they are not on a general domain. Different assumptions on the price error term correspond to different modes of tie-breaking (or lack thereof). Comparatively, random budgets are less flexible. Further, we show a link between the validity of tie-breaking and asymptotic efficiency. Last, they establish results for combinatorial allocation; our work applies our equilibrium concept to design a mechanism that satisfies desirable properties for online matching. Related, Bogomolnaia and Moulin (2001) introduce Probabilistic Serial (PS) in assign-ment problems with unit demand, motivating stochastic dominance as a welfare criterion. Although, their solution is not a pseudomarket mechanism. We highlight Bogomolnaia and Moulin (2001) because, along with follow-ups that extend PS (EPS) to environments with indifference, EPS solves our static problem (Katta and Sethuraman 2006). How-ever, it is unclear if it is possible to reconfigure EPS for online matching problems; this motivates our use of pseudomarkets and is our contribution beyond the static problem. Moreover, we are able to show a condition wherein a form of random tie-breaking is without loss of efficiency. 
+
+Online Matching. Karp, Vazirani, and Vazirani (1990) introduces the canonical model for online matching: agents or objects arrive sequentially over time, matching decisions are irrevocable, and arrivals depart immediately if unmatched. In the origi-nal problem, the goal is to maximize the number of matches; generally, the goal is to maximize a sum of cardinal match valuations. The ratio between algorithm’s worst-case (”adversarial”) performance and optimal performance is known as the competitive ratio. The celebrated Ranking algorithm achieves a competitive ratio of 1 − 1/e . Our present work assumes ordinal preferences and develops a mechanism with optimal asymptotic performance rather than an adversarial guarantee. Feldman et al. (2009) study online matching under known arrival distributions and show that this structure improves achievable welfare relative to the adversarial bench-mark. Essentially, their solution—and the typical approach to online stochastic matching— can be thought of as solving a utilitarian maximization problem for a large market prob-lem (referred to as a ”fluid problem”, see Aouad and Ma (2022) for further discussion). The algorithms use the fluid solution to determine matchings upon agents’ arrivals. Com-petitive equilibria need not be utilitarian efficient except under special preference assump-4tions, implying these approaches are fundamentally distinct from ours. Alaei, Hajiaghayi, and Liaghat (2012) establishes an algorithm with the intepretation that it utilizes posted prices to allocate arrivals, achieving a perfomance bound of 1 − 1/√k + 3, where k is the minimum number of objects an arrival demands. Gao, Peysakhovich, and Kroer (2021) use equilibria to allocate objects in the online fair division problem where there is a static population of agents that must be allocated arriving objects, and the market designer would like to achieve efficient and envy-free allo-cations. Many impossibility results from online matching fade because agents are typically assumed to be non-satiated, ruling out budget or demand constraints. However, the algo-rithms in this strand use linear programs that explicitly represent competitive equilibria in fluid problems (Benade et al. 2024). While the results in online matching and fair di-vision exploit stochastic arrivals, they continue to model preferences as cardinal weights or binary edges and allow the planner to reject arrivals or otherwise feature non-satiated demand. In addition to modeling online matching with ordinal preferences and greedy constraints, we also prove that our mechanism satisfies fairness and strategyproofness properties. 
+
+Large Markets. Azevedo and Leshno (2016) presented one of the first comprehen-sive arguments for the validity of large markets as approximations of finite markets. They show that, in matching with two-sided preferences (e.g. students and schools in school choice), the set of competitive equilibria correspond to the set of stable matchings, and the latter contains a unique matching under strict preferences and assumptions on ag-gregate demand. Others (Kojima and Pathak (2009), Lee (2016), Azevedo and Budish (2019)) focus on strategic incentives in large markets as opposed to our primary crite-ria of asymptotic efficiency. They prove that, in many settings, large markets deliver (approximate) strategyproofness. Under the assumption of strict preferences, Liu and Pycia (2016) proves that all asymptotically efficient, asymptotically strategyproof, and symmetric mechanisms produce equivalent allocations. Relative to the existing literatures, our approach differs in three key respects. First, we consider a dynamic process wherein a greedy allocation constraint requires arrivals to be matched immediately to the best possible object whenever feasible, reflecting institutional features of many applications. Second, we evaluate welfare using stochastic dominance rather than cardinal objectives or worst-case competitive ratios. Third, we integrate pseudomarket techniques into an online setting, yielding a mechanism that is greedy, equal-type envy-free, asymptotically efficient, and strategyproof with arbitrarily high probability. To our knowledge, this is the first online matching mechanism to jointly satisfy these properties under ordinality. We proceed as follows. In Section 2, we detail our model preliminaries, the large mar-ket problem, and the online matching problem. In Section 3, we solve the large market problem. In Section 4, we adapt the large market solution to design an asymptotically optimal mechanism for online matching. In Section 5, we discuss extensions, most promi-nently to fully online matching where objects also arrive stochastically. In Section 6, we simulate the performance of our mechanism in an applied setting. Finally, we conclude in Section 7. 
+
+# 2 Preliminaries 
+
+A market is M = ( X, S, I, T, F ). 51. Objects (X): There is a finite set of objects X = {1, 2, ..., |X|} with a typical 
+
+x ∈ X. The supply of goods is S = ( sx)x∈X where sx ∈ N+. There is a null option 
+
+o ∈ X that represents receiving no object such that so > |I|.2. Agents (I): There is a finite set of agent types I = {1, 2, ..., |I|} with a generic 
+
+i ∈ I. (Mostly, we will write ’agent’, but the correct interpretation is an agent type.) Every agent type is associated with ordinal preferences ⪰i ∈ L (X) where 
+
+L(X) is the set of all complete, transitive preference relations over X. The strict portion of ⪰i is ≻i such that x ≻i y if and only if x ⪰i y and not y ⪰i x. Each agent type has an arrival time ti, i.e., an agent type is described by preferences and arrival time. The sets X and I are fixed and known. 3. Arrivals (T, F ): The time horizon is a finite set [ T ] = {1, 2, ..., T } with a typical time t ∈ [T ]. The market unfolds over this finite horizon, and the arrival process is described by f = ( f t(i)) t∈[T ] where f t(i) is the probability that type i arrives at time t. We will write f t,k = Pkn=t f n(i) and f (i) = P  
+
+> t∈[T]
+
+f t(i). f satisfies: if 
+
+f t(i) > 0, then ti = t. The cumulative distribution functions are F = ( F t(i)) t∈[T ]
+
+which describe the probability that agents up to i arrive at time t; we normalize to one arrival per period so that F t(|I|) = 1 for all t ∈ [T ]. We can populate X and I with an arbitrary number of elements and simply consider them to be fixed. In addition, we will hold T fixed. We refer to the market fundamentals 
+
+as ν = ( F, S )1.In addition, we define the following notions: 4. Allocations: An agent’s allocation is ai ∈ [0 , 1] |X| satisfying P 
+
+> x∈X
+
+ai,x = 1. Note that such allocations are then probability distributions over objects. A market allocation is a function specifying an allocation for each agent type: a : I → [0 , 1] |X|.
+
+a is feasible if P 
+
+> i∈I
+
+a(i)f (i) ≤ S.5. Stochastic Dominance: An allocation a′ 
+
+> i
+
+stochastically dominates ai if, for each 
+
+x ∈ X, P 
+
+> y⪰x
+
+a′,y i ≥ P 
+
+> y⪰x
+
+ayi . We write that a′ 
+
+> i
+
+⪰i ai to represent the (partial) extension of i’s preferences over lotteries defined by stochastic dominance. If this is strict for some x, then a′ 
+
+> i
+
+≻i ai, i.e., a′ 
+
+> i
+
+strictly stochastically dominates ai.An allocation a is ordinally efficient if there does not exist any feasible allocation a′
+
+such that, for all i ∈ I, a′(i) ⪰i a(i), and for some i′ ∈ I, a′(i′) ≻i a(i′). The greedy allocation constraint we consider requires giving an arrival one of her fa-vorite objects that she could possibly receive upon arrival. An allocation a is greedy if, for any j ∈ I, a(j)x > 0 implies that, for any x∗ ∈ X such that x∗ ≻j x, P 
+
+> i∈I
+
+a(i)x∗ f 1,t j (i) = 
+
+sx∗ .Equivalently, if an agent does not receive a lottery over her most preferred objects, then any object x∗ more preferred than an object x she receives with positive probability must have its remaining supply consumed by (weakly) earlier arrivals.   
+
+> 1Fwill be a sufficient statistic for aggregate demand. The fundamentals represent the classical primitives that determine competitive equilibria: demand and supply.
+
+62.1 The Online Matching Problem 
+
+In the online matching problem, one agent i arrives at period t according to f t. We denote the arrival at time t as ˜It, then, for k ≥ n, the multi-set of arrivals between n and 
+
+k is ˜In,k = ∪n≤t≤k ˜It and ˜I = ˜I1,T . The set of realized allocations at time t is: ˜At = {˜a : ˜ ai ∈ [0 , 1] |X| for all i, ˜a is feasible and ˜ ai,x > 0 for any x ∈ X =⇒ i ∈ ˜I1,t }
+
+An ex-post allocation is some ˜ a ∈ ˜AT . Note that this can be a lottery. The critical distinction is that an ex-post allocation can only allocate objects to realized agents. Our asymptotic analysis shows that we can implement any lottery using deterministic allocations so that allowing lotteries does not impact our main results. ˜a is ordinally efficient if there does not exist another ex-post allocation ˜ a′ such that ˜ a′ 
+
+> i
+
+⪰i ˜ai for all 
+
+i ∈ ˜I and ˜ a′ 
+
+> i′
+
+≻i′ ˜ai′ for some i′ ∈ ˜I.An online matching mechanism assigns a lottery to realized arrivals given preference reports; it is a function, for each t ∈ [T ], πt : M × ˜I1,t → ˜At, and we write π =(πt)t∈[T ]. We allow online matching mechanisms to depend on the market, which, in online allocation, is ex-ante knowledge about objects, preferences, budgets, and the distribution of arrivals. We will usually write πt
+
+> M
+
+( ˜I1,t ) without dependence on M and ˜I1,t , considering them to be implicit. We assume that object allocations are permanent: πt+1  
+
+> i,x
+
+≥ πti,x for all 
+
+i ∈ ˜I1,t and x ∈ X. π is ordinally efficient if there does not exist any ex-post allocation ˜a such that ˜ ai ⪰i πTi for all i ∈ ˜I and ˜ aj ≻j πTj for some j ∈ ˜I.An online matching mechanism π is greedy if it assigns a most preferred lottery upon an agent’s arrival whenever feasible: πti 
+
+> i,x
+
+> 0 implies that, for any x∗ ∈ X such that 
+
+x∗ ≻i x, P  
+
+> j∈˜I1,t i
+
+πti 
+
+> j,x ∗
+
+= sx∗ . Last, we say that an online matching mechanism π is 
+
+strategyproof if no agent with preferences ⪰i can receive a strictly better (stochastically dominating) allocation by misreporting her preferences; in this setting, it is equivalent to misrepresenting her identity holding her arrival time fixed: for any i ∈ ˜I, there does not exist any j ∈ I with tj = ti such that πTi ({j} ∪ ˜I \ { i}) ⪰i πTi ( ˜I)2.
+
+# 2.2 A Basic Impossibility Result 
+
+Generally, it is impossible to design an online matching mechanism that is simultaneously greedy and ordinally efficient. The following example demonstrates this. 
+
+Example 1. There are two objects, x and y, each with one unit of supply, and three agent types, a, b, and c. Type a is indifferent between x and y, type b prefers x to y, and type c prefers y to x. One agent arrives per period for two periods. At t = 1, agent a
+
+arrives with probability one. At period t = 2, either agent b or c arrives with probability one-half each. Any greedy allocation must allocate a convex combination of x and y with probability one to agent a at t = 1. Therefore, the allocation is ordinally inefficient with positive probability since the arrival at t = 2 might not receive her most preferred object with probability one while a is indifferent. This impossibility motivates our search for an online matching mechanism that will still be desirable given the constraints discussed so far.   
+
+> 2This does not restrict misrepresentations as we can insert mass zero sets of agents with arbitrary preferences to allow ito report any preferences.
+
+73 The Large Market Problem 
+
+Our goal is to design an online matching mechanism—a direct revelation mechanism where agents report preferences upon arrival and receive allocations—that satisfies effi-ciency desideratum while respecting the greedy allocation constraint. Our approach to accomplish this is to develop a large market equilibrium concept that can be computed at each time period and used to guide allocations. In this section, we define our equilibrium concept, prove existence, and analyze its efficiency and fairness properties. 
+
+# 3.1 Price Equilibria 
+
+We describe our equilibrium concept. A random price is a random vector p = ( px)x∈X
+
+where px = px + ξx for some px ∈ R+ and ξx ∈ R. We write ξ = ( ξx)x∈X . ξ is random vector distributed G(·). A budget function b : I → R++ (writing b(i) = bi for short) specifies a strictly positive amount of token money given to each i ∈ I. For a realization 
+
+p, i’s demand is her set of cheapest, most preferred objects that are affordable: 
+
+Di(p) = min 
+
+> p·ai
+
+
+
+max 
+
+> ⪰i
+
+n
+
+ai ∈ X : p · ai ≤ bi
+
+o
+
+We will need to integrate over p to obtain expected demand. The suitable tool for integration over correspondences is the Aumann integral, defined for any measurable subset S:
+
+Z
+
+> S
+
+Di(p)dG (ξ) = 
+
+ Z 
+
+> S
+
+gi(p)dG (ξ) : gi(p) ∈ Di(p) for almost all p
+
+
+
+Aumann integrals are multi-valued functions (correspondences). Henceforth, it is as-sumed that every integral is Aumann integration, and we suppress dependence on ξ
+
+where it is clear. 
+
+i’s lottery demand is Li(p; ξ) = R 
+
+> R+
+
+Di(p+ξ)dG (ξ). Lottery demand is the expectation over optimal objects consumed at each realization of the correlated prices p. Aggregate demand for times between n and k ≥ n is Dn,k (p) = P 
+
+> i∈I
+
+Li(p)f n,k (i). Aggregate demand for all times k ≥ t is defined as Dt(p) := Dt,T (p). An equilibrium will require the market to clear in the sense that aggregate demand does not exceed supply. Our equilibrium will also be specified to consider aggregate demand from certain time periods and onward to allow for implementation in online matching, which we describe in Section 4. 
+
+Definition 1. A price p∗ is a ( t)-price equilibrium (or simply ( t)-equilibrium) if: 1. Dt(p∗) ≤ S
+
+2. p∗ 
+
+> x
+
+> 0 implies Dtx(p∗) = sx for all x ∈ X
+
+We say that a (1)-equilibrium is simply an equilibrium. We refer to an allocation 
+
+a∗ as a ( t)-equilibrium allocation if there exists a ( t)-equilibrium p∗ such that, for i-ae, 
+
+a∗(i) ∈ Li(p∗). Similarly, an equilibrium allocation is a (1)-equilibrium allocation. 8Figure 1: Non-Existence. X = {x, y }, bi = 1, and x ≻i y for all i ∈ I; T = 2. 
+
+0 0.5 1 1.5 2
+
+0
+
+0.4
+
+0.8
+
+1.2
+
+1.6
+
+2
+
+px
+
+> Probability of  x
+
+R 
+
+> I1,2
+
+Di(p)dF (i)
+
+Sx
+
+py = 1 
+
+# 3.2 Existence 
+
+In this sub-section, we establish existence results for our equilibrium concept. In general, equilibria often fail to exist for indivisible object allocation without transfers if one desires exact market clearing and deterministic allocations. The simplest illustration of this is seen in Figure 1. Aggregate demand is discontinuous at the budget threshold, and any price vector that attempts to clear the market for x either over- or under-allocates it. Instead, the market designer would prefer continuous demand to find p∗ where D1(p∗) = 
+
+S (Figure 2). Price equilibria do not necessarily exist for any random prices, mirroring Nguyen, Teytelboym, and Vardi (2025). However, as long as the price shock ξ and budget function b satisfy important assumptions, we can guarantee existence. 
+
+Assumption 1. The price shock ξx is continuously distributed for each x ∈ X with 
+
+E[ξx] = 0 and bounded with ξx ∈ [ξ, ¯ξ]. The continuous distribution and boundedness are substantive, but the mean-zero normalization is for convenience. We also assume that budgets are strictly positive and bounded: 
+
+Assumption 2. B ≤ inf i∈I bi and sup i∈I bi ≤ ¯B for some finite B, ¯B ∈ R++ .and 
+
+Assumption 3. ξ is bounded away from budgets : ¯ξ < B .Now, we can state our result. 
+
+Theorem 1. Under Assumptions 1 and 2, a (t)-price equilibrium exists for every t ∈
+
+[T ]. In addition: under Assumption 3, there exists some budgets b such that every price equilibrium allocation is greedy. 
+
+Demand is upper hemicontinuous at all prices that do not exactly lie on the boundary of the budget set which is a measure-zero set. It follows that the Aumann integral is upper hemicontinuous. In addition, Aumann integration also induces convex-valued lottery demand. This allows us to apply Kakutani’s Fixed Point Theorem to prove existence. We note that the first part of Theorem 1 also applies for combinatorial demand. Our work does not focus on this, but it might be of independent interest for combinatorial allocation with indifferences. 9Figure 2: Existence. X = {x, y }, bi = 1, and x ≻i y for all i ∈ I; T = 2. 
+
+0 0.5 1 1.5 2
+
+0
+
+0.4
+
+0.8
+
+1.2
+
+1.6
+
+2
+
+px
+
+> Probability of  x
+
+D1(p)x
+
+Sx
+
+py = 1 
+
+This implies that the market designer can introduce an arbitrarily small amount of noise into the price vector and solve for price equilibria. The Birkhoff-von Neumann Theorem guarantees that market clearing lotteries can be implemented as randomizations over ex-post feasible and efficient allocations. While this is true in the large market, it is not in the online problem, and we demonstrate how to build on this approach in Section 4 for the latter. The greedy property follows from constructing budgets that decrease over time. If income is sufficiently asymmetric, then whenever there is a realization p such that an agent i cannot purchase an object x∗ that i prefers to an object x, it follows that any agent j with tj > t i will never be able to purchase x∗ since the price shock is bounded. The proof provides the exact expression to construct greedy equilibria: defining bi := ˜bti
+
+where ˜b = ( b1, b 2, ..., b T ), then p∗ induces a greedy allocation if ˜bn > ˜bn+1 + ¯ξ + ξ.
+
+# 3.3 Efficiency and Fairness 
+
+Next, we would like to understand when price equilibrium allocations are ordinally effi-cient. Assumptions 1 through 3 are not sufficient. We state two independent assumptions: 
+
+Assumption 4. No Tie-Breaking (NTB): ξx = c for some c ∈ R such that c ∼ H(·). and 
+
+Assumption 5. Random Tie-Breaking (RTB): ξx = c + ζx for some c ∈ R such that 
+
+c ∼ H(·) and ζx ∼ Hx(·) independent across each x ∈ X such that ζx ∈ [−z, z ]. It is easier to understand Assumption 4 in light of Assumption 5. The latter is a 
+
+random tie-breaking assumption. Continuous, random, and independent price variation across objects causes the event of exact price ties to occur with probability zero. Agents demand the cheapest, most preferred objects. Under Assumption 5, this implies that agent demand is always single-valued even though, in principle, an agent could be in-different between objects. It is important to note that this does not imply that we find equilibria for strict preferences with randomly broken ties. Instead, tie-breaking is only relevant when prices for two goods are sufficiently close. In contrast, the former assumption is no tie-breaking . px = py necessarily implies 
+
+px = py for any realizations. Theorem 1 proves that, in either case, price equilibria exist. However, these two assumptions induce different efficiency results. 10 We re-state that an allocation a is ordinally efficient if there does not exist any feasible allocation that stochastically dominates a for all agents and strictly so for some positive measure set of agents. Our next result states the sufficient condition for efficiency. 
+
+Theorem 2. Under Assumptions 3 and 4, every price equilibrium allocation a∗ is ordi-nally efficient. 
+
+Some distance away from budgets in ξ’s bound is necessary to guarantee that price equilibria are non-wasteful. Otherwise, when px = 0 for some x, it might be possible that the price realization causes px > b i for some i so that i cannot purchase x even though it is free. Assumptions 3 and 4 allow us to prove a key lemma that p∗ · a∗(i) ≤ p∗ · ai for any 
+
+ai that stochastically dominates a∗(i) (and this relation also holds strictly). The latter assumption is necessary to guarantee that there are no ”price reversals”, that is, py > px
+
+even when px > p y. Integrating over all agents then implies that no feasible allocation can stochastically dominate the equilibrium allocation. Assumption 5 also yields efficiency under a specific condition: 
+
+Theorem 3. Under Assumptions 3 and 5: (i.) A price equilibrium allocation a∗ for p∗ is ordinally efficient if p∗
+
+> x
+
+, p ∗ 
+
+> y
+
+> 0 implies that |p∗ 
+
+> x
+
+− p∗
+
+> y
+
+| > 2z for all x, y ∈ X.(ii.) Dt(p) is a continuous function in p.
+
+The second statement in Theorem 3 implies that aggregate demand (in fact, all indi-viduals’ demands) collapses to a single value under random tie-breaking. The advantage of this tie-breaking method is that equilibrium computation is significantly simplified since it becomes unnecessary to approximate multi-valued demand correspondences. Condition (i) in the Theorem provides a sufficient condition to check that the computation produces an ordinally efficient allocation. The condition implies that whenever prices are sufficiently close such that aggregate demand considers these objects to be ”indifferent”, random tie-breaking can cause price reversals that over- or under-price objects. Though this is endogenous, there is good reason to believe that it holds in some markets. We can make z arbitrarily small so that, relative to the common shock c, each shock ζx barely impacts aggregate demand for each x ∈ X with the qualification that prices are not exactly equal. A move from no tie-breaking to random tie-breaking with arbitrarily small z should then be almost exactly market clearing. Further, under the assumption that prices are not exactly equal, aggregate demand (under Assumption 4) is locally continuous in prices. Therefore, we conjecture that a small movement in the price should suffice to clear the market exactly. This argument implies that it might be possible to strengthen Theorem 3 to |p∗ 
+
+> x
+
+− p∗
+
+> y
+
+| > 0. In contrast, if ξx = ζx, this intuition is definitively false. The equilibrium price for x is highly sensitive to the distribution of ζx because any positive price for x will concentrate around the budget constraint as variance decreases. For example, suppose that bi = 1 for all i ∈ I. There is no equilibrium where px − z > 1, and any equilibrium where 1 > p x + z is also an equilibrium for px = 0. Hence, we can assume that px ∈ [1 − z, 1 + z]. We should expect it to be very likely that |p∗ 
+
+> x
+
+− p∗
+
+> y
+
+| < z for two positively priced goods 
+
+x, y . We conclude that it is crucial to appropriately calibrate the price error terms. The usefulness of Assumption 5 will come into focus in the next section as we consider large market asymptotics. Next, we turn to fairness properties. 11 Definition 2. An allocation a is envy-free if there does not exist any i, j ∈ I such that 
+
+a(j) ≻i a(i). It is immediate that greedy allocations generically cannot be envy-free since earlier arrivals will have strict priority over later arrivals. Instead, we consider a relaxation called 
+
+equal-type envy-freeness (ET-EF). 
+
+Definition 3. An allocation a is equal-type envy-free if there exists some complete, transitive order ▷ over I with strict relation ▷ such that a(j) ≻i a(i) implies that j ▷ i
+
+In other words, no agent envies another agent of the same ”type” according to ▷.Our next result shows that price equilibrium allocations are ET-EF. 
+
+Theorem 4. Under Assumption 3, there exists budgets b such that every price equilibrium allocation a∗ is equal-type envy-free. 
+
+We let the type i of an agent be her arrival time ti. Using the above budgets, if 
+
+a∗(j) ≻i a∗(i), then p∗ · a∗(j) > p ∗ · a∗(i), implies that bj > b i thus j ▷ i. Hence, no agent envies another agent of a (weakly) lower type. Note that while this implies that equal-type agents do not envy each other’s lotteries, it does not imply that there will be no ex-post envy after resolving the lotteries. Ultimately, this is a fundamental limitation of indivisible object allocation. 
+
+# 4 The Online Matching Problem 
+
+We turn to our analysis of the online matching problem in this section. Using our large market equilibrium concept, we will construct an online matching mechanism that is ex-post efficient as the number of arrivals per period grows large and is always ex-post greedy. 
+
+# 4.1 The Sequential Equilibrium Mechanism 
+
+The online empirical distribution at k is ˜F (i; k) = ( ˜F 1, ˜F 2, ..., ˜F k, F k+1 , ..., F T ), which replaces the conditional distribution at times t ≤ k to match the realized arrivals: ˜F k(i) = P  
+
+> j∈˜Ik
+
+1{j ≤ i}/| ˜Ik|.Our method proposes an online matching mechanism that leverages price equilibria to achieve asymptotic efficiency while respecting the greedy constraint ex-post. In par-ticular, we compute a large market equilibrium pt at each time t then randomly allocate objects to arrivals according to their lotteries. The formal description of the Sequential Equilibrium Mechanism (SEM) is: 
+
+Algorithm: Sequential Equilibrium Mechanism 
+
+1. If t = 1, initialize S1 := S. At time t, compute a price equilibrum pt for the fundamentals νt = ( ˜F (·; t), S t). 2. Draw an ex-post allocation ˜ at from an equilibrium allocation at and allocate ˜ at(˜ i)to each ˜ i ∈ ˜It. Set St+1 := St − P  
+
+> i∈˜It
+
+˜at(i) ˜f t(i). 3. Continue to t + 1, or terminate if t = T or St+1 = {0}|X|.12 SEM defines a class of mechanisms that depend on the equilibrium selection at each period t. Our main result is that SEM achieves all of our desiderata if the underlying market satisfies a key condition. We say that a mechanism π is asymptotically efficient if its ex-post allocation con-verges to an ordinally efficient allocation as the market size grows large. Specifically, 
+
+replica markets are a sequence of markets ( Mn)n∈N such that each market has the same fundamentals but with n times the mass of agents and supply: Mn = ( X, nS, I, T, nF ). The realized arrivals for replica n at time t are ˜It(n) (a multi-set). Define πn = ( πtn)t∈[T ]
+
+by πtn := πt 
+
+> Mn
+
+( ˜I1,t (n)). 
+
+Definition 4. An online matching mechanism π is asymptotically efficient if, for all 
+
+ϵ > 0: lim  
+
+> n→∞
+
+Pr 
+
+
+
+∥πn − ˜a∗∥∞ < ϵ 
+
+
+
+= 1 for some ordinally efficient allocation ˜ a∗3.The ( t)-price equilibria for fundamentals ν are Pt(ν). Similarly, the set of equilibria allocations given fundamentals ν are Et(ν). 
+
+Definition 5. The fundamentals ν are regular if, for all t ∈ [T ], there exists some open ball U in the metric space defined by ∥ · ∥ ∞ around ν and a finite number N of continuous functions λ1(μ), λ 2(μ), ..., λ N (μ) from fundamentals to equilibrium prices such that for any μ ∈ U :(i.) λn(μ) is non-empty for each n.(ii.) If p ∈ P t(μ) then p ∈ λn(μ) for some n.A market is regular if its fundamentals are regular. In contrast, a market is allocation regular (for short, ℓ-regular) we can replace the above with maps from fundamentals to allocations such that (ii): if a ∈ E t(μ) then a ∈ λn(μ) for some n.Regularity is satisfied for almost all fundamentals (Debreu 1970). For the following result, we let Assumptions 1 through 3 hold. 
+
+Theorem 5. SEM is equal-type envy-free, strategyproof, and greedy. Moreover: (i.) Under Assumption 4, if M is ℓ-regular, then there exists a selection of SEM that is asymptotically efficient. (ii.) Under Assumption 5, if M is regular and the condition in Theorem 3 holds, then there exists a selection of SEM that is asymptotically efficient. 
+
+ℓ-regularity is necessary for stability of the large market convergence process. Un-der random tie-breaking, ℓ-regularity collapses to regularity 4. Briefly, we note that ℓ-regularity is likely to hold generically under no tie-breaking. Existing results have shown that essentially every economy is regular (Debreu 1970). ℓ-regularity follows if either (i) there are no price ties in equilibrium or (ii) if there are price ties, local perturbations   
+
+> 3The infinity norm ∥ · ∥ ∞is defined as the maximum absolute value of the components of a vector. See the Appendix for further details.
+> 4The proof is immediate: every agent’s demand is continuous in equilibrium prices by Theorem 3, therefore continuity of the equilibrium prices commutes to continuity of equilibrium allocations.
+
+13 in fundamentals preserve the ties. In either case, for sufficiently close prices, all agents demand similar allocations. Hence, regularity commutes to ℓ-regularity. We conduct simulations in the Appendix that show that 99.9% of perturbations satisfy condition (ii) in randomly generated markets. We propose that asymptotic efficiency is a solid foundation for utilizing SEM in on-line allocation. Example 1 demonstrates that no mechanism can generically be ex-post ordinally efficient. Asymptotic efficiency implies that SEM is ”correct” in the sense that, absent the feature of the environment that renders ex-post ordinal efficiency impossible (finiteness), SEM is ex-post ordinally efficient. Moreover, its performance is likely to improve in larger markets. Nevertheless, we acknowledge that this is not an airtight rationale; for small n, it is possible that SEM will perform poorly. Our primary focus in our simulations is to analyze SEM’s empirical effects versus a status-quo mechanism. The critical facet of the design of SEM that guarantees greediness and asymptotic efficiency simultaneously is its reliance on sequential equilibrium. It is not feasible to compute a p1 equilibrium to guide the online allocation because when the realized arrivals deviate from the large market distribution, some objects could become over- or under-demanded. The period-1 equilibrium allocation does not internalize these disturbances, and, as a result, the ex-post allocations can fail to be greedy. Sequential equilibria resolve this issue through updating the supply vectors after each period which then necessitates re-computing price equilibria. Together with stability of the equilibria allocations, we can achieve convergence to a (1)-equilibrium allocation, which is ordinally efficient under either set of assumptions. Moreover, any deterministic allocation in the support of an ordinally efficient alloca-tion is Pareto efficient (Ramezanian and Feizi 2022), and ordinal efficiency is invariant to the support of objects allocated to agents (Alva, Heo, and Manjunath 2024). This suggests that the probability that any SEM deterministic allocation is inefficient also converges to zero. Of the properties in Theorem 5, strategyproofness only holds under the assumption that | ˜It| = 1 for all t. Nevertheless, SEM is also strategyproof with probability one under any sets of realized arrivals as n grows large. Any allocation that an agent can receive by misreporting either (a) converges to an allocation that does not stochastically dominate the allocation she receives from truthfulness or (b) converges to the agent’s allocation under truthfulness. 
+
+i’s allocation under πn when truthful is πn,i := πTn,i ( ˜I(n)). i’s allocation when misrep-resenting as an agent j is πn, (i,j ) := πTn,i ({j} ∪ ˜I(n) \ { i}). 
+
+Definition 6. π is strategyproof with probability one (SP1) if, for any ϵ > 0: lim  
+
+> n→∞
+
+Pr 
+
+
+
+πn,i ⪰i πn, (i,j ) ∨ ∥ πn,i − πn, (i,j )∥∞ < ϵ 
+
+
+
+= 1 for all i ∈ ˜I(n) for any misrepresentation j ∈ I such that tj = ti.
+
+Corollary 1. Under the conditions for Theorem 5, there exists a selection of SEM that is strategyproof with probability one. Theorem 5 implies this result. An agent has zero price impact in the large market. Equivalently, she faces fixed prices. Misrepresenting herself as another agent that has the same budget (equal arrival time) cannot give her a strictly stochastically dominating allocation. Otherwise, she would purchase that agent’s allocation. The replica market allocations converge to these allocations given ℓ-regularity, and the Corollary follows. 14 4.2 Comparison to Existing Mechanisms 
+
+We discuss the relationship between SEM mechanisms and others in the literature. As far as we are aware, SEM is the only mechanism for online stochastic matching that satisfies ordinality and the greedy constraint. Our comparisons will therefore focus on (a) the solution to the static problem subject to the greedy and ordinality constraints (Serial Dictatorship with Indifferences), (b) solutions to the static problem with the ordinality constraint and without the greedy constraint (CERI, ACEEI, and EPS), and (c) briefly discuss solutions to the online problem subject to the ordinality constraint. 
+
+Serial Dictatorship with Indifferences (SDI). SDI mechanisms are extensions of Serial Dictatorships (SD) to allocate objects in static problems when agents have indifferences 5. They are deterministic and Pareto efficient but not (equal-type) envy-free. Generally, randomized SD mechanisms are not ordinally efficient. Seeing as SDI mechanisms are equivalent to SD mechanisms on strict preference domains, it follows that randomized SDI mechanisms are not ordinally efficient. Directly using SDI to allocate objects is infeasible; the matchmaker would need to wait until all arrivals are realized because SDI determines the match for a dictator using the preferences of later dictators. This information is necessary to efficiently allocate objects within an agent’s indifference set. However, this violates the greedy allocation constraint. If the market designer had omniscient foreknowledge of the agent arrivals ˜I,the designer could obtain a Pareto efficient deterministic allocation by running SDI then allocating to each agent the object that she would get under SDI when the agent arrives. The allocation would also be greedy (because earlier arrivals are earlier dictators). Interestingly, in the case of one arrival per period, one can think of SEM as a SDI mechanism. The prices of SEM serve as a proxy for how SDI would break ties within indifference sets absent ominiscience. An arriving agent receives her favorite object with the lowest price. They are not synonymous with more than one arrival per period: SEM will allocate envy-free lotteries whereas SDI does not. 
+
+Approximate Competitive Equilibrium from Equal Incomes (ACEEI) and 
+
+Competitive Equilibrium from Random Incomes (CERI). Both ACEEI (Budish 2011) and CERI (Nguyen, Teytelboym, and Vardi (2025)) are mechanisms primarily intended for combinatorial allocation. ACEEI is approximately Pareto efficient (ex-post) and envy-free up to one good (ex-post). In comparison, CERI is ordinally efficient and envy-free (per our definition of envy-freeness), whereas ACEEI is not. Our solution to the large market problem renders SEM more akin to CERI for a static problem, in fact, we conjecture that the two are equivalent on the strict preference domain despite our usage of random prices versus CERI’s random budgets. Yet, ACEEI and CERI differ from SEM in the crucial respect that they are defined only for this strict preference domain whereas we allow for the general preference domain with indifferences. 
+
+Extended Probabilistic Serial (EPS). Katta and Sethuraman (2006) develop this method to apply Bogomolnaia and Moulin (2001)’s Probabilistic Serial (PS) to the gen-eral preference domain. An EPS mechanism solves a network flow problem that is similar to the original PS formulation of ”eating speeds.” They prove a First and Second Welfare Theorem for EPS mechanisms; that is, EPS mechanisms characterize the set of ordinally efficient allocations. If our conjecture that price equilibria are analogous to CERI in the general preference domain is correct, then it is likely that price equilibria also charac-terize the set of ordinally efficient allocations just as CERI do under the strict domain. 
+
+> 5See Highsmith Ii (2024) for further discussion.
+
+15 Therefore, price equilibria and EPS mechanisms would be equivalent under unit demand. SEM is distinct for two reasons: (i) Our flexibility in specifying the price error term implies that price equilibria can implement different tie-breaking behavior which has interesting implications for ordinal efficiency (Theorem 3) and asymptotic convergence (Theorem 5). (ii) EPS is for static problems, and it is not clear if EPS can be extended to online matching. A ”dynamic” EPS (DEPS) must compute allocations not just for the static market but also for expected arrivals so that earlier arrivals receive their preferred objects over later arrivals. Additionally, DEPS would require a feasible iterative implementation as in Lemma A.3. Last, extending this hypothesized DEPS to fully online matching as in Theorem 6 could be significantly more difficult if not impossible. We view proving or contradicting these equivalence results as interesting open problems. 
+
+Online Matching with Ordinality. Hoefer and Kodric (2017) represents the mod-elling of online matching with ordinality. They assume underlying cardinal valuations, but the market designer only has access to an ordinal ranking consistent with the car-dinal values. The goal is to identify algorithms that ”lose little” compared to knowing the cardinal values. Our approach is fundamentally different as our welfare criteria is stochastic dominance, not performance benchmarks against cardinal loss. 
+
+# 5 Extensions 
+
+In this section, we explore an extension to our model to allow for stochastic arrivals of objects. 
+
+# 5.1 Fully Online Matching 
+
+A fully online matching problem refers to stochastic arrival of supply and demand. We focus our analysis on the description of this problem for the large market. The imple-mentation for the online problem is likely to follow the same steps as our main model, though we later note a few subtleties that must be handled to extend our results. A large market in the fully online matching problem is M = ( X, S, I, T, F ): 1. Objects (X), Agents (I), and Arrivals (T, F ) remain as before. 2. Supply S = ( St)t∈[T ] is a sequence of random variables St ∈ R|X| with joint CDFs (Ht(·)) t∈[T ] such that St ∼ Ht.A time tax price vector is p = ( pt)t∈[T ] where pt ∈ R|X| and pt = pt + ξ. We maintain Assumptions 1 through 3. An agent i with arrival time ti faces time-specific prices: 
+
+Di(p) = min 
+
+> p·ai
+
+
+
+max 
+
+> ⪰i
+
+n
+
+ai ∈ X : pti · ai ≤ 1
+
+o
+
+All else remains as in the general model. We denote period t through k expected supply as: 
+
+St,k =
+
+> k
+
+X
+
+> n=t
+
+E[Sn]We can now state our equilibrium concept and result. 16 Definition 7. A time tax price vector p∗ = ( p∗,t ) is a ( t)-Lindahl equilibrium if: 1. Dt,k (p∗) ≤ S t,k for all k ∈ [T ] such that k ≥ t.2. p∗,k x > 0 implies Dt,k x (p∗) = St,k x for all x ∈ X and k ∈ [T ] such that k ≥ t.As before, we will refer to a (1)-Lindahl equilibrium as simply a Lindahl equilibrium. 
+
+Theorem 6. Under Assumptions 1 and 2, a (t)-Lindahl equilibrium exists for every 
+
+t ∈ [T ]. In addition: under Assumption 3, every Lindahl equilibrium allocation is greedy. 
+
+This Theorem applies in the degenerate case where S is not stochastic and identical across t, implying that Lindahl equilibria generalize price equilibria. The necessity to allow for a ”time tax” arises because a single, fixed price vector cannot always satisfy multiple market clearing constraints. A simple case when this ensues is a situation with identical preferences and arrival of supply across time periods, but arrival of demand doubles in period 2 from period 1. Any fixed price vector that satisifes market clearing in period 1 must necessarily induce twice the demand of period 1 in period 2, meaning the expected supply will be exceeded by a factor of one-half. Theorem 6 establishes the possibility of using a large market approach for fully online matching. Interestingly, there is also little worry about using ”personalized” prices in this setting, as an agent’s arrival time is verifiable so that a manipulation cannot award her more favorable prices. We add a caveat: the application must fit immediate departure .A ( t)-Lindahl equilibrium ignores agent demand from periods n < t . This formulation implicitly assumes that agent departure is immediate. That is, arrivals cannot wait for a future time period to match. Immediate departure is the textbook case in the literature on fully online matching, but its appropriateness varies across applications. 
+
+# 6 Simulations 
+
+In this section, we describe our empirical application and present simulation results. 
+
+# 6.1 Institutional Context 
+
+In the United States, the foster care system is responsible for providing care to chil-dren found victim of abuse or neglect at the hands of their legal guardians. Each state administers its own foster care program, and, in many cases, local counties govern quasi-independent programs. Upon discovery of substantiated abuse or neglect, the local au-thority (in coordination with courts) removes the child from the custody of their legal guardians. Subsequently, the local authority assigns a caseworker to represent the child’s best interests, and the caseworker identifies a temporary foster home to care for the chil. Nationwide, children that enter foster care are at higher risk of negative emotional, be-havioral, and biological outcomes (Leve et al. 2012). In 2018, the Family First Prevention Act was established with one goal of reducing the number of children entering foster care by providing services to at-risk families (Font and Gershoff 2020). Our partner, the anonymous Firm, is a U.S-based nonprofit whose mission is to deter children from entering foster care. The Firm is organized into local chapters that operate on a state-by-state or county-by-county basis. In the locale specific to our work, The Firm provides temporary hosting services in collaboration with the local authorities. Parents 17 that are in need of social assistance—for example, a mom that needs a caregiver for her children while she attempts to find employment—can contact the Firm to request to have their children hosted in a host home that volunteers for the Firm. In addition, the Firm receives referrals directly from the local authorities that involve abuse or neglect cases that are deemed to have low risk of immediate harm to the child. The Firm subsequently identifies one of its own host homes to care for the child and coordinates with the local authorities to manage the child’s social services. The Firm’s caseworkers vet and approve host homes, process intake of children, and use a centralized system to attempt to match children to host homes. The Firm aims to minimize the time that children spend in hostings and provide high-quality assistance to parents in order to achieve quick reunification. The Firm and local authority are aligned in a desire to safely reunify children with biological parents, and the Firm provides economic value in both alleviating need for a state-approved foster home as well as potentially deterring entrance into foster care—which is costly (Barth et al. 2006)—altogether. We study the matching mechanism used by the Firm to allocate host homes to chil-dren. Their context fits our key constraints. The agents, children, arrive stochastically in patterns that often depend on time-based trends (school year, holidays, etc). The host homes are known apriori within planning horizons that span weeks to months. The Firm must match children to host homes immediately upon intake due to legal and logistical constraints. Finally, the Firm implicitly imposes ordinal preferences onto children. In particular, the Firm is indifferent to placing children in any host home subject to that home’s ability to provide adequate care for the child. Moreover, they elicit dichoto-mous preferences from host homes. This is equivalent to redefining children’s preferences so that a child either prefers a home to the outside object or does not, the child is indif-ferent between any homes preferred to the outside option, and a home is acceptable if and only if it is acceptable to the child and the child is acceptable to the home. Consequently, one can treat homes as objects without preferences 6. Informal conversations with vol-unteers in the Firm indicate that home preferences vary substantially over the age of children. A home finds any child below a certain age to be acceptable, and younger chil-dren tend to be acceptable more often than older children. This motivates some choices we describe in our simulations. The Firm’s current mechanism is an informal process where, upon intake of a child, every host home receives a notification describing the child’s characteristics and the rea-son for intake. Host homes then respond if they are willing to host the child, and the caseworker assigns the child to the first willing home. Alternatively, if the caseworker anticipates a need for a specific match fit, the worker may circumvent this process and directly contact a home to request hosting. Even assuming that host homes are perfectly altruistic (desiring to maximize the number of matches) and perfectly informed on future arrivals, this mechanism can fail to produce ordinally efficient allocations due to strate-gic coordination failures, motivating a case for applying SEM to improve the matching process. 
+
+> 6It is immediate that a matching is ordinally efficient and individually rational if and only if it is ordinally efficient with respect to the problem redefined so that only children have preferences.
+
+18 Table 1: Comparing SEM to SD-RTB 
+
+Mechanism n = 1 n = 5 n = 10 n = 25 
+
+Placement Rates 
+
+SEM 0.870 0.948 0.949 0.924 (0.179) (0.060) (0.064) (0.084) SD-RTB 0.760 0.860 0.852 0.820 (0.169) (0.074) (0.063) (0.029) 
+
+# 6.2 Market Primitives 
+
+Comparing SEM to the current process requires observational data on realized matches and other model primitives. Currently, we do not have access to the requisite data. In lieu of ongoing work with the Firm, we use a simplified procedure to model their existing matching process and compare it to SEM on a basic two-by-two example. We represent the current process using Serial Dictatorship with Random Tie-Breaking (SD-RTB) . In SD-RTB, we randomly permute the order of children upon their arrival and sequentially, randomly allocate one of their most preferred homes to each child. This captures the essence of the current process: host homes respond in an arbitrary order, and the caseworker allocates to the first willing home. Clearly, this does not capture other important aspects of the current process, such as caseworker discretion and strategic behavior by host homes. Nevertheless, this simplified model provides a useful benchmark to compare against SEM. We simulate a market with two host homes ( a, b ) and two types of children ( c1, c 2)over T = 4 periods. Type 1 is selective : a ≻1 o ≻1 b. That is, b is unacceptable. This may be interpreted as an older child that fewer homes find acceptable. In contrast, type 2 is non-selective: {a, b } ≻ 2 o, that is, either a or b is acceptable. Each period, n
+
+children arrives according to the distribution: F (c1) = 0 .5 and F (c2) = 0 .5, where we vary n = {1, 5, 10 , 25 } in our simulations. We simulate twenty-five markets for each n.Each home has unit supply. Budgets and price error terms are set to satisfy Assumptions 1 through 4. We use a customized algorithm tuned for computational speed to implement SEM. 
+
+# 6.3 Results 
+
+SEM is asymptotically efficient; its lotteries will be ordinally efficient as n grows to in-finity. However, for small n, SEM may perform poorly. We analyze the performance of SEM versus SD-RTB in finite markets of various sizes to evaluate this. Given di-chotomous preferences, our main metric is the placement rate, that is, the percentage of children who are matched to a home. Our preliminary results are encouraging in this basic environment. On average, SEM matches a higher percentage of children than SD-RTB across all market sizes (Table 1). The performance gap is most pronounced when n = 1, where SEM matches 11% more children on average. The gap remains steady across market sizes at approximately 10%. The standard deviations also fall sharply at any n > 1, confirming the general intuition that larger markets result in lower aggregate uncertainty. A similar analysis looking at the density of placement rates across market sizes shows that SEM 19 Figure 3: Density of Placement Rates 
+
+shifts mass to the right relative to SD-RTB (Figure 3). This result suggests that SEM can improve placement rates even in small markets. Intuitively, SEM’s reliance on large market equilibria allows it to better internalize future arrivals and allocate objects more efficiently even with a substantial amount of aggregate uncertainty. In contrast, SD-RTB’s myopic allocation can lead to suboptimal matches, especially when selective children arrive early and consume scarce resources. 
+
+# 7 Conclusion 
+
+In this work, we study an online matching problem where the market designer is con-strained to match agents immediately upon arrival and agents have ordinal preferences that may include indifferences. We develop a novel mechanism, the Sequential Equilib-rium Mechanism (SEM), that leverages large market equilibria to achieve desirable prop-erties including asymptotic efficiency, strategyproofness, and equal-type envy-freeness. Our analysis extends to fully online matching with stochastic arrivals of both supply and demand. Preliminary simulations in a stylized setting inspired by a real-world applica-tion demonstrate that SEM can outperform existing matching processes even in small markets. Future work includes collaborating with our partner organization to implement SEM in practice and tightening market conditions that guarantee ordinal efficiency under the random tie-breaking schema presented in Theorem 3. Moreover, there are open questions for equivalence results between price equilibria, random budget equilibria, and EPS: are they equivalent on the general preference domain with unit demand? Moreover, is it possible to extend existing ordinal mechanisms such as EPS or SDI to online matching? Might it be that any ordinally efficient mechanism has a large market counterpart that is asymptotically efficient in online matching? We view these as interesting questions with meaningful implications for this new problem. 20 References 
+
+[1] Saeed Alaei, MohammadTaghi Hajiaghayi, and Vahideh Liaghat. “Online allocation with stochastic arrivals”. In: Proceedings of the 13th ACM Conference on Electronic Commerce (2012), pp. 80–96. [2] Samson Alva, Eun Jeong Heo, and Vikram Manjunath. “Unambiguous Efficiency of Random Allocations”. In: arXiv preprint arXiv:2401.11899v4 (2024). [3] Ali Aouad and Will Ma. “A nonparametric framework for online stochastic match-ing with correlated arrivals”. In: arXiv preprint arXiv:2208.02229 (2022). [4] Jean-Pierre Aubin and H´ el` ene Frankowska. Set-Valued analysis . Jan. 2009. doi :
+
+10.1007/978- 0- 8176- 4848- 0 . url : http://hdl.handle.net/2078/ebook: 13186 .[5] Robert J Aumann. “Integrals of set-valued functions”. In: Journal of mathematical analysis and applications 12.1 (1965), pp. 1–12. [6] Eduardo M Azevedo and Eric Budish. “Strategy-proofness in the large”. In: The Review of Economic Studies 86.1 (2019), pp. 81–116. [7] Eduardo M Azevedo and Jacob D Leshno. “A supply and demand framework for two-sided matching markets”. In: Journal of Political Economy 124.5 (2016), pp. 1235–1268. [8] Richard P Barth et al. “A comparison of the governmental costs of long-term foster care and adoption”. In: Social Service Review 80.1 (2006), pp. 127–158. [9] Gerdus Benade et al. “Fair and efficient online allocations”. In: Operations Research 
+
+72.4 (2024), pp. 1438–1452. [10] Anna Bogomolnaia and Herv´ e Moulin. “A new solution to the random assignment problem”. In: Journal of Economic Theory 100.2 (2001), pp. 295–328. [11] Eric Budish. “The combinatorial assignment problem: Approximate competitive equilibrium from equal incomes”. In: Journal of Political Economy 119.6 (2011), pp. 1061–1103. [12] Gerard Debreu. “Economies with a Finite Set of Equilibria”. In: Econometrica 38.3 (May 1970), p. 387. doi : 10.2307/1909545 . url : https://doi.org/10.2307/ 1909545 .[13] Federico Echenique, Antonio Miralles, and Jun Zhang. “Constrained Pseudo-Market Equilibrium”. In: American Economic Review 111.11 (Nov. 2021), pp. 3699–3732. 
+
+doi : 10.1257/aer.20201769 . url : https://www.aeaweb.org/articles?id=10. 1257/aer.20201769 .[14] Jon Feldman et al. “Online Stochastic Matching: Beating 1-1/e”. In: Proceedings of the 2009 50th Annual IEEE Symposium on Foundations of Computer Science .FOCS ’09. USA: IEEE Computer Society, 2009, pp. 117–126. isbn : 9780769538501. 
+
+doi : 10.1109/FOCS.2009.72 . url : https://doi.org/10.1109/FOCS.2009.72 .[15] Sarah A Font and Elizabeth T Gershoff. “Foster care: How we can, and should, do more for maltreated children”. In: Social policy report 33.3 (2020), pp. 1–40. [16] Rajiv Gandhi et al. “Dependent rounding in bipartite graphs”. In: The 43rd Annual IEEE Symposium on Foundations of Computer Science, 2002. Proceedings. IEEE. 2002, pp. 323–332. 21 [17] Yuan Gao, Alex Peysakhovich, and Christian Kroer. “Online Market Equilibrium with Application to Fair Division”. In: Advances in Neural Information Processing Systems . Ed. by M. Ranzato et al. Vol. 34. Curran Associates, Inc., 2021, pp. 27305– 27318. url : https : / / proceedings . neurips . cc / paper _ files / paper / 2021 / file/e562cd9c0768d5464b64cf61da7fc6bb-Paper.pdf .[18] Faruk Gul, Wolfgang Pesendorfer, and Mu Zhang. “Efficient allocation of indivisible goods in pseudomarkets with constraints”. In: Journal of Political Economy 132.11 (2024), pp. 3708–3736. [19] Yinghua He et al. “A pseudo-market approach to allocation with priorities”. In: 
+
+American Economic Journal: Microeconomics 10.3 (2018), pp. 272–314. [20] Terence Highsmith Ii. “Matching Design with Algorithms and Applications to Fos-ter Care”. In: arXiv preprint arXiv:2411.12860 (2024). [21] Martin Hoefer and Bojana Kodric. “Combinatorial secretary problems with ordinal information”. In: arXiv preprint arXiv:1702.01290 (2017). [22] Aanund Hylland and Richard Zeckhauser. “The efficient allocation of individuals to positions”. In: Journal of Political Economy 87.2 (Apr. 1979), pp. 293–314. doi :
+
+10.1086/260757 . url : https://doi.org/10.1086/260757 .[23] Richard M Karp, Umesh V Vazirani, and Vijay V Vazirani. “An optimal algorithm for on-line bipartite matching”. In: Proceedings of the twenty-second annual ACM symposium on Theory of computing (1990), pp. 352–358. [24] Akshay-Kumar Katta and Jay Sethuraman. “A solution to the random assign-ment problem on the full preference domain”. In: Journal of Economic theory 131.1 (2006), pp. 231–250. [25] Fuhito Kojima and Parag A Pathak. “Incentives and stability in large two-sided matching markets”. In: American Economic Review 99.3 (2009), pp. 608–627. [26] Daniel Kornbluth and Alexey Kushnir. Undergraduate course allocation through competitive markets . Tech. rep. Technical Report, 2021. [27] SangMok Lee. “Incentive compatibility of large centralized matching markets”. In: 
+
+The Review of Economic Studies 84.1 (2016), pp. 444–463. [28] Leslie D Leve et al. “Practitioner review: children in foster care–vulnerabilities and evidence-based interventions that promote resilience processes”. In: Journal of child psychology and psychiatry 53.12 (2012), pp. 1197–1211. [29] Qingmin Liu and Marek Pycia. “Ordinal efficiency, fairness, and incentives in large markets”. In: Fairness, and Incentives in Large Markets (August 1, 2016) (2016). [30] Antonio Miralles and Marek Pycia. “Foundations of pseudomarkets: Walrasian equi-libria for discrete resources”. In: Journal of economic theory 196 (2021), p. 105303. [31] Hai Nguyen, Th` anh Nguyen, and Alexander Teytelboym. “Stability in Matching Markets with Complex Constraints”. In: Management Science 67.12 (Mar. 2021), pp. 7438–7454. doi : 10.1287/mnsc.2020.3869 . url : https://doi.org/10.1287/ mnsc.2020.3869 .[32] Th` anh Nguyen, Alexander Teytelboym, and Shai Vardi. “Efficiency, Envy, and In-centives in Combinatorial Assignment”. In: arXiv preprint arXiv:2509.13198 (2025). 22 [33] Marek Pycia. “Pseudomarkets”. In: Online and Matching-Based Market Design .Ed. by Federico Echenique, Nicole Immorlica, and Vijay V. Vazirani. Cambridge: Cambridge University Press, 2023. Chap. 16, pp. 361–380. [34] Rasoul Ramezanian and Mehdi Feizi. “Robust ex-post Pareto efficiency and fair-ness in random assignments: Two impossibility results”. In: Games and Economic Behavior 135 (2022), pp. 356–367. 
+
+# A Proof Appendix 
+
+Before beginning, note that we will say that a property Z holds r-ae (almost everywhere) under measure μ for a mathematical object Or if Z is true for Or for every r ∈ R \ S for a subset S ⊂ R such that μ(S) = 0. 
+
+Proof of Theorem 1 .
+
+Claim 1: Di(p) is non-empty and upper hemicontinuous at almost every p. Define: 
+
+Ji = {p : p · ai = bi for some ai ∈ X}
+
+Since Di(p) is compact-valued, it is upper hemicontinuous at p if it has a closed graph at p. Let ( pk) be a sequence of prices converging to p. Di(p) has a closed graph if, for all such sequences, whenever aki ∈ Di(pk) for all k with aki → ai, we have: 
+
+ai ∈ Di(p)Let ( pk) be a sequence of prices converging to some p0 /∈ Ji. The demand for i at each 
+
+pk is aki ∈ Di(pk) with limit a0 
+
+> i
+
+. Toward a contradiction, suppose that a0 
+
+> i
+
+/∈ Di(p0). Note that a0 
+
+> i
+
+must be affordable at p0, otherwise p0 · a0 
+
+> i
+
+> b i. However, since a0 
+
+> i
+
+∈{0, 1}|X| and aki ∈ { 0, 1}|X| for all k, this implies that there exists some K such that for all j > K , aji = a0 
+
+> i
+
+. Then: 
+
+pj · aji = pj · a0
+
+> i
+
+but 
+
+pm · a0 
+
+> i
+
+> b i for large enough m
+
+so that we can take j∗ = max {m, j }, then: 
+
+pj∗
+
+· aj∗ 
+
+> i
+
+> b i
+
+contradicting aj∗ 
+
+> i
+
+∈ Di(pj∗
+
+). So, we continue with two cases: 1. There exists some ai ∈ A i with p0 · ai ≤ bi and ai ≻i a0 
+
+> i
+
+.2. There exists some ai ∈ A i with ai ⪰i a0 
+
+> i
+
+and p0 · ai < p0 · a0 
+
+> i
+
+.In the first case, p0 · ai < b i since ai ∈ Di(p0) and p0 /∈ Ji. Since pk → p0, there exists some K such that for all j > K , pj · ai < b i. Therefore, for all j > K , ai is affordable at price pj and ai ≻i a0 
+
+> i
+
+∼i aji for large enough j. This contradicts that aji ∈ Di(pj ). Similarly, in the second case, since pk → p0, there exists some K such that for all 
+
+j > K , pj ·ai < pj ·a0 
+
+> i
+
+. Further, for large enough j > K , pj ·a0 
+
+> i
+
+= pj ·aji and ai ⪰i a0 
+
+> i
+
+∼i aji .This contradicts that aji ∈ Di(pj ). 23 Let Ji,x = {p : px = bi} which is singleton for each x ∈ X. (In the case of combina-torial demand, it is an affine space in |X| − 1, and results are unchanged.) Then: 
+
+Ji = ∪x∈X Ji,x 
+
+Under Assumption 1: Pr( px = bi) = Pr( ξx = bi − px) = 0 = ⇒ Pr( p ∈ Ji,x ) = 0 Moreover: Pr( p ∈ Ji) ≤ X
+
+> x∈X
+
+Pr( p ∈ Ji,x ) = 0 where the final inequality follows because the number of events is finite. This implies that Ji has measure zero. Hence, Di(p) is an upper hemicontinuous correspondence at almost every p for every i. Equivalently, Di(p + ξ) is upper hemicontinuous for all p for 
+
+ξ-a.e. 
+
+Claim 2: Li(p) and Dt(p) are non-empty, convex, and upper hemicontinuous corre-spondences in p. We use the following results 7 which require some definitions: Consider any correspondence H : I ⇒ Rm that is non-empty and closed for any 
+
+i ∈ I. H is integrably bounded if there exists a single-valued, Lebesgue integrable function 
+
+h : I → Rm such that, for each i ∈ I and a ∈ H(i), |a| ≤ h(i). We say that g(i) is a 
+
+μ-measurable selection of H(i) if g(i) ∈ H(i) for all i ∈ I except for some set I′ ⊂ I such that μ(I′) = 0. The Aumann (1965) integral of H with respect to an atomless probability measure μ is: 
+
+Z
+
+H := 
+
+ Z 
+
+> I
+
+g(i)dμ (i) : g(i) is a μ-measurable selection of H(i)
+
+
+
+Aubin and Frankowska (2009). Theorem 8.1.3. If H is a measurable set-valued corre-spondence and is closed and non-empty for each i ∈ I, then a measurable selection of 
+
+H exists. This implies that a measurable selection of Di(·) exists. Therefore, Li(p) is non-empty for each p.Aubin and Frankowska (2009). Theorem 8.6.3. If H is Borel-measurable and in-tegrably bounded, then R H is convex-valued and compact. Di(p) is non-empty and compact-valued for each i ∈ I and p ∈ R|X|. Di(p) is immediately Borel-measurable for each i ∈ I and p ∈ R|X|. Any bounded, measurable function on a probability space is also integrably bounded. Therefore, Li(p; ξ) is convex-valued and compact-valued for each p.Finally, upper hemicontinuity of Li(p) at each p follows by the set-valued Lebesgue Dominated Convergence Theorem (Aubin and Frankowska (2009). Theorem 8.6.7 ) be-cause Di(p + ξ) is upper hemicontinuous ( p + ξ)-ae for each p.Non-emptiness, convex values, and upper hemicontinuity are preserved under product with constants and summation, implying the corresponding properties for aggregate de-mand. With this claim established, we continue using the standard fixed-point argument. 
+
+Claim 3: An equilibrium exists. There exists a price vector ¯ p with px ≤ K for each 
+
+x ∈ X such that Dt(¯ p) = {(0) }x∈X by assumptions 1 and 2 (we can consider a large enough K such that K > ¯B − ξ). Now, we can construct the price adjustment function (using the Minkowski sum): 
+
+> 7Each result was originally proven in Aumann (1965), but his case restricts to the Lebesgue measure. We use the fully generalized versions for any non-atomic measure.
+
+24 Z(p) = max {p, 0} +
+
+
+
+Dt(p) − S
+
+
+
+and define it on the domain and range such that, for all price vectors, 0 ≤ px ≤ K
+
+for each x ∈ X. This is a non-empty, compact, and convex set in R|X| 
+
+> +
+
+, and aggregate demand is non-empty, convex, and upper hemicontinuous for all p. By Kakutani’s Fixed Point Theorem, there exists a fixed point p∗ such that Z(p∗) = p∗. At this fixed point, we have that, for each x ∈ X:
+
+p∗ 
+
+> x
+
+= max {p∗
+
+> x
+
+, 0} +
+
+
+
+Dtx(p∗) − sx
+
+
+
+Therefore, if p∗ 
+
+> x
+
+> 0, then Dtx(p∗) = sx. Moreover, by construction, if p∗ 
+
+> x
+
+= 0, then 
+
+Dtx(p∗) − sx ≤ 0 so that Dtx(p∗) ≤ sx. (Otherwise, this could not be a fixed point.) Therefore, p∗ is a price equilibrium. 
+
+Claim 4: The equilibrium is greedy for some budgets b.We can write the equilibrium allocation as a∗ : I → { 0, 1}|X| such that a∗(i) = a∗ 
+
+> i
+
+for some F -measurable selection a∗ 
+
+> i
+
+∈ Li(p∗). Note then that, i-ae, a∗(i) ∈ Li(p∗). Suppose that x∗ ≻i x for some x ∈ X satisfying a∗ 
+
+> i,x
+
+> 0. a∗ 
+
+> i,x
+
+> 0 implies that, for some realization 
+
+p∗:
+
+p∗ 
+
+> x∗
+
+> b i =⇒ p∗ 
+
+> x∗
+
+> b i − ¯ξ
+
+otherwise, i would consume x∗ instead of x. Then, we may set bj < b i − ¯ξ + ξ for all j such that tj > t i. This implies that that Dj (p∗)x∗ = 0 for all realizations p∗, and therefore 
+
+a∗ 
+
+> j,x ∗
+
+= 0 for all j such that tj > t i. Moreover, B > 0 implies that p∗ 
+
+> x∗
+
+> 0 (Assumptions 2 and 3), so that market clearing implies all of x∗ is allocated to i′ such that ti′ ≥ ti. This proves the Theorem. ■
+
+We require two lemmas before proving Theorem 2. 
+
+Lemma A.1. Suppose that p∗ is a price equilibrium. Then if x ≻i Di(p∗) for some realization p∗, then px > 0. 
+
+Proof of Lemma A.1. x ≻i Di(p∗) implies that p∗ 
+
+> x
+
++ ξ > b i, which, when p∗ 
+
+> x
+
+= 0, is only possible if ¯ξ > b i. Since ¯ξ < min i bi, this implies that p∗ 
+
+> x
+
+> 0. ■
+
+Lemma A.2. Suppose that a∗ is a price equilibrium allocation under p∗. Then: 1. If Assumption 4 holds and ai stochastically dominates a∗(i) (strictly), then p∗ · ai ≥
+
+p∗ · a∗(i) ( p∗ · ai > p ∗ · a∗(i)). 2. If Assumption 5 holds, |p∗
+
+> x
+
+−p∗
+
+> y
+
+| > 2z for all x, y ∈ X, and ai stochastically dominates 
+
+a∗(i) (strictly), then p∗ · ai ≥ p∗ · a∗(i) ( p∗ · ai > p ∗ · a∗(i)). 
+
+Proof of Lemma A.2. We can write Di(p∗) ∼ a∗ 
+
+> i
+
+and A ∼ ai. By Strassen’s Theorem for FOSD, ai stochastically dominates a∗ 
+
+> i
+
+if and only if there exists some random variable Z such that Di(p∗) = ϕ1(Z), A = ϕ2(Z), and ϕ2(z) ⪰i ϕ1(z) for z-ae. We can embed these random variables in some probability space with events Ω with generic ω ∈ Ω where p∗(ω) and Z(ω) are realizations in the event ω. Then, for each ω:
+
+p∗(ω) · ϕ2(Z(ω)) ≥ p∗(ω) · ϕ1(Z(ω)) To see this, let y be defined by ϕ2(Z(ω)) y = 1 and x by ϕ1(Z(ω)) x = 1, if any such x
+
+exists (we deal with the case that none exists shortly). The definition of demand implies 25 that p∗ 
+
+> y
+
+> p∗ 
+
+> x
+
+if y ≻i x by preference maximization, and p∗ 
+
+> y
+
+≥ p∗ 
+
+> x
+
+if y ∼ x by expenditure minimization. Under case (1) of the Lemma: 
+
+p∗ 
+
+> x
+
+= p∗ 
+
+> x
+
++ c and p∗ 
+
+> y
+
+= p∗ 
+
+> y
+
++ c
+
+implies that p∗ 
+
+> y
+
+≥ p∗ 
+
+> x
+
+(p∗ 
+
+> y
+
+> p ∗ 
+
+> x
+
+if y ≻i x). Under case (2) of the Lemma: 
+
+p∗ 
+
+> x
+
+≥ p∗ 
+
+> x
+
++ c − z and p∗ 
+
+> y
+
+≤ p∗ 
+
+> y
+
++ c + z
+
+which implies: 
+
+p∗ 
+
+> y
+
++ z ≥ p∗ 
+
+> x
+
+− z =⇒ p∗ 
+
+> y
+
+≥ p∗ 
+
+> x
+
+− 2z =⇒ p∗ 
+
+> y
+
+∈ [p∗ 
+
+> x
+
+− 2z, ∞)but then we know that: 
+
+|p∗ 
+
+> y
+
+− p∗
+
+> x
+
+| > 2z =⇒ p∗ 
+
+> y
+
+/∈ [p∗ 
+
+> x
+
+− 2z, p ∗ 
+
+> x
+
++ 2 z]intersecting, p∗ 
+
+> y
+
+∈ (p∗ 
+
+> x
+
++ 2 z, ∞). So, p∗ 
+
+> y
+
+> p ∗
+
+> x
+
+.If no such x exists, then ϕ2(Z(ω)) ≻i Di(p(ω)) so that lemma A.1 implies that py > 0. Hence p∗ · ϕ2(Z(ω)) > p ∗ · ϕ1(Z(ω)) = 0, and, combining the cases: 
+
+p∗ · ϕ2(Z(ω)) ≥ p∗ · ϕ1(Z(ω)) and if ϕ2(Z(ω)) ≻i ϕ1(Z(ω)) then p∗ · ϕ2(Z(ω)) > p ∗ · ϕ1(Z(ω)). Since this holds for every realization, it follows that: 
+
+p∗ · E[ϕ2(Z(ω))] = p∗ · ai ≥ p∗ · a∗ 
+
+> i
+
+= p∗ · E[ϕ1(Z(ω))] and strictly so if ai stochastically dominates a∗ 
+
+> i
+
+strictly because ϕ2(Z(w)) ≻i ϕ1(Z(w)) must hold for some positive measure set of events by Strassen’s Theorem. This proves the Lemma. ■
+
+Proof of Theorem 2 and Theorem 3, Part 1. 
+
+Suppose that p∗ is a price equilibrium. Let a∗ : I → R|X| be an equilibrium allocation such that a∗ 
+
+> i
+
+∈ Li(p∗) and a∗(i) = a∗ 
+
+> i
+
+for all i ∈ I. Toward a contradiction, suppose that an allocation a stochastically dominates a∗.Under the assumptions for either Theorem, by Lemma A.2, we have for all i:
+
+p∗ · a(i) ≥ p∗ · a∗(i)and for some i′ ∈ I:
+
+p∗ · a(i′) > p ∗ · a∗(i′)Hence, we obtain: 
+
+X
+
+> i∈I
+
+p∗ · (a(i) − a∗(i)) f (i) = X
+
+> i̸=i′
+
+p∗ · (a(i) − a∗(i)) f (i) + p∗ · (a(i′) − a∗(i′)) f (i′) > 0However, this implies for some x ∈ X with p∗ 
+
+> x
+
+> 0: 
+
+p∗
+
+> x
+
+X
+
+> i∈I
+
+(ax(i) − a∗
+
+> x
+
+(i)) f (i) > 0 = ⇒ X
+
+> i∈I
+
+ax(i)f (i) > X
+
+> i∈I
+
+a∗
+
+> x
+
+(i)f (i) = sx
+
+where the last equality holds by market clearing. Therefore, a cannot be a feasible allocation, a contradiction. This proves the Theorem. ■
+
+26 Proof of Theorem 3, Part 2. Claim 1: Di(p) is non-empty, single-valued, and continuous at almost every p. De-fine: 
+
+Ji = {p : p · Di(p) = bi} ∪ { p : p · ai = p · a′ 
+
+> i
+
+for ai, a ′ 
+
+> i
+
+∈ X}
+
+Consider any p /∈ Ji. Then: 
+
+Di(p) = {ai} for some ai ∈ X
+
+and p · ai < b i. Let Ri(ai) = {a′ 
+
+> i
+
+∈ X : a′ 
+
+> i
+
+≻i ai} and ¯Ri(ai) = {a′ 
+
+> i
+
+∈ X : a′ 
+
+> i
+
+⪰i ai}.For any a′ 
+
+> i
+
+∈ Ri(ai), p · a′ 
+
+> i
+
+> b i by assumption that Di(p) = {ai}. Similarly, a′ 
+
+> i
+
+∈ ¯Ri(ai)implies p · a′ 
+
+> i
+
+> p · ai.There exists some ϵ > 0 such that for any p′ where ∥p − p′∥∞ < ϵ :
+
+Di(p′) = {ai}
+
+We can consider ϵ < b i − p · a′ 
+
+> i
+
+for all a′ 
+
+> i
+
+∈ Ri(ai) so that p′ · a′ 
+
+> i
+
+> b i for any a′ 
+
+> i
+
+∈ X such that a′ 
+
+> i
+
+≻i ai. Alternatively, we may consider ϵ < p · ai − p · a′ 
+
+> i
+
+for all a′ 
+
+> i
+
+∈ ¯R(ai) so that 
+
+p′ · a′ 
+
+> i
+
+> p′ · ai for any a′ 
+
+> i
+
+∈ X such that a′ 
+
+> i
+
+⪰i ai.This implies that Di(·) is single-valued and locally constant at any p /∈ Ji; it is therefore non-empty and continuous at every p /∈ Ji.As in Theorem 1, let Ji,x = {p : px = bi}. Let Ji, (x,y ) = {p : px = py}. We have already shown that Pr( p ∈ Ji,x ) = 0. Moreover: Pr( p ∈ Ji, (x,y )) = Pr( px + c + ζx = py + c + ζy) = Pr( ζx − ζy = px − py) = 0 where the last equality follows since, by Assumptions 1 and 5, ζx − ζy is a continuously distributed random variable. Then: Pr( p ∈ Ji) ≤ X
+
+> x∈X
+
+
+
+Pr( p ∈ Ji,x ) + X
+
+> y∈X
+
+Pr( p ∈ Ji, (x,y ))
+
+
+
+= 0 where the last inequality follows since this is a finite sum of measure zero events. There-fore, Ji has zero measure. The Claim follows. 
+
+Claim 2: Li(p) is a non-empty and continuous function in p. By Claim 1, we can simply use the Lebesgue integral instead of Aumann integration to obtain a function that is non-empty and continuous. These properties are preserved under product and summation, implying that they hold for aggregate demand. ■
+
+We establish a useful Lemma before proving Theorem 5. 
+
+Lemma A.3. Suppose that pt is a ( t)-equilibrium and at is a ( t)-equilibrium allocation for pt. Then pt is a ( t + 1)-price equilibria under supply S − P 
+
+> i∈I
+
+at(i)f t(i), and at is a (t + 1)-equilibrium allocation. Let the conditions for the Lemma hold. We have that: 
+
+X
+
+> i∈I
+
+at(i)f t+1 ,T (i) ∈ D t+1 (pt)Moreover: X
+
+> i∈I
+
+at(i)f t,T (i) = X
+
+> i∈I
+
+at(i)f t(i) + X
+
+> i∈I
+
+at(i)f t+1 ,T (i) ≤ S
+
+27 implies X
+
+> i∈I
+
+at(i)f t+1 ,T ≤ S − X
+
+> i∈I
+
+at(i)f t(i)Clearly, this must also hold with equality for any x ∈ X such that px > 0. This proves the Lemma. ■
+
+Proof of Theorem 5 .Before beginning, we define some notation. We use the L∞ norm to measure distance. That is: 
+
+∥a(i) − a′(i)∥∞ = sup 
+
+> x∈X
+
+∥a(i, x ) − a′(i, x )∥
+
+Then: 
+
+∥a(·) − a′(·)∥∞ = sup 
+
+> i∈I
+
+∥a(i) − a′(i)∥∞
+
+The underlying space includes distributions over I, supply vectors, price vectors, and allocations. We represent this as: 
+
+C = P × R|X| × R|X| × A 
+
+Finally, we can use the L∞ product metric (we write this as ∥ · ∥ ∗∞) to define a metric space on C. An element in this product metric space converges to another element if and only if each component converges in the respective metric. Suppose that ( θn) = ( θ1, θ 2, ..., θ n) is a sequence of i.i.d random vectors with expecta-tion E[θ]. We say that θnp
+
+−−→ θ (uniform convergence in probability) if: lim  
+
+> n→∞
+
+Pr 
+
+
+
+∥θn − θ∥∞ > ϵ 
+
+
+
+= 0 Now, by assumption of ℓ-regularity (as argued in the text, this is implied by regularity under RTB), we can select an equilibrium a∗ ∈ E 1(ν) such that a∗ = λn(ν) := λ(ν) for some continuous function λ. Fix this equilibrium for the remainder of the proof. 
+
+Claim 1: We will show that ˜F 1 approximates F 1, and, therefore, S2/n also approxi-mates S − P 
+
+> i∈I
+
+a∗(i)f 1(i). Let ˜F 1 
+
+> n
+
+(i) denote the empirical distribution in period 1 for an n-fold replica, that is: ˜F 1 
+
+> n
+
+(i) = 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+1{i′ ≤ i}
+
+Analogously, ˜Fn(·; 1) = ( ˜F 1 
+
+> n
+
+(·), F 2(·), ..., F T (·)). Each i′ ∈ ˜I1(n) can be viewed as a ran-dom variable which is an arrival independently sampled from the conditional distribution 
+
+F 1. By the Glivenko–Cantelli Theorem, we have: ˜F 1
+
+> np
+
+−−→ F 1
+
+The equilibrium correspondence is homogenous degree one. This implies that an equilib-rium for the scaled empirical distribution ν1 
+
+> n
+
+= ( ˜F (·, 1) , nS 1/n ) is also an equilibrium for the replica market: 
+
+α1 
+
+> n
+
+∈ E1(ν1
+
+> n
+
+) = ⇒ α1 
+
+> n
+
+∈ E1(n ˜F (·; 1) , nS )28 S1 = S implies that ν1
+
+> np
+
+−−→ ν. Hence, for any ϵ > 0, there exists a large enough n such that, for any k > 0: Pr 
+
+
+
+∥ν1 
+
+> n
+
+− ν∥∗∞ > ϵ 
+
+
+
+< k 
+
+By ℓ-regularity, for any δ > 0, we can thus find an n such that we can select α1 
+
+> n
+
+satisfying: Pr 
+
+
+
+∥α1 
+
+> n
+
+− a∗∥∞ > δ 
+
+
+
+< k 
+
+so α1
+
+> np
+
+−−→ a∗. Thus: 
+
+X
+
+> i∈I
+
+ α1
+
+> n
+
+(i) − a∗(i) ˜f 1 
+
+> n
+
+(i) ≤ sup  
+
+> i∈˜I1(n)
+
+ α1
+
+> n
+
+(i) − a∗(i) p
+
+−−→ { 0}|X|
+
+=⇒ 1
+
+n
+
+X 
+
+> ˜i∈˜I1(n)
+
+α1
+
+> n
+
+(˜ i) p
+
+−−→ 1
+
+n
+
+X 
+
+> ˜i∈˜I1(n)
+
+a∗(˜ i) p
+
+−−→ X
+
+> i∈I
+
+a∗(i)f 1(i)The first convergence follows by assumption that ∥α1 
+
+> n
+
+−a∗∥∞
+
+> p
+
+−−→ 0. The last convergence follows because each a∗(˜ i) is an independent, identically distributed random variable. By the WLLN, the sample average converges to its expectation for any distance norm. By Gandhi et al. (2002), there exists a dependent rounding scheme producing a fea-sible ex-post allocation (with probability one) such that, letting ˜ α1 
+
+> n
+
+be a draw from a distribution Gn over ex-post allocations, (i) EGn [˜ α1
+
+> n
+
+(i′)] = α1
+
+> n
+
+(i′) and (ii) for any x ∈ X,
+
+Cov (˜ α1
+
+> n,x
+
+(i), ˜α1
+
+> n,x
+
+(j)) ≤ 0 for every i, j ∈ ˜I1(n). Note then that ˜ α1 
+
+> n
+
+is conditional upon observing arrivals and is random only with respect to randomization over ex-post feasible allocations. By (ii): 
+
+V ar 
+
+ 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+˜α1
+
+> n,x
+
+(i′)
+
+
+
+= 1
+
+n2
+
+X 
+
+> i′∈˜I1(n)
+
+V ar (˜ α1
+
+> n,x
+
+(i′)) + 1
+
+n2
+
+X 
+
+> i′̸=j′
+
+Cov (˜ α1
+
+> n,x
+
+(i′), ˜α1
+
+> n,x
+
+(j′)) 
+
+≤ 1
+
+n2
+
+X 
+
+> i′∈˜I1(n)
+
+V ar (˜ α1
+
+> n,x
+
+(i′)) 
+
+≤ 14n
+
+where the final inequality follows since each ˜ α1
+
+> n,x
+
+(i′) ∈ { 0, 1}. Applying Chebyshev’s inequality for each x ∈ X and a union bound: Pr 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+˜α1
+
+> n
+
+(i′) − 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+α1
+
+> n
+
+(i′) ∞
+
+> δ 
+
+!
+
+≤ |X|
+
+4nδ 2
+
+> n→∞
+
+−−−→ 0therefore: 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+˜α1
+
+> n
+
+(i′) p
+
+−−→ 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+α1
+
+> n
+
+(i′) = ⇒ 1
+
+n
+
+X 
+
+> i′∈˜I1(n)
+
+˜α1
+
+> n
+
+(i′) p
+
+−−→ X
+
+> i∈I
+
+a∗(i)f 1(i)Moreover, t = 2 supply is: 
+
+S2 = nS − X 
+
+> i′∈˜I1(n)
+
+˜α1
+
+> n
+
+(i′) = ⇒ S2
+
+n
+
+> p
+
+−−→ S − X
+
+> i∈I
+
+a∗(i)f 1(i)29 Claim 2: For each t ∈ { 1, 2, ..., T − 1}, St+1 /n p
+
+−−→ S − P 
+
+> i∈I
+
+a∗(i)f 1,t (i). Claim 1 proved the base case for t = 1. We assume that the claim holds for t and prove that it holds for 
+
+t + 1. By the same logic as Claim 1: ˜F t+1 
+
+> np
+
+−−→ F t+1 
+
+Define: 
+
+νt+1  
+
+> n
+
+=
+
+
+
+˜F (·; t + 1) , St+1 
+
+n
+
+
+
+The induction hypothesis implies that νt+1 
+
+> np
+
+−−→ (F, S − P 
+
+> i∈I
+
+a∗(i)f 1,t (i)). By Lemma A.3, a∗ ∈ E t+1 (F, S − P 
+
+> i∈I
+
+a∗(i)f 1,t (i)). Similarly, ℓ-regularity implies that, for large enough n, we can select αt+1  
+
+> n
+
+∈ E t+1 (νt+1  
+
+> n
+
+)such that αt+1 
+
+> np
+
+−−→ a∗ to obtain: 1
+
+n
+
+X 
+
+> i′∈˜It+1 (n)
+
+˜αt+1  
+
+> n
+
+(i′) p
+
+−−→ X
+
+> i∈I
+
+a∗(i)f t+1 (i)and conclude that: 
+
+St+2 
+
+n
+
+> p
+
+−−→ St+1 
+
+n − X
+
+> i∈I
+
+a∗(i)f t+1 (i) = S − X
+
+> i∈I
+
+a∗(i)f 1,t +1 (i)
+
+Claim 3: The SEM allocation αn is asymptotically efficient. By Claims 1 and 2, we can conclude that αtnp
+
+−−→ a∗ for each t. Therefore, αnp
+
+−−→ a∗. a∗ is ordinally efficient by either Theorem 2 or 3. This proves the first part of the Theorem. 
+
+Claim 4: αn is equal-type envy-free for any n. Toward a contradiction, suppose that 
+
+αkn(j) ≻i αtn(i) for some i, j ∈ ˜I with k > t . This implies there exists some x such that 
+
+skx > 0 and x ≻i y for some y with αtn,y (i) > 0. However: 
+
+skx > 0 = ⇒ stx − X
+
+> i∈I
+
+αtn(i)f t(i) > 0Then, x ≻i y implies that ptx > b i for some realization pt. By Theorem 4, ptx − ξ > b j for any j with tj > t i. So: 
+
+stx − X
+
+> i∈I
+
+αtn(i)f t,T (i) = stx − X
+
+> i∈I
+
+αtn(i)f t(i) > 0By market clearing, we must have that ptx = 0. This contradicts αtn,y (i) > 0. Moreover, by Theorem 4, the allocation is envy-free within time periods. Hence, αn is equal-type envy-free for each n.
+
+Claim 5: SEM is strategyproof. This immediately follows because by declaring truthfully, an agent arriving at t has the largest budget among remaining agents. She must receive a stochastically undominated lottery given remaining supply at t by Theorem 1. 
+
+Claim 6: SEM is ex-post greedy for each n. Let ˜ αtn be some matching drawn from the distribution of αtn. Toward a contradiction, suppose that there exists some x such that x ≻i y for some y with αtn,y (i) > 0 and ˜ αkn,x (j) > 0 for some k > t . This implies that 30 skx > 0. We obtain the same contradiction as in Claim 4. Hence, ˜ αn is ex-post greedy for each n. This proves the Theorem. 
+
+Corollary 1: Fix an agent i, a misreport j with tj = ti, and ε > 0. Write 
+
+πn,i := πTn,i ( ˜I1,T (n)) and πn, (i,j ) := πTn,i ({j} ∪ ˜I1,T (n) \ { i})for agent i’s allocation under truthful reporting and under the misreport, respectively. By Theorem 5, there exists an equilibrium allocation a∗ with πi := a∗(i) and πj := 
+
+a∗(j) such that 
+
+πn,i p
+
+−−→ πi and πn, (i,j )
+
+> p
+
+−−→ πj .
+
+In particular, such an equilibrium must exist because a single agent’s misrepresentation affects the empirical distribution by 1 /n at most, so the empirical distribution under either truth-telling or misrepresentation converges to the same limit. The proof of Theorem 5 follows to show that the limiting equilibrium allocation is equivalent. By the intersection bound, lim  
+
+> n→∞
+
+Pr  ∥πn,i − πi∥∞ < δ ∧ ∥ πn, (i,j ) − πj ∥∞ < δ  = 1 for all δ > 0.
+
+We distinguish two cases. 
+
+Case 1: πi = πj . For any ϵ > 0, choose δ ≤ ε/ 2. On the event above, 
+
+∥πn,i − πn, (i,j )∥∞ ≤ ∥ πn,i − πi∥∞ + ∥πn, (i,j ) − πj ∥∞ < 2δ ≤ ε. 
+
+Hence, lim  
+
+> n→∞
+
+Pr  ∥πn,i − πn, (i,j )∥∞ < ε  = 1 
+
+Case 2: πi̸ = πj . Lemma A.2 and bi = bj imply that it is not true that πj ⪰i πi. Thus there exists a cutoff x such that: X
+
+> y⪰ix
+
+πj,y < X
+
+> y⪰ix
+
+πi,y .
+
+Let 
+
+γ := X
+
+> y⪰ix
+
+πi,y − X
+
+> y⪰ix
+
+πj,y > 0.
+
+For any ϵ > 0, choose δ < min {ε/ 2, γ/ 3}. On the event that both πn,i and πn, (i,j ) are within δ of their limits, we have 
+
+X
+
+> y⪰ix
+
+πn, (i,j ),y ≤ X
+
+> y⪰ix
+
+πj,y + δ < X
+
+> y⪰ix
+
+πi,y − γ + δ ≤ X
+
+> y⪰ix
+
+πn,i,y − (γ − 2δ),
+
+where −(γ − 2δ) is strictly negative by construction. Thus πn, (i,j ) does not stochastically dominate πn,i . Therefore, lim  
+
+> n→∞
+
+Pr  πn,i ⪰i πn, (i,j )
+
+ = 1 Finally: lim  
+
+> n→∞
+
+Pr   πn,i ⪰i πn, (i,j )
+
+| {z }
+
+> E1
+
+∨ ∥ πn,i − πn, (i,j )∥∞ < ϵ 
+
+| {z }
+
+> E2
+
+ ≥ lim 
+
+> n→∞
+
+
+
+max {Pr( E1) , Pr( E2)}
+
+
+
+= max 
+
+
+
+lim  
+
+> n→∞
+
+Pr( E1) , lim  
+
+> n→∞
+
+Pr( E2)
+
+
+
+= 1 This proves the Corollary. ■
+
+31 Proof of Theorem 6 .By Theorem 1, we know that lottery demand satisfies the necessary properties for Kakutani’s Fixed Point Theorem. Hence, we can begin from this point. 
+
+Claim 1: A ( t)-Lindahl equilibrium exists. Assume there exists prices such that: 
+
+Dt,k −1(pt, p t+1 , ..., p k−1) ≤ S t,k −1 (Induction) By Theorem 1, we know such prices exist for k = t. We skip this base case. There exists a price vector ¯ pk with pkx ≤ K for each x ∈ X such that Dk,k (¯ pk) = 
+
+{(0) }x∈X by assumptions 1 and 2 (we can consider a large enough K such that K > 1−ξ). This, in turn with the inductive hypothesis, implies: 
+
+Dt,k (pt, p t+1 , ..., p k−1, ¯pk) = Dt,k −1(pt, p t+1 , ..., p k−1) ≤ St,k −1 ≤ St,k 
+
+The price adjustment function for period-k prices (using the Minkowski sum) is: 
+
+Zk(p) = max {pk, 0} +
+
+
+
+Dt,k (p) − S t,k 
+
+
+
+and define it on the domain and range such that, for all price vectors, 0 ≤ ptx ≤ K
+
+for each x ∈ X. By Kakutani’s Fixed Point Theorem, there exists a fixed point p∗ such that Zk(p∗) = p∗,k for each k ∈ [T ] such that k ≤ t. At this fixed point, we have that, for each x ∈ X:
+
+p∗,k x = max {p∗,k x , 0} +
+
+
+
+Dt,k x (p∗) − S t,k x
+
+
+
+Therefore, if p∗,k x > 0, then Dt,k x (p∗) = St,k x . Moreover, by construction, if p∗,k x = 0, then 
+
+Dt,k x (p∗) ≤ S t,k x . Applying induction suffices to find such equilibrium prices for every 
+
+k ∈ [T ] such that k ≥ t. Therefore, we can construct p∗ which will be a ( t)-Lindahl equilibrium. 
+
+Claim 2: The equilibrium allocation is greedy. We can write the equilibrium allocation as a∗ : I → { 0, 1}|X| such that a∗(i) = a∗
+
+> i
+
+for some F -measurable selection a∗ 
+
+> i
+
+∈ Li(p∗). Suppose that x∗ ≻i x for some x ∈ X
+
+satisfying a∗ 
+
+> i,x
+
+> 0. Let k := ti. a∗ 
+
+> i,x
+
+> 0 implies that, for some realization p∗:
+
+p∗,k x∗ > 1 = ⇒ p∗,k x∗ > 1 − ¯ξ > 0where the right-hand implication follows by Assumption 3. Market clearing implies that 
+
+Dt,k x (p∗) = St,k x . This proves the Theorem. ■
+
+# B Simulation Appendix 
+
+Here, we provide an additional simulation to support the claim that ℓ-regularity holds generically. We simulate one-hundred instances of large markets with three objects and thirteen agent types which permute all preference rankings over the three objects (we exclude the outside option for convenience; this ensures that positive prices occur semi-frequently). We set T = 3 to match aggregate supply with aggregate demand. The base arrival rates are drawn from a Dirichlet distribution with identical parameters across coordinates. Budgets and prices are set to satisfy Assumptions 1 through 4. 32 Table B.1: Perturbation Results 
+
+Metric Average Price Distance 0.012 
+
+Average % Preserved Ties 100% 
+
+Average Clearing Error 0.007 For each market instance, we simulate one-hundred perturbations of the market which adds a Dirichlet distributed shock vector scaled by ϵ to the arrival densities; we then re-normalize them to sum to one and compute the equilibrium prices. Our algorithm computes market clearing equilibria within a tolerance of 0 .01, so we set ϵ = 0 .025 to allow prices to change from the base market. In our results below, we report the infinity norm in the prices between each perturbed market and the base market. We report this distance metric as normalized by the median budget to allow for meaningful comparisons. Moreover, we also report whether or not prices that are tied in the base market remain tied in the perturbed market. Table B.1 summarizes our results. On average, prices change very little relative to budgets for small perturbations, indicating that most markets are regular. Moreover, all ties in the base market remain tied in the perturbed markets, suggesting that ℓ-regularity also holds. Finally, the average clearing error remains below our tolerance threshold, demonstrating that our algorithm is generally able to converge to an equilibrium. 33

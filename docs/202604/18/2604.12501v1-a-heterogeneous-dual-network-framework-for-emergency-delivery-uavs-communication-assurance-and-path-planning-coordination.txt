@@ -1,0 +1,1431 @@
+Title: A Heterogeneous Dual-Network Framework for Emergency Delivery UAVs: Communication Assurance and Path Planning Coordination
+
+URL Source: https://arxiv.org/pdf/2604.12501v1
+
+Published Time: Wed, 15 Apr 2026 01:42:18 GMT
+
+Number of Pages: 13
+
+Markdown Content:
+> MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 1
+
+# A Heterogeneous Dual-Network Framework for Emergency Delivery UAVs: Communication Assurance and Path Planning Coordination 
+
+Ping Huang 1, Bin Duo 1,∗, Member, IEEE, Ziedor Godfred 1, Liuwei Huo 2, Jin Ning 1, Xiaojun Yuan 2, Fellow, IEEE, 
+
+and Jun Li 3, Fellow, IEEE, 
+
+Abstract —Natural disasters often damage ground infrastructure, making unmanned aerial vehicles (UAVs) essential for emergency supply delivery. Yet safe operation in complex post-disaster environments requires reliable command-and-control (C2) links; link instability can cause loss of control, delay rescue, and trigger severe secondary harm. To provide continuous three-dimensional (3D) C2 coverage during dynamic missions, we propose a Heterogeneous Dual-Network Framework (HDNF) for safe and reliable emergency delivery. HDNF tightly couples an Emergency Communication Support Network (ECSN), formed by hovering UAV base stations, with a Delivery Path Network (DPN), formed by fast-moving delivery UAVs. The ECSN dynamically safeguards mission-critical flight corridors, while the DPN aligns trajectories with reliable coverage regions. We formulate ajoint optimization problem over task assignment, 3D UAV-BS deployment, and DPN path planning to maximize end-to-end C2 reliability while minimizing UAV flight energy consumption and base-station deployment cost. To solve this computationally intractable NP-hard problem, we develop a layered strategy with three components: (i) a multi-layer C2 service model that overcomes 2D-metric limitations and aligns UAV-BS deployment with mission-critical 3D phases; (ii) a 3D coverage-aware multi-agent reinforcement learning algorithm that addresses the high-dimensional search space and improves both training efficiency and topology resilience; and (iii) a 3D communication-aware A* planner that jointly optimizes C2 quality and flight energy, mitigating trajectory–coverage mismatch and improving routing safety. Extensive simulations show that HDNF markedly improves C2 reliability, eliminates outages in critical phases, and sustains high task success rates while reducing hardware deployment cost. 
+
+Index Terms —Emergency supply delivery, Unmanned aerial vehicles (UAVs), UAV base stations (UAV-BSs) deployment, Multi-agent reinforcement learning, Path planning. 
+
+I. I NTRODUCTION 
+
+# BIg earthquakes and typhoons are becoming increasingly frequent and severe, straining emergency response systems [1], [2]. After such disasters, ground infrastructure is often badly damaged: roads may either be broken or blocked, and Ground Base Stations (BSs) frequently fail due to power outages or physical damage. This separates the damaged zones from the outside world, turning them into ”information islands” [3], [4]. Disaster relief protocols often emphasize the first 60 minutes after a disaster, usually termed as the ”golden hour”, during  
+
+> 1Ping Huang, Bin Duo, Ziedor Godfred, and Jin Ning are with the College of Computer Science and Cyber Security, Chengdu University of Technology, Chengdu 610059, China. ∗Corresponding author (e-mail: duobin@cdut.edu.cn).
+> 2Liuwei Huo and Xiaojun Yuan are with the National Key Laboratory of Wireless Communications, University of Electronic Science and Technology of China, Chengdu 611731, China.
+> 3Jun Li is with the School of Information Science and Engineering, Southeast University, Nanjing 210096, China.
+
+which swift delivery of aid can significantly reduce death rates. When ground transport is halted, unmanned aerial vehicles (UAVs) performing short-range airdrops become a key solution [5]. UAVs are widely used for disaster delivery because of rapid deployment and high mobility [6]. Prior studies optimize delivery performance through non-linear power control [7], [8], payload constraints [9], on-demand scheduling [10], [11], and air-ground coordination with vehicles [12], [13]. However, these methods are mostly developed under favorable link conditions and typically rely on broad cellular coverage or stable Global Positioning System (GPS) links for navigation. In disaster zones, this ideal assumption often fails. When ground networks fail, steady links are not merely convenient; they are vital. Remotely operated UAVs rely on stable command and control (C2) links for telemetry, path updates, and safe obstacle avoidance [6]. Without steady links, UAVs lose timely guidance, which not only increases failure risks but also may threaten ground staff and property [14]. Therefore, it is important to set up a strong communication network to deliver emergency supplies safely. Recent work uses UAV-BSs to rapidly restore connectivity in disaster areas through temporary aerial networks [4], [15]. Proper hovering altitude can improve LoS availability and reduce blockage [16]. However, most existing UAV-BS deploy-ment methods target ground users [3], [17]. When applied to moving delivery UAVs, base-station placement directly affects route feasibility: partial or static coverage can leave mission-critical phases (cargo drop, takeoff/landing, and cruise) exposed to C2 blind spots. Effective coordination between UAV-BSs and delivery UAVs in such dynamic scenarios remains underexplored. Most existing UAV-BS placement methods optimize service for fixed or slow-varying ground nodes (e.g., survivors or sensors) using fixed demand maps or slowly varying CSI [18]– [23]. In contrast, disaster logistics involves fast-moving aerial nodes with task-driven trajectories and strict site constraints. If UAV-BSs are deployed mainly for ground 2D coverage, communication gaps are likely along delivery corridors. Unlike ground users, delivery UAVs require continuous 3D con-nectivity (horizontal and vertical) from takeoff to landing. Consequently, prior static-coverage planning and full-prior-data optimization tools (e.g., MILP, convex optimization, and genetic algorithms) adapt poorly to this coupled problem. A joint 3D deployment–trajectory framework is therefore needed to ensure end-to-end C2 coverage. In this paper, we propose a Heterogeneous Dual-Network Framework (HDNF) that jointly designs an Emergency Com- 
+
+> arXiv:2604.12501v1 [cs.IT] 14 Apr 2026 MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 2
+
+munication Support Network (ECSN) and a Delivery Path Network (DPN). The ECSN consists of hovering UAV-BSs that provide a temporary C2 backbone, while the DPN consists of delivery UAVs executing 3D supply routes. Coordination is achieved by deploying ECSN nodes along mission corridors and planning DPN trajectories within reliable coverage regions. We formulate a joint optimization problem over UAV-BS placement and delivery-UAV 3D path planning to maximize C2 reliability while minimizing flight energy and deployment cost under power and link constraints. To solve this coupled problem, we develop the following key components: (i) We propose a multi-layer C2 service model to address the limitation of traditional 2D coverage models in capturing the dynamic 3D communication requirements of delivery UAVs. The model maps spatial communication demand to distinct operational phases, including terminal supply delivery, vertical takeoff/landing, and high-speed cruise corridors. It provides a quantitative characterization of C2 link availability in 3D space and guides UAV-BS deployment to align with mission-critical flight phases rather than only ground coverage. (ii) We develop a 3D coverage-aware multi-agent reinforce-ment learning algorithm (3DCA-MATD3 with PER) to address the high-dimensional search space and computa-tional bottleneck of UAV-BS placement in post-disaster scenarios. By using a shared backbone for global topolog-ical feature extraction and a prioritized experience replay mechanism for high-value sampling, the method improves training efficiency and deployment quality. In addition, by reformulating backhaul-connectivity evaluation with graph-theoretic metrics, the method avoids inefficient traversal-based checks and improves the resilience of the resulting UAV-BS topology. (iii) We develop a 3D communication-aware A* path-planning algorithm to reduce the risk of delivery UAVs entering communication dead zones. By integrating C2 link quality and flight energy consumption into a unified trajectory cost, the planner steers UAVs toward communication-reliable regions and mitigates trajectory–coverage mis-match, thereby improving routing safety under communi-cation constraints. Extensive simulations show that the proposed HDNF con-sistently outperforms representative baselines in both C2 link reliability and resource efficiency. The results confirm that 3D coverage-aware ECSN deployment effectively removes communication blind spots, enabling the DPN to generate safer and more energy-efficient 3D trajectories without excessive detours. Notably, this dual-network coordination satisfies stringent C2 requirements across all mission-critical phases, especially during the highly dynamic vertical takeoff/landing and high-altitude cruise segments. As the disaster area expands, HDNF maintains a 100% task success rate with zero C2 outages while reducing UAV-BS deployment requirements by up to 20% compared with conventional static deployments. II. S YSTEM MODEL FOR HDNF This section presents the system model of the proposed HDNF. The framework coordinates the ECSN and DPN to 
+
+Fig. 1: System model. enable emergency supply delivery in disaster scenarios. In our model, the ECSN deploys UAV-BSs to provide temporary C2 connectivity, while the DPN plans delivery-UAV schedules and routes for emergency-supply requests under such connectivity support. As illustrated in Fig. 1, we study emergency supply delivery over a disaster region Ω ⊂ R3. Delivery destinations are denoted by T = {1, 2, . . . , T task }, where Ttask is the number of tasks. The system adopts a heterogeneous architecture of delivery UAVs and UAV-BSs. Delivery UAVs, indexed by 
+
+UD = {1, 2, . . . , U D }, depart from a central depot and follow planned routes to serve T . Each UAV-BS b ∈ U B is fixed at 
+
+qb = ( xb, y b, h b) with altitude constraint hb ∈ [hmin , h max ].The ECSN aims to build a resilient aerial-to-aerial (A2A) mesh that maintains reliable C2 links for delivery UAVs throughout the disaster area. 
+
+A. ECSN Model 
+
+Given the complex post-disaster environment, A2A links are vulnerable to blockage by high-rise obstacles. We therefore adopt a probabilistic channel model driven by LoS probability. For any aerial node pair (e.g., UAV-BS b and delivery UAV u,or UAV-BS b′), the slot-n 3D distance is db,u,n = ∥qb − pu,n ∥,where pu,n = ( xu,n , y u,n , z u,n ) is the instantaneous position of delivery UAV u. Let θb,u,n denote their slot-n elevation angle. In degrees, it is 
+
+θb,u,n = 180 
+
+π arcsin 
+
+ |hb − zu,n |
+
+db,u,n 
+
+
+
+. (1) The LoS probability PLoS is modeled as a sigmoid of elevation angle: 
+
+PLoS (θb,u,n ) = 11 + α exp   − β(θb,u,n − α) , (2) where α and β are environment-dependent constants reflecting the density of obstacles. The total path loss includes free-space path loss (FSPL) and environment-induced excess attenuation. FSPL in decibels (dB) is 
+
+LFSPL (db,u,n ) = 20 log 10 (db,u,n ) + 20 log 10 (f (Hz)  
+
+> c
+
+)+ 20 log 10 
+
+ 4πc0
+
+
+
+, (3) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 3
+
+where f (Hz)  
+
+> c
+
+is carrier frequency (Hz) and c0 is the speed of light. If frequency is given in GHz, we convert it by f (Hz)  
+
+> c
+
+=
+
+f (GHz)  
+
+> c
+
+× 10 9.Using channel statistics, the slot-n average path loss ¯Lb,u,n 
+
+is written as the weighted sum of LoS and non-line-of-sight (NLoS) terms: 
+
+¯Lb,u,n = LFSPL (db,u,n ) + PLoS (θb,u,n )ηLoS 
+
++ 1 − PLoS (θb,u,n )ηNLoS , (4) where ηLoS and ηNLoS are the mean additional losses (dB) for LoS and NLoS links, respectively. The slot-n average received power from b to u is 
+
+Pb,u,n = P (lin)  
+
+> t
+
+· 10 − ¯Lb,u,n /10 , (5) where P (lin)  
+
+> t
+
+= 10 (P (dBm)   
+
+> t−30) /10
+
+is the UAV-BS transmit power in Watts. The aggregated interference at delivery UAV u in slot n is 
+
+Iu,n = X 
+
+> b′∈U B\{ b}
+
+Pb′,u,n , (6) and the corresponding signal-to-interference-plus-noise ratio (SINR) is 
+
+SINR b,u,n = Pb,u,n 
+
+N (lin)  
+
+> 0
+
+B + Iu,n 
+
+, (7) where N (lin)  
+
+> 0
+
+= 10 (N (dBm/Hz)   
+
+> 0−30) /10
+
+is noise power spectral density (W/Hz), and B is system bandwidth. If a SINR threshold is specified in dB, we convert it as Γ(lin) = 10 Γ(dB) /10 
+
+before feasibility checks. To characterize ECSN topology, we model slot-n backhaul as an undirected graph Gn = ( V, En), where V = UB ∪ { 0}
+
+includes all UAV-BSs and the central depot (node 0). For any distinct j, k ∈ V , (j, k ) is a candidate backhaul link. Using the same propagation/interference model as Eq. (7), we compute directional qualities SINR j→k,n and SINR k→j,n and enforce reciprocity: (j, k ) is feasible only if both directions satisfy Γbh ,i.e., min(SINR j→k,n , SINR k→j,n ) ≥ Γbh .Accordingly, connectivity is encoded by adjacency matrix 
+
+An ∈ { 0, 1}|V|×|V| , whose entries are 
+
+aj,k,n =
+
+(
+
+1, if j̸ =k, 
+
+> min(SINR j→k,n ,SINR k→j,n )≥Γbh
+
+,
+
+0, otherwise . (8) To quantify local connectivity, we compute node degree. For each j ∈ V in slot n, degree dj,n equals the number of feasible incident backhaul links: 
+
+dj,n = X
+
+> k∈V
+
+aj,k,n . (9) This gives the diagonal degree matrix Dn =
+
+diag (d1,n , d 2,n , . . . , d |V| ,n ).We then construct Laplacian matrix Ln ∈ Z|V|×|V| as Ln =
+
+Dn − An, with entries 
+
+lj,k,n =
+
+
+
+dj,n , if j = k, 
+
+−1, if j̸ = k and aj,k,n = 1 ,
+
+0, otherwise .
+
+(10) 
+
+Fig. 2: Comparison of different network topologies. A higher algebraic connectivity indicates a robust mesh network rather than a fragile chain. As illustrated in Fig. 2, binary connectivity (path existence only) is insufficient for safety-critical disaster missions; struc-tural robustness to link failures is also required. We therefore use algebraic connectivity, i.e., the second-smallest eigenvalue of the Laplacian, denoted by λ2(Ln).From spectral graph theory, λ2(Ln) > 0 guarantees full connectivity. Beyond feasibility, a larger λ2(Ln) indicates stronger robustness and fewer topological bottlenecks. We thus define a continuous connectivity utility that captures both feasibility and robustness: 
+
+Cconn ,n = min 
+
+
+
+1, λ2(Ln)
+
+λreq 
+
+
+
+, (11) where λreq is the target robustness level. Under deployment 
+
+Q, we use the worst-slot utility Cconn (Q) ≜ min n Cconn ,n (Q),which drives optimization toward resilient mesh formation. 
+
+B. DPN Model 
+
+Each delivery UAV u and each UAV-BS b have a maximum flight speed vmax  
+
+> D
+
+, each delivery UAV u has a maximum cruise altitude hcruise , and a maximum payload capacity W max  
+
+> u
+
+. For tractable modeling, the trajectory of UAV u is discretized into waypoints. UAV u serves a task subset Tu ⊆ T , and its trajectory is represented as 
+
+Pu = {pu, 0, pu, 1, . . . , pu,n u }. (12) where nu is the index of the final waypoint (i.e., the trajectory contains nu + 1 waypoints from index 0 to nu). The total accumulated flight distance of UAV u is 
+
+Lu =
+
+> nu−1
+
+X
+
+> i=0
+
+∥pu,i +1 − pu,i ∥ (13) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 4
+
+For delivery UAV u, cruise-phase energy consumption is modeled by a widely used linear form for tractable optimization [24]: 
+
+Eu = ηL u
+
+X
+
+> t∈T u
+
+wt, (14) where η (J/(m ·kg)) denotes the average payload-aware energy coefficient and wt is the payload weight associated with task 
+
+t.To ensure mission feasibility, each delivery UAV must satisfy 
+
+Eu ≤ Emax  
+
+> u
+
+, X
+
+> t∈T u
+
+wt ≤ W max  
+
+> u
+
+, (15) where Emax  
+
+> u
+
+represents the onboard battery energy budget. Each task t ∈ T is described by horizontal coordinates 
+
+(xt, y t) ∈ Ω ⊂ R2, corresponding 3D coordinates ℓt =(xt, y t, 0) ∈ R3, and a service window [at, b t], where at and bt
+
+are the earliest and latest expected arrival times. For delivery UAV u, let tu ∈ T u denote a local task index and let τu,t u be the arrival time at task tu. Then, 
+
+atu ≤ τu,t u ≤ btu , ∀tu ∈ T u. (16) Task assignment enforces that each task is served exactly once by one delivery UAV: 
+
+X
+
+> u∈U D
+
+xu,t = 1 , ∀t ∈ T , (17) where xu,t ∈ { 0, 1} is a binary decision variable; xu,t = 1 
+
+indicates that UAV u is assigned to global task t, and xu,t = 0 
+
+otherwise. Finally, each delivery trajectory must start from and return to the depot: 
+
+pu, 0 = pu,n u = pcenter , ∀u ∈ U D , (18) where pcenter represents the coordinates of the command center and depot, pcenter = ( xc, y c, 0) .
+
+C. Multi-Layer C2 Service Model 
+
+Conventional UAV-BS deployment is usually optimized by ground-centric 2D metrics, which mismatch the dynamic 3D C2 requirements of delivery UAVs. A complete mission includes terminal delivery, vertical takeoff/landing, and high-altitude cruise, and each phase has different C2 vulnerabilities. A single aggregated metric can therefore hide phase-specific blind spots. To address this, we build a multi-layer C2 service model that quantifies phase-dependent communication quality and aligns ECSN deployment with actual DPN trajectories. For each sampled point x ∈ R3, we define a binary C2-feasibility indicator and a normalized Shannon-capacity metric: 
+
+I(x) = I
+
+
+
+max 
+
+> b∈U B
+
+SINR( x, b ) ≥ Γctrl 
+
+
+
+,
+
+˜C(x) = min 1, log 2
+
+ 1 + max b∈U B SINR( x, b )
+
+Cmax 
+
+!
+
+,
+
+(19) where Γctrl is the minimum C2 SINR threshold and Cmax 
+
+is a normalization constant for spectral efficiency. Eq. (19) determines whether a point is C2-feasible and, if feasible, how strong its C2 quality is. 
+
+Fig. 3: Phase transition of the system-level coordinated C2 metric under varying layer weights (ωt, ω v , ω c).To capture phase heterogeneity, we construct three sampling sets: 1) Terminal layer (St): 
+
+St = {ℓt | t ∈ T } , (20) which contains all terminal service locations. 2) Vertical layer (Sv ): for each task location ℓt = ( xt, y t, 0) ,vertical samples are 
+
+x(v) 
+
+> t,m
+
+= ( xt, y t, h m),hm = h(v)min + m∆h, m = 0 , . . . , M v . (21) and Sv = {x(v)
+
+> t,m
+
+}.3) Corridor layer (Sf ): for each task t, we sample points on the nominal depot-to-task cruise corridor at altitude 
+
+hcruise :
+
+x(f ) 
+
+> t,k
+
+=
+
+
+
+xc + kKt
+
+(xt − xc),yc + kKt
+
+(yt − yc), h cruise 
+
+
+
+,k = 0 , . . . , K t,
+
+(22) and Sf = {x(f ) 
+
+> t,k
+
+}.Here, h(v)min is the vertical sampling start altitude, ∆h is the vertical sampling interval, Mv is the number of vertical sampling intervals per task, and Kt controls corridor sampling density. Based on these sets, we compute the per-layer coverage ratio and average normalized capacity: 
+
+Cterm = 1
+
+|S t|
+
+X
+
+> x∈S t
+
+I(x), ¯Ct = 1
+
+|S t|
+
+X
+
+> x∈S t
+
+˜C(x),Cvert = 1
+
+|S v |
+
+X
+
+> x∈S v
+
+I(x), ¯Cv = 1
+
+|S v |
+
+X
+
+> x∈S v
+
+˜C(x),Ccorr = 1
+
+|S f |
+
+X
+
+> x∈S f
+
+I(x), ¯Cc = 1
+
+|S f |
+
+X
+
+> x∈S f
+
+˜C(x).
+
+(23) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 5
+
+We then define the system-level coordinated C2 service metric as 
+
+¯Csyn = ωt ¯Ct + ωv ¯Cv + ωc ¯Cc, (ωt + ωv + ωc = 1) . (24) where (ωt, ω v , ω c) are phase-importance weights. As shown in Fig. 3, the coordinated C2 metric exhibits clear phase transitions under different weight settings. The three vertices of the ternary plot correspond to extreme single-phase optimization (e.g., terminal-only or corridor-only), which inevitably weakens communication integrity in neglected phases. In contrast, the HDNF setting balances heterogeneous 3D demands and reduces phase-specific blind spots. Therefore, this multi-layer C2 model directly serves as a reward-shaping signal for subsequent multi-agent reinforcement learning (MARL). By embedding ¯Csyn into the objective, the algorithm penalizes redundant terminal-only coverage and incentivizes robust C2 support along dynamic 3D flight corridors. III. P ROBLEM FORMULATION 
+
+In this section, the dual network coordination problem is formulated as a joint optimization problem of task assignment, ECSN deployment, and DPN trajectory planning. The objective is to solve the problem of interdependence between C2 communication coverage and flight trajectory feasibility. The problem is subject to the following three sets of decision variables:  
+
+> •
+
+Task assignment X: The binary assignment matrix X =
+
+{xu,t } ∈ { 0, 1}UD ×Ttask , where each xu,t ∈ { 0, 1} is a scalar indicator denoting whether delivery UAV u ∈ U D
+
+is assigned to task t ∈ T . 
+
+> •
+
+ECSN deployment Q: The 3D coordinate set Q = {qb |
+
+b ∈ U B }, determining the topology of the aerial C2 backbone.  
+
+> •
+
+DPN trajectories P: The delivery trajectory set P =
+
+{P u | u ∈ U D }, representing the ordered waypoints of each delivery mission. Therefore, we formulate the following optimization problem: 
+
+min  
+
+> X,Q,P
+
+ωd card( Q) + ωe
+
+X
+
+> u∈U D
+
+Eu
+
+− (γtCterm + γv Cvert + γcCcorr ) ,
+
+s.t. (15) , (16) , (17) , (18) ,Cconn (Q) ≥ 0.5,hmin ≤ hb ≤ hmax , ∀qb ∈ Q
+
+(25) 
+
+card( Q) denotes the number of deployed UAV-BSs. The coefficients ωd and ωe weight the deployment cost and the aggregate flight energy P 
+
+> u∈U D
+
+Eu, respectively. Problem (25) is a mixed-integer nonlinear program (MINLP) and is NP-hard. Its main difficulty is variable coupling: Q
+
+must match the spatiotemporal demand induced by P, while trajectory feasibility depends on the C2 coverage provided by 
+
+Q. The nonconvex A2A channel model and discrete structure of X further make conventional optimization computationally prohibitive. We therefore adopt a MARL-driven hierarchical decomposition to decouple variables and efficiently explore the high-dimensional mixed-variable space (Section IV). IV. MARL-B ASED HIERARCHICAL DECOMPOSITION 
+
+SCHEME 
+
+This section presents the MARL-based hierarchical decom-position scheme for Problem (25), as illustrated in Fig. 4. Specifically, for Problem (25), we hierarchically decompose the original problem into two coordinated sub-problems: 1) a task-assignment and ordering sub-problem, and 2) an ECSN deployment and DPN trajectory-refinement sub-problem. 
+
+A. Problem Division 
+
+When the task sequence assigned to delivery UAV u is denoted by Tu = {tu, 1, . . . , t u, |T u|}, the corresponding flight distance is calculated as follows: 
+
+˜Lu = ∥pcenter − ℓtu, 1 ∥
+
++
+
+> |T u|− 1
+
+X
+
+> k=1
+
+∥ℓtu,k +1 − ℓtu,k ∥
+
++ ∥ℓtu, |T u| − pcenter ∥.
+
+(26) Correspondingly, its flight energy consumption is ˜Eu =
+
+η ˜Lu
+
+P 
+
+> t∈T u
+
+wt.Based on the above derivation, we formulate the delivery-UAV task assignment and ordering sub-problem as follows: 
+
+min 
+
+> X,{T u}u∈U D
+
+ωe
+
+X
+
+> u∈U D
+
+˜Eu
+
+s.t. ˜Eu ≤ Emax  
+
+> u
+
+, ∀u ∈ U D ,
+
+(15) , (16) , (17) , (18) ,xu,t ∈ { 0, 1}, ∀u ∈ U D , ∀t ∈ T .
+
+(27) Given X∗ and {T ∗ 
+
+> u
+
+}u∈U D , the second sub-problem for ECSN deployment and DPN trajectory refinement is formulated as: 
+
+min  
+
+> P,Q
+
+ωd card( Q) + ωe
+
+X
+
+> u∈U D
+
+Eu(Pu)
+
+− (γtCterm + γv Cvert + γcCcorr ) ,
+
+s.t. Eu(Pu) ≤ Emax  
+
+> u
+
+, ∀u ∈ U D ,Cconn (Q) ≥ 0.5,hmin ≤ hb ≤ hmax , ∀qb ∈ Q.
+
+(18) .
+
+(28) 
+
+B. Stage One: Task Assignment and Ordering 
+
+For solving Problem (27), we propose a sequential insertion algorithm to rapidly obtain sub-optimal solutions for task assignments. The core idea is to process tasks sequentially one after the other rather than evaluating them through numerous sorting combinations. Therefore, we initialize the sorting based on the urgency level of each task (according to the time window). This yields a task sequence with urgency levels. Next, we define the following marginal cost to evaluate which delivery UAV should be assigned to which insertion position k in the current route: 
+
+∆Ju,t,k = ωe∆ ˜Eu,t + ωwait ∆Wu,t , (29) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 6
+
+Fig. 4: Proposed HDNF workflow. where ∆ ˜Eu,t = ˜Eafter  
+
+> u
+
+− ˜Ebefore  
+
+> u
+
+denotes the exact incremental payload-aware energy, with ˜Ebefore  
+
+> u
+
+= η ˜Lbefore 
+
+> u
+
+P  
+
+> i∈T before
+> u
+
+wi and 
+
+˜Eafter  
+
+> u
+
+= η ˜Lafter 
+
+> u
+
+P  
+
+> i∈T after
+> u
+
+wi. Here, ωwait is the waiting-time penalty weight in the insertion cost. 
+
+∆Wu,t = max(0 , a t − τu,t ), (30) which represents the incremental waiting-time penalty for premature arrivals. If the UAV arrives earlier than the earliest allowable service time at, it must hover and wait. Considering only marginal cost is insufficient. We must also determine whether the current insertion would violate energy or time-window constraints. If either occurs, we set 
+
+∆Ju,t,k = M∞, where M∞ is a sufficiently large infeasibility penalty constant. Finally, after traversing all delivery UAVs and all valid insertion positions k, we select the combination (u∗, k ∗) with the minimum total cost. This combination is added to the UAV’s task sequence T ∗ 
+
+> u
+
+, and the solution variables X∗ are updated. If no insertion is feasible for the current task, the algorithm terminates and reports the instance as infeasible, which is consistent with Eq. (17). The pseudocode is shown in Algorithm 1. 
+
+C. Stage Two: ECSN Deployment and DPN Trajectory Refine-ment 
+
+To efficiently solve the sub-problem formulated in Eq. (28), this stage is divided into two sequential steps, achieving an effective hierarchical decomposition of ECSN deployment and DPN trajectory planning. Specifically, we first propose a 3D coverage-aware multi-agent reinforcement learning algorithm (3D-CASB MATD3 with PER) to optimize the spatial topology of the UAV-BSs. Subsequently, based on the established communication coverage, we introduce a 3D communication-aware A* planner to refine the flight trajectories of the delivery 
+
+Algorithm 1 Sequential Insertion Heuristic for Task Assign-ment  
+
+> 1:
+
+Input: Task set T , delivery-UAV set UD . 
+
+> 2:
+
+Initialize: T ∗ 
+
+> u
+
+← ∅ and X∗ ← 0 for all u ∈ U D . 
+
+> 3:
+
+Sort tasks by urgency to form Trem ← T (according to time windows).  
+
+> 4:
+
+while Trem is not empty do  
+
+> 5:
+
+t ← Dequeue (Trem ) 
+
+> 6:
+
+Jmin ← M ∞; (u∗, k ∗) ← ∅  
+
+> 7:
+
+for all u ∈ U D and valid insertion positions k in route 
+
+T ∗ 
+
+> u
+
+do  
+
+> 8:
+
+Compute ∆Ju,t,k by Eq. (29)  
+
+> 9:
+
+if energy/time-window constraints are violated, set 
+
+∆Ju,t,k ← M ∞ 
+
+> 10:
+
+if ∆Ju,t,k < J min then  
+
+> 11:
+
+Jmin ← ∆Ju,t,k ; (u∗, k ∗) ← (u, k ) 
+
+> 12:
+
+end if  
+
+> 13:
+
+end for  
+
+> 14:
+
+if Jmin < M∞ then  
+
+> 15:
+
+Insert task t into T ∗ 
+
+> u∗
+
+at position k∗ 
+
+> 16:
+
+Update assignment matrix X∗ 
+
+> 17:
+
+else  
+
+> 18:
+
+Return infeasible (no feasible insertion exists for task t) 
+
+> 19:
+
+end if  
+
+> 20:
+
+end while  
+
+> 21:
+
+Return sub-optimal solution (X∗, {T ∗ 
+
+> u
+
+}u∈U D ).UAVs. This decoupling approach ensures effective coordination between the ECSN and the DPN. 
+
+1) 3D-CASB MATD3 with PER for ECSN Deployment: 
+
+We reformulate the UAV-BS deployment sub-problem in (28) as a Multi-Agent Markov Decision Process (MMDP), where MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 7
+
+nonconvex continuous 3D deployment is handled through sequential cooperative decisions under centralized training and decentralized execution (CTDE). 
+
+a) Multi-layer grid-map state construction: We build the communication-demand map from the multi-layer C2 model in Section II-C . Samples in St, Sf , and Sv are projected to a structured grid (rather than an unstructured 3D point list), which stabilizes policy learning (Fig. 4). Let the operational airspace be Ω ⊂ R3 with horizontal projection Ωxy ⊂ R2. We uniformly partition Ωxy into K × K cells and define 
+
+Mgrid ∈ [0 , 1] C×K×K , C = 3 , (31) where the three channels correspond to terminal service demand ( c = 1 ), cruise-corridor demand ( c = 2 ), and vertical takeoff/landing demand ( c = 3), i.e., (S(1) , S(2) , S(3) ) =(St, Sf , Sv ).For each channel c ∈ { 1, 2, 3} with sampled set S(c), and each grid index pair (r, c) ∈ { 1, . . . , K }2, let cell( r, c) ⊂ Ωxy 
+
+denote the corresponding grid cell and define the in-cell set 
+
+K(c) 
+
+> r,c
+
+= S(c) ∩ cell( r, c). (32) Using the C2-availability indicator I(·) in Eq. (19), the in-cell coverage ratio is 
+
+κ(c) 
+
+> r,c
+
+=
+
+
+
+1
+
+K(c)
+
+> r,c
+
+P
+
+> p∈K (c)
+> r,c
+
+I(p), K(c) 
+
+> r,c
+
+> 0,
+
+1, otherwise .
+
+(33) The corresponding outage-density value is 
+
+M (c)
+
+> grid
+
+[r, c] = 1 − κ(c) 
+
+> r,c
+
+. (34) Thus, each grid cell is represented by 
+
+cell( r, c) = M (1) 
+
+> grid
+
+[r, c], M (2) 
+
+> grid
+
+[r, c], M (3) 
+
+> grid
+
+[r, c]⊤ ∈ [0 , 1] 3,
+
+(35) where larger components indicate more uncovered demand in the corresponding layer. 
+
+b) Agent observation, action, and deployment set: Agent 
+
+i observes 
+
+oi = {oenv  
+
+> i
+
+, oint  
+
+> i
+
+}, (36) with 
+
+oenv  
+
+> i
+
+= {qi, hmetric , ntopo }, (37) 
+
+oint  
+
+> i
+
+= {li, vguide }. (38) Here, qi ∈ R3 is the normalized agent position, hmetric =[Cterm , C vert , C corr , C conn ] is the global scalar-metric vector, ntopo 
+
+stacks relative-position vectors of the k nearest neighbors, 
+
+li ∈ { 0, 1} is the altitude-layer indicator, and vguide ∈ R3
+
+points toward uncovered-demand directions from Mgrid .At MARL decision step t ∈ { 0, . . . , T step }, agent i outputs 
+
+a(t) 
+
+> i
+
+= v(t)
+
+> cmd ,i
+
+, g (t)
+
+> gate ,i
+
+, (39) where v(t) 
+
+> cmd ,i
+
+∈ [−1, 1] 3 is a normalized 3D motion command used to update qi, and g(t) 
+
+> gate ,i
+
+∈ [0 , 1] is a deployment-gate score that determines whether the UAV-BS candidate is retained. The position update is 
+
+q(t+1)  
+
+> i
+
+= Clip Ωxy ×[hmin ,h max ]
+
+
+
+q(t) 
+
+> i
+
++ vmax  
+
+> D
+
+v(t)
+
+> cmd ,i
+
+∆t
+
+
+
+, (40) where Clip Ωxy ×[hmin ,h max ](·) clips horizontal coordinates into 
+
+Ωxy and altitude into [hmin , h max ], and ∆t > 0 denotes the physical time interval of one MARL decision step. Agent i is activated if g(Tstep ) 
+
+> gate ,i
+
+> δ th . The final deployment is 
+
+Q = {q(Tstep ) 
+
+> b
+
+| b ∈ U B , g (Tstep ) 
+
+> gate ,b
+
+> δ th }. (41) 
+
+c) Shared-backbone MATD3 with PER: Fig. 5 shows the overall training architecture, including the shared encoder, role-aware actor branches, and twin critics under CTDE. The actor is decomposed as 
+
+hi = fθ ({oi, M grid }), ai = gφ(hi, l i), (42) where fθ is a shared encoder (Fig. 6) and gφ is a role-aware head (Fig. 7). This architecture shares spatial features across agents while preserving role-specific control behavior. Fig. 6 and Fig. 7 illustrate that the shared encoder extracts common spatial features and the role-aware head maps (hi, l i)
+
+to motion command and activation gate. At decision step t, we denote the joint state and action by 
+
+st = {Mgrid ,t, o1,t, . . . , oNBS ,t} and at = {a1,t, . . . , aNBS ,t},respectively. The reward is designed as 
+
+r(st, at) = Rvol + Rnet + Rtopo , (43) where 
+
+Rvol = γtCterm + γv Cvert + γcCcorr , (44) 
+
+Rnet = λconn Cconn + λcap 
+
+  ¯Csyn − ¯Creq 
+
+ , (45) 
+
+Rtopo = −
+
+> NBS
+
+X
+
+> i=1
+
+ X
+
+> j∈N i
+
+ηcoll exp 
+
+
+
+− ∥qi − qj ∥2
+
+δ2
+
+> safe
+
+
+
++ wh
+
+hi
+
+hmax 
+
+ .
+
+(46) Here, (γt, γ v , γ c) are phase-priority weights in Rvol ;
+
+(λconn , λ cap ) balance backhaul connectivity and capacity margin in Rnet ; and in Rtopo , Ni is the set of k nearest neighbors, ηcoll 
+
+is the collision-penalty scale, δsafe is the safety distance, and 
+
+wh regularizes altitude (with hi and hmax denoting current and maximum UAV-BS altitudes). The three terms jointly optimize coverage quality, network robustness/capacity, and geometric safety. The objective is 
+
+J(Θ) = E(st,at)∼ρπΘ
+
+
+
+> Tstep
+
+X
+
+> t=0
+
+γtr(st, at)
+
+ , (47) with Θ = {θ, φ }. The shared-encoder gradient is 
+
+∇θ J(Θ) ≈ 1
+
+NBS NBS X
+
+> i=1
+
+E(st,at)∼D 
+
+h
+
+∇ai Qϕ(st, at)
+
+· ∇ hi gφ(hi, l i) · ∇ θ fθ ({oi, t, M grid ,t})
+
+i
+
+.
+
+(48) To reduce overestimation bias, we use twin target critics. Here, j ∈ B is the sampled-transition index and k ∈ { 1, 2} is the critic index: 
+
+yj = rj + γ min  
+
+> k∈{ 1,2}
+
+Qϕ′ 
+
+> k
+
+(s′
+
+> j
+
+, a′
+
+> j
+
+), (49) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 8
+
+Fig. 5: Pre-trained 3D-CASB-MATD3 with PER architecture. 
+
+Fig. 6: Shared 3D coverage information environment encoder. 
+
+Fig. 7: Specific policy output head. and we optimize critics by PER-weighted loss 
+
+L(ϕk) = 1
+
+|B| 
+
+X
+
+> j∈B
+
+wj (yj − Qϕk (sj, aj)) 2 . (50) where wj is the importance-sampling weight. The full training loop is summarized in Algorithm 2. 
+
+2) 3D communication-aware A* planner for DPN Trajectory Refinement: Given the deployment Q∗ from Stage Two-step one and the fixed task order from Stage One, we solve for the trajectory variable P in (28). To avoid conflict with the backhaul graph Gn, we denote the A* search graph by G3D =(X3D , A3D). The horizontal plane is discretized using the same parameter K, and each cell is expanded across altitude layers in [hmin , h max ]. Each ξ ∈ X 3D is a feasible 3D cell-node, and each (ξ, ξ ′) ∈ A 3D is a feasible one-step transition. The neighborhood is 
+
+N3D (ξ) = {ξ′ ∈ X 3D | (ξ, ξ ′) ∈ A 3D }, (51) 
+
+Algorithm 2 3D Coverage-Aware Multi-Agent Deployment via MATD3 with PER 
+
+Require: Episodes Emax , horizon Tstep (max MARL decision steps), number of UAV-BSs NBS  
+
+> 1:
+
+Initialize fθ , gφ, critics Qϕ1 , Q ϕ2 , target networks, and PER buffer D 
+
+> 2:
+
+for e = 1 to Emax do  
+
+> 3:
+
+Reset environment; obtain Mgrid ,0 and {oi, 0}NBS  
+
+> i=1
+> 4:
+
+for t = 1 to Tstep do  
+
+> 5:
+
+for each agent i do  
+
+> 6:
+
+hi ← fθ ({oi, t, M grid ,t}) 
+
+> 7:
+
+ai ← gφ(hi, l i) + N (0 , σ 2) 
+
+> 8:
+
+end for  
+
+> 9:
+
+Execute joint action at; observe rt, st+1 ; store 
+
+(st, at, r t, st+1 ) in D 
+
+> 10:
+
+if update step then  
+
+> 11:
+
+Sample mini-batch B ⊂ D with PER; compute weights wj 
+
+> 12:
+
+Compute targets yj by Eq. (49)  
+
+> 13:
+
+Update Qϕ1 , Q ϕ2 via Eq. (50)  
+
+> 14:
+
+if t mod d = 0 then  
+
+> 15:
+
+Update actor parameters Θ = {θ, φ } using deterministic policy gradient  
+
+> 16:
+
+Soft-update all target networks  
+
+> 17:
+
+end if  
+
+> 18:
+
+end if  
+
+> 19:
+
+st ← st+1  
+
+> 20:
+
+end for  
+
+> 21:
+
+end for 
+
+which is the one-step reachable set from ξ in G3D .Consistent with the DPN notation in Section II-B , let Pu
+
+denote UAV-u’s path and let its cell-node representation be 
+
+bPu = {ξ0, ξ 1, . . . , ξ Nu }, where Nu is the number of one-step MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 9
+
+Algorithm 3 3D Communication-Aware A* Planner 
+
+Require: Start cell-node ξs ∈ X3D , goal cell-node ξg ∈ X3D ,deployment set Q∗
+
+1: Initialize OpenSet ← { ξs}, ClosedSet ← ∅ 
+
+2: Initialize path-cost-to-come g(ξs) ← 0, f (ξs) ← h(ξs), and Parent (ξs) = ∅
+
+3: for all ξ ∈ X 3D \ { ξs} do 
+
+4: g(ξ) ← ∞ , f (ξ) ← ∞ 
+
+5: end for 
+
+6: while OpenSet is not empty do 
+
+7: ξcurr ← arg min ξ∈OpenSet f (ξ)
+
+8: if ξcurr = ξg then 
+
+9: break 
+
+10: end if 
+
+11: Move ξcurr from OpenSet to ClosedSet 
+
+12: for each neighbor ξnext ∈ N 3D (ξcurr ) do 
+
+13: if ξnext ∈ ClosedSet then 
+
+14: continue 
+
+15: end if 
+
+16: Compute one-step cost by Eq. (56) at ξnext :
+
+17: S(ξnext ) ← max b∈Q∗ SINR( ξnext , b )
+
+18: if S(ξnext ) < Γctrl then continue ▷ equivalent to 
+
+Ψ = ∞
+
+19: cstep ← ωe∥ξnext − ξcurr ∥2 + λout Ψ( S(ξnext )) 
+
+20: gnew ← g(ξcurr ) + cstep 
+
+21: if gnew < g (ξnext ) then 
+
+22: Parent (ξnext ) ← ξcurr 
+
+23: g(ξnext ) ← gnew 
+
+24: f (ξnext ) ← g(ξnext ) + h(ξnext ) ▷ A* expansion score 
+
+25: Insert ξnext into OpenSet 
+
+26: end if 
+
+27: end for 
+
+28: end while 
+
+29: Reconstruct path P∗ 
+
+> u
+
+by backtracking Parent (·) from ξg
+
+30: return P∗
+
+> u
+
+transitions, ξ0 = ξs, and ξNu = ξg . We define 
+
+Jtraj (u) = 
+
+> Nu−1
+
+X
+
+> m=0
+
+ωe∥ξm+1 − ξm∥2 + λout Ψ S(ξm+1 ) ,
+
+(52) where m indexes consecutive transitions along bPu, ωe weights the motion cost, and λout weights the communication risk. The best available C2 quality at cell-node ξ is 
+
+S(ξ) = max  
+
+> b∈Q∗
+
+SINR( ξ, b ). (53) The communication penalty is 
+
+Ψ( S) = 
+
+
+
+∞, S < Γctrl ,
+
+0, S ≥ Γctrl ,Smax ≤ Γctrl + ϵΨ,
+
+max 
+
+
+
+0, Smax −SSmax −Γctrl 
+
+
+
+, S ≥ Γctrl ,Smax > Γctrl + ϵΨ,
+
+(54) where Smax = max ξ∈X 3D , b ∈Q∗ SINR( ξ, b ) denotes the maxi-mum attainable SINR under the current deployment and search space, and ϵΨ > 0 is a small safeguard. This penalty rejects outage nodes and decreases as feasible SINR increases. For path-planner search, the heuristic function is 
+
+h(ξ) = ωe∥ξ − ξg ∥2, (55) 
+
+Algorithm 4 Hierarchical HDNF 
+
+Require: Task set T ; delivery-UAV set UD ; grid map Mgrid 
+
+Require: Backhaul SINR threshold Γbh ; C2 SINR threshold 
+
+Γctrl ; pruning tolerance ϵ
+
+1: Load pre-trained 3D-CASB-MATD3 policy πΘ with pa-rameters Θ = {θ, φ }
+
+2: // Stage One: Task Assignment and Ordering 
+
+3: Rtask ← Heuristic VRPTW (T , UD , ω e, ω wait )
+
+4: if Rtask = infeasible then 
+
+5: Return infeasible (Stage One failed) 
+
+6: end if 
+
+7: (X∗, {T ∗ 
+
+> u
+
+}) ← Rtask 
+
+8: // Stage Two, Sub-step 1: ECSN Deployment via 3D-CASB-MATD3 
+
+9: Construct dual-stream state S ← BuildState ({T ∗ 
+
+> u
+
+}, M grid )
+
+10: Qinit ← Policy Inference (S, π Θ)
+
+11: Q∗ ← Qinit 
+
+12: for each UAV-BS b in Qinit (ascending coverage contribu-tion) do 
+
+13: Qtemp ← Q∗ \ { b}
+
+14: if Cconn (Qtemp ) = 1 and ¯Csyn (Qtemp ) ≥ ¯Csyn (Qinit ) − ϵ
+
+then 
+
+15: Q∗ ← Qtemp ▷ Prune while preserving robustness target 
+
+16: end if 
+
+17: end for 
+
+18: // Stage Two, Sub-step 2: DPN Trajectory Refinement 
+
+19: P∗ ← ∅ 
+
+20: for each delivery UAV u ∈ U D do 
+
+21: P∗ 
+
+> u
+
+← ∅ 
+
+22: if |T ∗ 
+
+> u
+
+| = 0 then 
+
+23: P∗ 
+
+> u
+
+← { pcenter }
+
+24: else 
+
+25: Build waypoint sequence Wu =[pcenter , ℓtu, 1 , . . . , ℓtu, |T ∗  
+
+> u|
+
+, pcenter ]
+
+26: for r = 1 to |W u| − 1 do 
+
+27: (ξs, ξ g ) ← MapTo3DCellNodes (Wu[r], Wu[r+1]) 
+
+28: P∗ 
+
+> u,r
+
+← CommAware A* (ξs, ξ g , Q∗)
+
+29: P∗ 
+
+> u
+
+← Concat (P∗
+
+> u
+
+, P∗ 
+
+> u,r
+
+)
+
+30: end for 
+
+31: end if 
+
+32: P∗ ← P∗ ∪ {P ∗
+
+> u
+
+}
+
+33: end for 
+
+34: Return joint solution (X∗, Q∗, P∗)
+
+To connect with the Stage Two subproblem in Eq. (28), we define the edge cost induced by Eq. (52) as 
+
+c(ξ, ξ ′) = ωe∥ξ′ −ξ∥2 +λout Ψ( S(ξ′)) , (ξ, ξ ′) ∈ A 3D . (56) Then the dynamic recursion of the realized path cost is 
+
+g(ξ′) = min 
+
+> ξ:( ξ,ξ ′)∈A 3D
+
+[g(ξ) + c(ξ, ξ ′)] , g(ξs) = 0 , (57) and the A* evaluation score is 
+
+f (ξ) = g(ξ) + h(ξ). (58) MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 10 
+
+Algorithm 3 summarizes the planner. Thus, Stage Two-(2) solves the trajectory subproblem in Eq. (28) by minimizing 
+
+Jtraj through A* expansion with f (ξ) = g(ξ) + h(ξ).
+
+D. Algorithm Overview 
+
+Algorithm 4 summarizes the complete HDNF inference pipeline and is consistent with the stage decomposition in Section IV. The pipeline first executes Stage One (task assignment and ordering). If Stage One is infeasible, the procedure terminates and returns infeasible; otherwise, it outputs (X∗, {T ∗ 
+
+> u
+
+}).Stage Two is then executed in two sequential sub-steps corresponding to the two subsubsections under Stage Two. First, the ECSN-deployment sub-step uses the ordered tasks together with the communication-demand cues in Mgrid to infer an initial deployment Qinit . A pruning step then refines Qinit 
+
+into Q∗ while preserving the target robustness level ( Cconn = 1 )and maintaining synchronized C2 performance within tolerance 
+
+ϵ.Second, the DPN-trajectory-refinement sub-step is performed based on Q∗. For each delivery UAV, if no task is assigned, a depot-only trajectory is returned; otherwise, the ordered mission waypoints are decomposed into consecutive waypoint pairs, each pair is solved by the communication-aware A* planner, and the resulting local paths are concatenated to form the final 3D route. Collecting all refined trajectories yields P∗ and completes the coordinated output (X∗, Q∗, P∗).V. E XPERIMENTS AND RESULTS 
+
+This section evaluates the advantages of the proposed HDNF in communication-coverage quality and training efficiency, and further highlights the importance of the multi-layer C2 service model. We compare against the following schemes: 1) Proposed (HDNF): ECSN deployment is optimized using the 3D-CASB MATD3 with PER algorithm integrated with the multi-layer C2 service model, and DPN routing is solved by the proposed 3D communication-aware A* planner. 2) MATD3-2D (2D-Only): ECSN deployment is optimized by MATD3 using only conventional 2D ground-task coverage, while DPN routing is solved by the same 3D communication-aware A* planner. 3) MADDPG: ECSN deployment is optimized by the conventional MADDPG algorithm, while DPN routing is solved by the same 3D communication-aware A* planner. 4) Grid Deployment: ECSN deployment uses a static grid-based deployment strategy, while DPN routing is solved by the same 3D communication-aware A* planner. 5) Ablation w/o PER: ECSN deployment uses the proposed framework but removes the PER mechanism. 6) Ablation w/o Shared Backbone: ECSN deployment uses the proposed framework but removes the Shared Backbone architecture, so each agent extracts environmental features independently. All simulation parameters and hyperparameter settings are summarized in Table I. For reproducibility, task payloads are sampled i.i.d. as wt ∼ U [0 .5, 1.5] kg and then fixed across TABLE I: Simulation Parameters and Hyperparameter Settings                                                                                                                                              
+
+> Parameter Symbol Value
+> Environment & Kinematics
+> Target Area Dimension Ω{3000 ,3500 , . . . , 5000 }2m2
+> Central Depot Location pcenter (200 ,100 ,0)
+> Number of Delivery UAVs UD7
+> Maximum Number of UAV-BSs NBS 15 ,20 ,25 ,30 ,35
+> Delivery-UAV Cruise Altitude hcruise 100 mUAV-BS Altitude Range [hmin , h max ][30 ,200] mEach UAV Maximum Flight Speed vmax
+> D20 m/s Number of Delivery Tasks Ttask 30
+> Maximum Payload Capacity Wmax
+> u15 kg Delivery UAV Battery Capacity Emax
+> u10000 kJ Flight-Energy Consumption Coefficient
+> η500 J/(m ·kg)
+> Multi-Layer C2 Sampling
+> Vertical Sampling Start Altitude h(v)min 0mVertical Sampling Interval ∆h10 mNumber of Vertical Sampling Intervals
+> Mv10
+> Corridor Sampling Density Factor Kt20
+> Grid Discretization Resolution K×K100 ×100
+> Collision Avoidance Radius δsafe 250 mInfeasibility Penalty Constant M∞10 10
+> Communication Model
+> Carrier Frequency fc2.4GHz Transmit Power Pt23 dBm Noise Power Spectral Density N0−174 dBm/Hz System Channel Bandwidth B10 MHz C2 Control-Link SINR Threshold (dB)
+> Γctrl 14 dB Backhaul-Link SINR Threshold (dB)
+> Γbh 12 dB Maximum Spectral Efficiency Cmax 8bps/Hz Propagation Speed c03×10 8m/s Additional Path Loss (LoS/NLoS) ηLoS , η NLoS 1.0,20 .0
+> Urban Environment Parameters from [25]
+> α, β 9.61 ,0.16
+> 3D CASB-MATD3 with PER Hyperparameters
+> Actor Learning Rate αθ1×10 −4
+> Critic Learning Rate αϕ5×10 −4
+> Replay Buffer Size |D| 1×10 6
+> Mini-Batch Size |B| 128
+> Discount Factor γ0.99
+> Target Network Soft Update Rate τsoft 0.005
+> Exploration Noise Std. Dev. σ0.2
+> Policy Update Frequency d2
+> Deployment-gate Score ggate 0.5
+> Objective & Reward Coefficients
+> Flight Energy Objective Weight ωe1.0
+> Waiting Penalty Weight ωwait 0.5
+> C2 Service Model Weights (ωt, ω v, ω c)0.3,0.3,0.4
+> Deployment Cost Objective Weight ωd0.5
+> C2 Coverage Reward Weights (γt, γ v, γ c)2.0,2.0,4.0
+> Backhaul Connectivity Reward Weight
+> λconn 5.0
+> Normalized Capacity Incentive λcap 1.0
+> Required Synchronized-Capacity Baseline
+> ¯Creq Mission-dependent Desired Robustness Level λreq 0.5
+> Collision-Penalty Scaling Factor ηcoll 50 .0
+> Altitude-Variation Penalty Weight wh0.5
+> C2 Outage Penalty Weight λout 1000 .0
+
+all compared schemes under the same random seed for each scenario. MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 11 
+
+A. Training Reward Convergence and Training Efficiency Analysis 
+
+Fig. 8: Total reward convergence. Figure 8 shows total reward trajectories over 900 training episodes. MADDPG exhibits large oscillations and unstable convergence, indicating weak coordination in high-dimensional continuous spaces. MATD3-2D (2D-Only) converges quickly but reaches the lowest asymptotic reward because it ignores 3D aerial communication demand. HDNF converges rapidly and stabilizes at the highest reward level. The two ablations confirm the contributions of both components: removing the Shared Backbone increases late-stage oscillation, while removing PER reduces early exploration efficiency and slows reward accumulation. Figure 9 reports wall-clock training time to reach the same target episode count. HDNF reduces training time by about 58.4% versus MADDPG and 39.8% versus Ablation w/o Shared Backbone. Although MATD3-2D has the shortest runtime, this speedup comes from omitting high-dimensional 3D feature extraction and is consistent with its lowest asymptotic reward in Fig. 8. Overall, the Shared Backbone improves training efficiency while preserving policy quality. 
+
+B. Analysis of the Performance of Multi-Layer C2 Service Model 
+
+To evaluate the practical value of the multi-layer C2 service model for ECSN–DPN coordination, we compare HDNF with 2D-Only under different disaster scales and SINR requirements. Figure 10 reports C2 satisfaction probabilities from 14 dB to 24 dB for three mission phases: terminal delivery (Ground), vertical takeoff/landing (Vertical), and high-altitude cruise (Flight). Under loose requirements (e.g., 14 dB), both methods provide basic coverage, though 2D-Only already lags behind. As requirements tighten (16 dB to above 20 dB), 2D-Only degrades sharply in Vertical and Flight phases, whereas HDNF remains consistently robust. The gap further widens with larger disaster areas, confirming the necessity of the multi-layer C2 model for large-scale robust deployment. 
+
+C. System-Level Scalability and Robustness Assessment of Dual-Network Coordination 
+
+To evaluate system-level scalability, Fig. 11 reports total outage slots, deployed UAV-BS count, and task success rate as the disaster area expands from 3000 × 3000 m2 to 5000 × 5000 
+
+m2. We adopt a strict failure policy: once a delivery UAV experiences a communication outage, all its remaining assigned tasks are counted as failed. 
+
+Fig. 9: Total training time to reach the target number of episodes. 
+
+Fig. 10: Probability Distribution of C2 Link Quality at Different SINR Requirements. 
+
+Fig. 11: System-level performance metrics under varying disaster area sizes. 
+
+Fig. 12: Boxplot-based statistical distributions of key perfor-mance indicators under different schemes. MADDPG and 2D-Only exhibit rapidly increasing outage slots as the area grows. Grid Deployment reaches the maximum limit of 35 UAV-BSs at 5000 × 5000 m2, yet outages still occur when key paths cross weak grid edges. In contrast, HDNF maintains zero outages across all tested scales while requiring only about 28 UAV-BSs in the largest scenario, MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 12 
+
+Fig. 13: Coverage heatmaps of UAV-BS deployment schemes in representative post-disaster areas. 
+
+Fig. 14: 3D delivery-UAV trajectories under different deployment schemes in representative post-disaster areas. corresponding to roughly 20% hardware savings. Consistently, HDNF sustains a 100% task success rate, whereas MADDPG and 2D-Only fall below 80% at large scales. These results verify that HDNF provides robust dual-network coordination with lower deployment overhead. To complement mean-level comparisons, Fig. 12 presents boxplots of task success rate, total outage slots, average successful-task delivery time, and average successful-task energy consumption. HDNF shows the best reliability profile, with success rates tightly concentrated at 1.0 and outage slots near zero, both with low dispersion. MADDPG and 2D-Only have median success rates around 0.8 and notably broader outage distributions, indicating weaker communication robustness. Grid Deployment occasionally yields slightly lower time/energy medians because dense static redundancy can create locally over-covered corridors and near-straight routes for completed tasks. However, this gain depends on substantial infrastructure over-provisioning. HDNF achieves near-comparable efficiency with far fewer UAV-BSs while eliminating outages, demonstrating a stronger balance among deployment cost, mission reliability, and execution efficiency. 
+
+D. Coordination Analysis of ECSN and DPN 
+
+To show how deployment strategies affect realized delivery behavior, we present 2D heatmaps (Fig. 13) and 3D trajectories (Fig. 14) for two representative scales ( 3000 ×3000 and 5000 ×
+
+5000 m2). Grid Deployment provides broad baseline coverage but wastes resources in task-sparse areas because of rigid uniform placement. MADDPG yields scattered UAV-BS layouts with fragmented blind zones, forcing tortuous and energy-MANUSCRIPT PREPARED FOR IEEE TRANSACTIONS ON WIRELESS COMMUNICATIONS 13 
+
+intensive detours. 2D-Only partially covers ground demand but fails to maintain continuity along 3D corridors, causing airborne C2 interruptions. In contrast, HDNF concentrates UAV-BSs around task-dense regions and key corridors, enabling near-shortest inter-task trajectories with far fewer communication-avoidance maneuvers. VI. C ONCLUSION 
+
+In post-disaster scenarios with damaged ground infrastruc-ture, emergency-delivery UAV safety depends on uninterrupted C2 links. To overcome the isolated design of communication coverage and flight feasibility, this paper proposes HDNF, which tightly coordinates ECSN deployment with DPN tra-jectory planning. Enabled by a multi-layer C2 service model, a 3D coverage-aware MARL deployment algorithm, and a communication-aware A* planner, HDNF eliminates critical C2 outages in vulnerable phases (takeoff, landing, and high-altitude cruise) while maintaining a 100% task success rate under strict constraints. As scale increases, HDNF also reduces UAV-BS hardware demand by up to 20% versus conventional static deployment, demonstrating a resilient and resource-efficient system-level solution. REFERENCES [1] Silva, Wilson R. S. et al. , “Optimization Strategies for UAV-BS Positioning in Disaster Scenarios,” IEEE Access , vol. 13, pp. 189 751– 189 761, 2025. [2] H. Zhang et al. , “A Joint Communication-Load Restoration Strategy Based on UAVs for Resilient Distribution System,” IEEE Transactions on Power Systems , vol. 40, no. 6, pp. 4797–4809, 2025. [3] S. Li et al. , “Maximizing Network Throughput in Heterogeneous UAV Networks,” IEEE/ACM Transactions on Networking , vol. 32, no. 3, pp. 2128–2142, 2024. [4] Y. Cao et al. , “UAV-Based Emergency Communications: An Iterative Two-Stage Multiagent Soft Actor–Critic Approach for Optimal Association and Dynamic Deployment,” IEEE Internet of Things Journal , vol. 11, no. 16, pp. 26 610–26 622, 2024. [5] L. Zhou et al. , “Joint Resource Allocation and Trajectory Optimization for Reliable UAV-to-Vehicle Services,” IEEE Internet of Things Journal ,vol. 11, no. 24, pp. 39 114–39 126, 2024. [6] B. Duo et al. , “Joint Path and Pick-Up Design for Connectivity-Aware UAV-Enabled Multi-Package Delivery,” IEEE Transactions on Intelligent Transportation Systems , vol. 25, no. 12, pp. 20 017–20 031, 2024. [7] M. E. Bruni et al. , “Energy Efficient UAV-Based Last-Mile Delivery: A Tactical-Operational Model With Shared Depots and Non-Linear Energy Consumption,” IEEE Access , vol. 11, pp. 18 560–18 570, 2023. [8] F. Wu et al. , “Energy Consumption Optimization for Cellular-Connected Multi-UAV Pickup and Delivery System,” IEEE Transactions on In-telligent Transportation Systems , vol. 26, no. 11, pp. 19 106–19 119, 2025. [9] G. Park et al. , “3D Multi-Trajectory and Pick-Up Optimization of UAV for Minimizing Delivery Time With Weight Restriction,” IEEE Transactions on Intelligent Transportation Systems , vol. 25, no. 11, pp. 17 562–17 573, 2024. [10] Z. Pei et al. , “Urban On-Demand Delivery via Autonomous Aerial Mobility: Formulation and Exact Algorithm,” IEEE Transactions on Automation Science and Engineering , vol. 20, no. 3, pp. 1675–1689, 2023. [11] Z. Hu et al. , “A Reinforcement Learning Method for UAV Delivery Scheduling Under Dynamic Pricing,” IEEE Transactions on Cognitive Communications and Networking , vol. 12, pp. 4105–4119, 2026. [12] G. Jingfeng et al. , “Aerial-Ground Collaborative Delivery Route Planning with UAV Energy Function and Multi-Delivery,” Journal of Systems Engineering and Electronics , vol. 36, no. 2, pp. 446–461, 2025. [13] Y. H. Cho et al. , “Multi-Criteria Coordinated Electric Vehicle-Drone Hybrid Delivery Service Planning,” IEEE Transactions on Vehicular Technology , vol. 72, no. 5, pp. 5892–5905, 2023. [14] A. Mardani et al. , “Communication-Aware UAV Path Planning,” IEEE Access , vol. 7, pp. 52 609–52 621, 2019. [15] J. Wang et al. , “Mission-Aware UAV Deployment for Post-Disaster Scenarios: A Worst-Case SAC-Based Approach,” IEEE Transactions on Vehicular Technology , vol. 73, no. 2, pp. 2712–2727, 2024. [16] Q. Zeng et al. , “3-D Deployment of UAV-BSs for Effective Communi-cation Coverage,” IEEE Internet of Things Journal , vol. 11, no. 14, pp. 25 162–25 172, 2024. [17] Y. Wang et al. , “Deep-Reinforcement-Learning-Based Placement for Integrated Access Backhauling in UAV-Assisted Wireless Networks,” 
+
+IEEE Internet of Things Journal , vol. 11, no. 8, pp. 14 727–14 738, 2024. [18] L. T. Hoang et al. , “Adaptive 3D Placement of Multiple UAV-Mounted Base Stations in 6G Airborne Small Cells With Deep Reinforcement Learning,” IEEE Transactions on Networking , vol. 33, no. 4, pp. 1989– 2004, 2025. [19] Y. Ren et al. , “Energy Efficiency Optimization for UAV Distribution and Resource Allocation in NOMA and Multi-UAV Assisted Wireless Networks,” IEEE Open Journal of the Communications Society , vol. 6, pp. 6142–6155, 2025. [20] S. Baghdady et al. , “Reinforcement Learning Placement Algorithm for Optimization of UAV Network in Wireless Communication,” IEEE Access ,vol. 12, pp. 37 919–37 936, 2024. [21] H. He et al. , “Deep Reinforcement Learning-Based Distributed 3D UAV Trajectory Design,” IEEE Transactions on Communications , vol. 72, no. 6, pp. 3736–3751, 2024. [22] L. Sun et al. , “Multi-Agent Q-Net Enhanced Coevolutionary Algorithm for Resource Allocation in Emergency Human-Machine Fusion UAV-MEC System,” IEEE Transactions on Automation Science and Engineer-ing , vol. 22, pp. 4473–4489, 2025. [23] B. Yuan et al. , “Service Time Optimization for UAV Aerial Base Station Deployment,” IEEE Internet of Things Journal , vol. 11, no. 23, pp. 38 000–38 011, 2024. [24] K. Dorling et al. , “Vehicle Routing Problems for Drone Delivery,” IEEE Transactions on Systems, Man, and Cybernetics: Systems , vol. 47, no. 1, pp. 70–85, 2017. [25] P. Huang et al. , “Dynamic dual-antenna time-slot allocation protocol for uav-aided relaying system under probabilistic los-channel,” Sensors ,vol. 25, no. 24, 2025.

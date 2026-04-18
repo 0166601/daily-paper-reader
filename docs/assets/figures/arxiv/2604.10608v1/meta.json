@@ -1,0 +1,174 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-001.webp",
+      "caption": "Table 5. Path query times for basic/none path unpacking in sequential and batch settings.",
+      "page": 25,
+      "index": 1,
+      "width": 644,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-002.webp",
+      "caption": "Table 6. Path query times for extended/none path unpacking in sequential and batch settings.",
+      "page": 25,
+      "index": 2,
+      "width": 652,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-003.webp",
+      "caption": "Table 7. Path query times for extended/basic path unpacking in sequential and batch settings.",
+      "page": 26,
+      "index": 3,
+      "width": 652,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-004.webp",
+      "caption": "Table 8. Average path overlap across queries, exploited by CTL batch processing.",
+      "page": 26,
+      "index": 4,
+      "width": 827,
+      "height": 190
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-005.webp",
+      "caption": "Table 11. Labeling size for CTL variants with no path information in 𝐿.",
+      "page": 30,
+      "index": 5,
+      "width": 652,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-006.webp",
+      "caption": "Fig. 11. Preprocessing time of CTL and CCH, and construction time of H2H.",
+      "page": 30,
+      "index": 6,
+      "width": 508,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-007.webp",
+      "caption": "Fig. 1. Framework overview: relationship to existing work; novel contributions highlighted in red.",
+      "page": 2,
+      "index": 7,
+      "width": 821,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-008.webp",
+      "caption": "Fig. 2. (left) CTL variants from different storage choices in shortcut graphs (SG) and path arrays (PA). (right) Query time vs. labeling size for these variants on large networks.",
+      "page": 2,
+      "index": 8,
+      "width": 807,
+      "height": 180
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-009.webp",
+      "caption": "Table 9. Labeling size supporting distance and path queries.",
+      "page": 29,
+      "index": 9,
+      "width": 827,
+      "height": 413
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-010.webp",
+      "caption": "Table 10. Labeling size for CTL variants with 𝑘 = 6 for extended path unpacking.",
+      "page": 29,
+      "index": 10,
+      "width": 677,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-011.webp",
+      "caption": "Table 1. Summary of 13 real-world road networks.",
+      "page": 22,
+      "index": 11,
+      "width": 631,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-012.webp",
+      "caption": "Table 2. Comparing customization time of CTL with CCH and query time for distance queries with CCH and H2H.",
+      "page": 23,
+      "index": 12,
+      "width": 827,
+      "height": 459
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-013.webp",
+      "caption": "Fig. 10. Update time analysis of DHL with varying numbers of updates for both edge cost increases and decreases, compared to the reconstruction time of DHL and the customization time of CTL.",
+      "page": 28,
+      "index": 13,
+      "width": 815,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-014.webp",
+      "caption": "Fig. 6. Parameterized labeling 𝐿𝜃𝜔 with 𝜃 = 2, where vertices at the first level are assigned the empty bitstring 𝜆.",
+      "page": 13,
+      "index": 14,
+      "width": 492,
+      "height": 400
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-015.webp",
+      "caption": "Fig. 4. An illustration of a tree hierarchy 𝐻𝐺 and tree labeling Scheme 𝐿 over 𝐺 , where vertices at the first level are assigned the empty bitstring 𝜆. We only show 𝜏 (𝑣) in place of T (𝑣) for brevity.",
+      "page": 8,
+      "index": 15,
+      "width": 631,
+      "height": 392
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-016.webp",
+      "caption": "Fig. 8. Query times across query sets of varying distances with 𝑘 = 6 for extended path unpacking.",
+      "page": 27,
+      "index": 16,
+      "width": 817,
+      "height": 403
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-017.webp",
+      "caption": "Fig. 9. Query performance under varying batch sizes with 𝑘 = 6 for extended path unpacking.",
+      "page": 27,
+      "index": 17,
+      "width": 817,
+      "height": 402
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-018.webp",
+      "caption": "Table 4. Path query times for extended path unpacking with 𝑘 = 6 in sequential and batch settings.",
+      "page": 24,
+      "index": 18,
+      "width": 642,
+      "height": 419
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-019.webp",
+      "caption": "Table 3. Comparing path query times for basic path unpacking in sequential and batch settings with CCH and H2H.",
+      "page": 24,
+      "index": 19,
+      "width": 827,
+      "height": 446
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-020.webp",
+      "caption": "Fig. 5. (a) An illustration of shortcut graph scheme; (b) Shortcut graph scheme after customization.",
+      "page": 9,
+      "index": 20,
+      "width": 631,
+      "height": 251
+    },
+    {
+      "url": "assets/figures/arxiv/2604.10608v1/fig-021.webp",
+      "caption": "Fig. 12. Query performance of extended path unpacking variant of CTL using varying valley-path lengths 𝑘 .",
+      "page": 31,
+      "index": 21,
+      "width": 817,
+      "height": 403
+    }
+  ]
+}
