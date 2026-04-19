@@ -6,76 +6,73 @@
 </div>
 
 ## 每次日报
-- 最新运行日期：2026-04-18
-- 运行时间：2026-04-18 19:35:43 UTC
+- 最新运行日期：2026-04-19
+- 运行时间：2026-04-19 19:39:17 UTC
 - 运行状态：成功
-- 本次总论文数：18
-- 精读区：7
+- 本次总论文数：17
+- 精读区：6
 - 速读区：11
 
 ### 今日简报（AI）
-今日聚焦空地协同即时配送，深度解析了获满分评价的 TriDeliver 调度框架等 18 篇前沿成果。
-核心结论指出，整合无人机、快递员与众包车辆的协同模式是突破物流瓶颈的关键，同时动态约束下的多机器人博弈与定价策略表现亮眼。
-建议优先研读 TriDeliver 的协同机制，并关注如何利用定价手段优化在线匹配效率。
-- 详情：[/202604/18/README](/202604/18/README)
+今日精选17篇前沿论文，深度聚焦实时车辆调度与跨场景路径规划的智能化突破。
+重点关注多目标偏好自适应调度算法及联邦学习在提升路径规划泛化性上的卓越表现。
+建议关注扩散强化学习与不确定性决策框架，探索复杂物流场景下的端到端优化新路径。
+- 详情：[/202604/19/README](/202604/19/README)
 
 ### 精读区论文标签
-1. [{\sf TriDeliver}: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/18/2604.09049v1-sf-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
-   标签：评分：10.0/10、query:profile-1
-   evidence：无人机与地面车辆协同的即时配送层级框架
-2. [TriDeliver: Cooperative Air-Ground Instant Delivery with UAVs, Couriers, and Crowdsourced Ground Vehicles](/202604/18/2604.09049v2-trideliver-cooperative-air-ground-instant-delivery-with-uavs-couriers-and-crowdsourced-ground-vehicles)  
+1. [Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching](/202604/19/2604.10664v1-preference-agile-multi-objective-optimization-for-real-time-vehicle-dispatching)  
    标签：评分：10.0/10、query:q2
-   evidence：涉及配送员和车辆的即时配送分层协作框架
-3. [Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching](/202604/18/2604.10664v1-preference-agile-multi-objective-optimization-for-real-time-vehicle-dispatching)  
-   标签：评分：10.0/10、query:q2
-   evidence：实时车辆调度的偏好敏捷多目标优化
-4. [Enhancing Cross-Problem Vehicle Routing via Federated Learning](/202604/18/2604.10652v1-enhancing-cross-problem-vehicle-routing-via-federated-learning)  
+   evidence：针对实时车辆调度的偏好敏捷多目标优化
+2. [Enhancing Cross-Problem Vehicle Routing via Federated Learning](/202604/19/2604.10652v1-enhancing-cross-problem-vehicle-routing-via-federated-learning)  
    标签：评分：9.0/10、query:profile-1
-   evidence：利用联邦学习提升车辆路径规划问题的神经组合优化泛化能力
-5. [Robust Energy-Aware Routing for Air-Ground Cooperative Multi-UAV Delivery in Wind-Uncertain Environments](/202604/18/2604.13441v1-robust-energy-aware-routing-for-air-ground-cooperative-multi-uav-delivery-in-wind-uncertain-environments)  
-   标签：评分：9.0/10、query:profile-1
-   evidence：风力不确定动态环境下卡车辅助无人机配送的在线风险敏感规划
-6. [On the Use of Iterative Problem Solving for the Traveling Salesperson Problem with Changing Time Window Constraints](/202604/18/2604.14745v1-on-the-use-of-iterative-problem-solving-for-the-traveling-salesperson-problem-with-changing-time-window-constraints)  
+   evidence：针对复杂约束车辆路径规划问题的神经组合优化
+3. [Bilevel Late Acceptance Hill Climbing for the Electric Capacitated Vehicle Routing Problem](/202604/19/2604.13013v1-bilevel-late-acceptance-hill-climbing-for-the-electric-capacitated-vehicle-routing-problem)  
+   标签：评分：9.0/10、query:q5
+   evidence：电动容量受限车辆路径问题的双层优化
+4. [Robust Energy-Aware Routing for Air-Ground Cooperative Multi-UAV Delivery in Wind-Uncertain Environments](/202604/19/2604.13441v1-robust-energy-aware-routing-for-air-ground-cooperative-multi-uav-delivery-in-wind-uncertain-environments)  
+   标签：评分：9.0/10、query:q10
+   evidence：不确定环境下卡车辅助无人机配送的在线风险敏感规划
+5. [On the Use of Iterative Problem Solving for the Traveling Salesperson Problem with Changing Time Window Constraints](/202604/19/2604.14745v1-on-the-use-of-iterative-problem-solving-for-the-traveling-salesperson-problem-with-changing-time-window-constraints)  
    标签：评分：9.0/10、query:q4
-   evidence：具有变化时间窗约束的旅行商问题
-7. [Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation](/202604/18/2604.15190v1-meituan-merchant-business-diagnosis-via-policy-guided-dual-process-user-simulation)  
+   evidence：带变化时间窗约束的旅行商问题与序列迁移
+6. [Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation](/202604/19/2604.15190v1-meituan-merchant-business-diagnosis-via-policy-guided-dual-process-user-simulation)  
    标签：评分：9.0/10、query:q2
-   evidence：美团商家业务诊断与用户模拟
+   evidence：美团商户业务诊断与用户模拟
 
 ### 速读区论文标签
-1. [On the Use of Bi-Objective Evolutionary Algorithms for the Stochastic MKP under Dynamic Constraints](/202604/18/2604.10930v1-on-the-use-of-bi-objective-evolutionary-algorithms-for-the-stochastic-mkp-under-dynamic-constraints)  
+1. [Pseudoconvex Problems in Operational Decision Systems: Algorithms for Joint Learning and Optimization](/202604/19/2604.10778v1-pseudoconvex-problems-in-operational-decision-systems-algorithms-for-joint-learning-and-optimization)  
+   标签：评分：8.0/10、query:q9
+   evidence：多目标运营决策系统的联合优化与学习
+2. [Diffusion Reinforcement Learning Based Online 3D Bin Packing Spatial Strategy Optimization](/202604/19/2604.10953v1-diffusion-reinforcement-learning-based-online-3d-bin-packing-spatial-strategy-optimization)  
+   标签：评分：8.0/10、query:q8
+   evidence：用于物流在线3D装箱问题的扩散强化学习
+3. [Deep Learning for Sequential Decision Making under Uncertainty: Foundations, Frameworks, and Frontiers](/202604/19/2604.11507v1-deep-learning-for-sequential-decision-making-under-uncertainty-foundations-frameworks-and-frontiers)  
+   标签：评分：8.0/10、query:profile-1
+   evidence：深度强化学习用于动态环境下的序列决策
+4. [Dynamic Multi-Robot Task Allocation under Uncertainty and Communication Constraints: A Game-Theoretic Approach](/202604/19/2604.11954v1-dynamic-multi-robot-task-allocation-under-uncertainty-and-communication-constraints-a-game-theoretic-approach)  
    标签：评分：8.0/10、query:q10
-   evidence：带有机会约束的随机动态资源分配变体
-2. [Dynamic Multi-Robot Task Allocation under Uncertainty and Communication Constraints: A Game-Theoretic Approach](/202604/18/2604.11954v1-dynamic-multi-robot-task-allocation-under-uncertainty-and-communication-constraints-a-game-theoretic-approach)  
-   标签：评分：8.0/10、query:q3
-   evidence：不确定性及在线任务到达下的动态多机器人任务分配
-3. [How to Use Prices for Efficient Online Matching](/202604/18/2604.12181v1-how-to-use-prices-for-efficient-online-matching)  
-   标签：评分：8.0/10、query:q3
-   evidence：针对需要立即分配的动态到达代理的在线匹配算法
-4. [A Heterogeneous Dual-Network Framework for Emergency Delivery UAVs: Communication Assurance and Path Planning Coordination](/202604/18/2604.12501v1-a-heterogeneous-dual-network-framework-for-emergency-delivery-uavs-communication-assurance-and-path-planning-coordination)  
-   标签：评分：8.0/10、query:q10
-   evidence：动态任务中应急配送无人机的路径规划协调
-5. [A simulation-optimization approach for fractional, profitability-oriented inventory control under service-level type constraints](/202604/18/2604.10012v1-a-simulation-optimization-approach-for-fractional-profitability-oriented-inventory-control-under-service-level-type-constraints)  
+   evidence：不确定性和时间窗约束下的动态多机器人任务分配
+5. [Traffic-Aware Domain Partitioning and Load-Balanced Inter-Domain Routing for LEO Satellite Networks](/202604/19/2604.12382v1-traffic-aware-domain-partitioning-and-load-balanced-inter-domain-routing-for-leo-satellite-networks)  
+   标签：评分：7.5/10、query:q8
+   evidence：针对随机故障下动态路由的深度强化学习与多目标优化
+6. [Safe reinforcement learning with online filtering for fatigue-predictive human-robot task planning and allocation in production](/202604/19/2604.12667v2-safe-reinforcement-learning-with-online-filtering-for-fatigue-predictive-human-robot-task-planning-and-allocation-in-production)  
+   标签：评分：7.5/10、query:profile-1
+   evidence：使用强化学习处理考虑工人福祉约束的动态任务规划与分配
+7. [A simulation-optimization approach for fractional, profitability-oriented inventory control under service-level type constraints](/202604/19/2604.10012v1-a-simulation-optimization-approach-for-fractional-profitability-oriented-inventory-control-under-service-level-type-constraints)  
    标签：评分：7.0/10、query:q9
-   evidence：物流库存与服务水平约束的仿真优化
-6. [Graph-RHO: Critical-path-aware Heterogeneous Graph Network for Long-Horizon Flexible Job-Shop Scheduling](/202604/18/2604.10073v1-graph-rho-critical-path-aware-heterogeneous-graph-network-for-long-horizon-flexible-job-shop-scheduling)  
-   标签：评分：7.0/10、query:q7
-   evidence：用于长周期柔性车间调度的图网络
-7. [Optimized Customizable Route Planning in Large Road Networks with Batch Processing](/202604/18/2604.10608v1-optimized-customizable-route-planning-in-large-road-networks-with-batch-processing)  
+   evidence：物流库存控制的随机模拟与利润导向优化
+8. [Graph-RHO: Critical-path-aware Heterogeneous Graph Network for Long-Horizon Flexible Job-Shop Scheduling](/202604/19/2604.10073v1-graph-rho-critical-path-aware-heterogeneous-graph-network-for-long-horizon-flexible-job-shop-scheduling)  
    标签：评分：7.0/10、query:profile-1
-   evidence：在大规模道路网络中针对动态条件和快速响应需求优化路径规划
-8. [Pseudoconvex Problems in Operational Decision Systems: Algorithms for Joint Learning and Optimization](/202604/18/2604.10778v1-pseudoconvex-problems-in-operational-decision-systems-algorithms-for-joint-learning-and-optimization)  
-   标签：评分：7.0/10、query:q9
-   evidence：实时决策系统的多目标公式与联合学习优化
-9. [HTNav: A Hybrid Navigation Framework with Tiered Structure for Urban Aerial Vision-and-Language Navigation](/202604/18/2604.08883v1-htnav-a-hybrid-navigation-framework-with-tiered-structure-for-urban-aerial-vision-and-language-navigation)  
-   标签：评分：6.0/10、query:q8
-   evidence：用于物流配送中空中视觉语言导航的混合模仿学习与强化学习框架。
-10. [Multi-Agent Decision-Focused Learning via Value-Aware Sequential Communication](/202604/18/2604.08944v1-multi-agent-decision-focused-learning-via-value-aware-sequential-communication)  
-   标签：评分：6.0/10、query:profile-1
-   evidence：多智能体协作与面向决策的学习以提升任务性能
-11. [Pareto Set Characterization in Constrained Multiobjective Optimization and the COBI Problem Generator *](/202604/18/2604.09131v1-pareto-set-characterization-in-constrained-multiobjective-optimization-and-the-cobi-problem-generator-)  
-   标签：评分：6.0/10、query:q9
-   evidence：约束多目标优化中的帕累托集表征
+   evidence：针对长周期调度问题的滚动时域优化与图结构依赖建模
+9. [Mix-CALADIN: A Distributed Algorithm for Consensus Mixed-Integer Optimization](/202604/19/2604.14897v1-mix-caladin-a-distributed-algorithm-for-consensus-mixed-integer-optimization)  
+   标签：评分：6.5/10、query:profile-1
+   evidence：适用于物流调度的共识混合整数优化分布式算法
+10. [RAD-2: Scaling Reinforcement Learning in a Generator-Discriminator Framework](/202604/19/2604.15308v1-rad-2-scaling-reinforcement-learning-in-a-generator-discriminator-framework)  
+   标签：评分：6.5/10、query:q8
+   evidence：针对多模态未来不确定性的运动规划强化学习
+11. [Convex Synthesis of First-Order Methods for Time-Varying Smooth Strongly Convex Optimization](/202604/19/2604.09926v1-convex-synthesis-of-first-order-methods-for-time-varying-smooth-strongly-convex-optimization)  
+   标签：评分：6.0/10、query:q10
+   evidence：动态环境下时变平滑强凸问题的优化
 
 
 <div class="dpr-home-promo-card">

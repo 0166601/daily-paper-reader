@@ -1,0 +1,679 @@
+{
+  "mode": "standard",
+  "generated_at": "2026-04-19T19:36:37.746802+00:00",
+  "stats": {
+    "mode": "standard",
+    "tag_count": 1,
+    "deep_divecandidates": 13,
+    "deep_cap": 6,
+    "deep_selected": 6,
+    "quick_candidates": 51,
+    "quick_skim_target": 11,
+    "quick_selected": 11
+  },
+  "deep_dive": [
+    {
+      "id": "2604.10664v1",
+      "source": "arxiv",
+      "title": "Preference-Agile Multi-Objective Optimization for Real-time Vehicle Dispatching",
+      "abstract": "Multi-objective optimization (MOO) has been widely studied in literature because of its versatility in human-centered decision making in real-life applications. Recently, demand for dynamic MOO is fast-emerging due to tough market dynamics that require real-time re-adjustments of priorities for different objectives. However, most existing studies focus either on deterministic MOO problems which are not practical, or non-sequential dynamic MOO decision problems that cannot deal with some real-life complexities. To address these challenges, a preference-agile multi-objective optimization (PAMOO) is proposed in this paper to permit users to dynamically adjust and interactively assign the preferences on the fly. To achieve this, a novel uniform model within a deep reinforcement learning (DRL) framework is proposed that can take as inputs users' dynamic preference vectors explicitly. Additionally, a calibration function is fitted to ensure high quality alignment between the preference vector inputs and the output DRL decision policy. Extensive experiments on challenging real-life vehicle dispatching problems at a container terminal showed that PAMOO obtains superior performance and generalization ability when compared with two most popular MOO methods. Our method presents the first dynamic MOO method for challenging \\rev{dynamic sequential MOO decision problems",
+      "authors": [
+        "Jiahuan Jin",
+        "Wenhao Zhao",
+        "Rong Qu",
+        "Jianfeng Ren",
+        "Xinan Chen",
+        "Qingfu Zhang",
+        "Ruibin Bai"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-12T14:39:41+00:00",
+      "link": "https://arxiv.org/pdf/2604.10664v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 10.0,
+      "llm_evidence_en": "Preference-agile multi-objective optimization for real-time vehicle dispatching",
+      "llm_evidence_cn": "针对实时车辆调度的偏好敏捷多目标优化",
+      "llm_evidence": "针对实时车辆调度的偏好敏捷多目标优化",
+      "canonical_evidence": "针对实时车辆调度的偏好敏捷多目标优化",
+      "llm_tldr_en": "Proposes PAMOO for real-time vehicle dispatching, allowing dynamic adjustment of objective preferences.",
+      "llm_tldr_cn": "提出PAMOO框架，支持在实时车辆调度中动态调整多目标优先级以适应市场变化。",
+      "llm_tldr": "提出PAMOO框架，支持在实时车辆调度中动态调整多目标优先级以适应市场变化。",
+      "llm_tags": [
+        "query:q2"
+      ],
+      "matched_query_tag": "query:q2",
+      "matched_query_text": "Meituan instant delivery dispatching system and algorithms",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.10652v1",
+      "source": "arxiv",
+      "title": "Enhancing Cross-Problem Vehicle Routing via Federated Learning",
+      "abstract": "Vehicle routing problems (VRPs) constitute a core optimization challenge in modern logistics and supply chain management. The recent neural combinatorial optimization (NCO) has demonstrated superior efficiency over some traditional algorithms. While serving as a primary NCO approach for solving general VRPs, current cross-problem learning paradigms are still subject to performance degradation and generalizability decay, when transferring from simple VRP variants to those involving different and complex constraints. To strengthen the paradigms, this paper offers an innovative \"Multi-problem Pre-train, then Single-problem Fine-tune\" framework with Federated Learning (MPSF-FL). This framework exploits the common knowledge of a federated global model to foster efficient cross-problem knowledge sharing and transfer among local models for single-problem fine-tuning. In this way, local models effectively retain common VRP knowledge from up-to-date global model, while being efficiently adapted to downstream VRPs with heterogeneous complex constraints. Experimental results demonstrate that our framework not only enhances the performance in diverse VRPs, but also improves the generalizability in unseen problems.",
+      "authors": [
+        "Xiangchi Meng",
+        "Jianan Zhou",
+        "Jie Gao",
+        "Yifan Lu",
+        "Yaoxin Wu",
+        "Gonglin Yuan",
+        "Yaqing Hou"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.LG"
+      ],
+      "published": "2026-04-12T13:58:47+00:00",
+      "link": "https://arxiv.org/pdf/2604.10652v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "neural combinatorial optimization for vehicle routing problems with complex constraints",
+      "llm_evidence_cn": "针对复杂约束车辆路径规划问题的神经组合优化",
+      "llm_evidence": "针对复杂约束车辆路径规划问题的神经组合优化",
+      "canonical_evidence": "针对复杂约束车辆路径规划问题的神经组合优化",
+      "llm_tldr_en": "Enhances cross-problem VRP solving using a federated learning framework for better generalizability.",
+      "llm_tldr_cn": "利用联邦学习框架增强跨问题车辆路径规划的泛化能力和求解效率。",
+      "llm_tldr": "利用联邦学习框架增强跨问题车辆路径规划的泛化能力和求解效率。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.13013v1",
+      "source": "arxiv",
+      "title": "Bilevel Late Acceptance Hill Climbing for the Electric Capacitated Vehicle Routing Problem",
+      "abstract": "This paper tackles the Electric Capacitated Vehicle Routing Problem (E-CVRP) through a bilevel optimization framework that handles routing and charging decisions separately or jointly depending on the search stage. By analyzing their interaction, we introduce a surrogate objective at the upper level to guide the search and accelerate convergence. A bilevel Late Acceptance Hill Climbing algorithm (b-LAHC) is introduced that operates through three phases: greedy descent, neighborhood exploration, and final solution refinement. b-LAHC operates with fixed parameters, eliminating the need for complex adaptation while remaining lightweight and effective. Extensive experiments on the IEEE WCCI-2020 benchmark show that b-LAHC achieves superior or competitive performance against eight state-of-the-art algorithms. Under a fixed evaluation budget, it attains near-optimal solutions on small-scale instances and sets 9/10 new best-known results on large-scale benchmarks, improving existing records by an average of 1.07%. Moreover, the strong correlation (though not universal) observed between the surrogate objective and the complete cost justifies the use of the surrogate objective while still necessitating a joint solution of both levels, thereby validating the effectiveness of the proposed bilevel framework and highlighting its potential for efficiently solving large-scale routing problems with a hierarchical structure.",
+      "authors": [
+        "Yinghao Qin",
+        "Mosab Bazargani",
+        "Edmund K. Burke",
+        "Carlos A. Coello Coello",
+        "Zhongmin Song",
+        "Jun Chen"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "math.OC"
+      ],
+      "published": "2026-04-14T17:47:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.13013v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "bilevel optimization for the Electric Capacitated Vehicle Routing Problem",
+      "llm_evidence_cn": "电动容量受限车辆路径问题的双层优化",
+      "llm_evidence": "电动容量受限车辆路径问题的双层优化",
+      "canonical_evidence": "电动容量受限车辆路径问题的双层优化",
+      "llm_tldr_en": "Presents a bilevel hill climbing algorithm for routing and charging in electric vehicle fleets.",
+      "llm_tldr_cn": "提出了一种双层爬山算法，用于解决电动车辆路径规划与充电决策问题。",
+      "llm_tldr": "提出了一种双层爬山算法，用于解决电动车辆路径规划与充电决策问题。",
+      "llm_tags": [
+        "query:q5"
+      ],
+      "matched_query_tag": "query:q5",
+      "matched_query_text": "vehicle routing problem with stochastic requests",
+      "matched_requirement_id": "req-5",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.13441v1",
+      "source": "arxiv",
+      "title": "Robust Energy-Aware Routing for Air-Ground Cooperative Multi-UAV Delivery in Wind-Uncertain Environments",
+      "abstract": "Ensuring energy feasibility under wind uncertainty is critical for the safety and reliability of UAV delivery missions. In realistic truck-drone logistics systems, UAVs must deliver parcels and safely return under time-varying wind conditions that are only partially observable during flight. However, most existing routing approaches assume static or deterministic energy models, making them unreliable in dynamic wind environments. We propose Battery-Efficient Routing (BER), an online risk-sensitive planning framework for wind-sensitive truck-assisted UAV delivery. The problem is formulated as routing on a time dependent energy graph whose edge costs evolve according to wind-induced aerodynamic effects. BER continuously evaluates return feasibility while balancing instantaneous energy expenditure and uncertainty-aware risk. The approach is embedded in a hierarchical aerial-ground delivery architecture that combines task allocation, routing, and decentralized trajectory execution. Extensive simulations on synthetic ER graphs generated in Unreal Engine environments and quasi-real wind logs demonstrate that BER significantly improves mission success rates and reduces wind-induced failures compared with static and greedy baselines. These results highlight the importance of integrating real-time energy budgeting and environmental awareness for UAV delivery planning under dynamic wind conditions.",
+      "authors": [
+        "Tianshun Li",
+        "Hongliang Lu",
+        "Yanggang Sheng",
+        "Zhongzhen Wang",
+        "Haoang Li",
+        "Xinhu Zheng"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-04-15T03:43:18+00:00",
+      "link": "https://arxiv.org/pdf/2604.13441v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "online risk-sensitive planning for truck-assisted UAV delivery under uncertainty",
+      "llm_evidence_cn": "不确定环境下卡车辅助无人机配送的在线风险敏感规划",
+      "llm_evidence": "不确定环境下卡车辅助无人机配送的在线风险敏感规划",
+      "canonical_evidence": "不确定环境下卡车辅助无人机配送的在线风险敏感规划",
+      "llm_tldr_en": "Develops a battery-efficient routing framework for air-ground cooperative delivery in wind-uncertain environments.",
+      "llm_tldr_cn": "开发了一种风力不确定环境下空地协同配送的电池高效路径规划框架。",
+      "llm_tldr": "开发了一种风力不确定环境下空地协同配送的电池高效路径规划框架。",
+      "llm_tags": [
+        "query:q10"
+      ],
+      "matched_query_tag": "query:q10",
+      "matched_query_text": "stochastic and dynamic optimization for on demand delivery networks",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.14745v1",
+      "source": "arxiv",
+      "title": "On the Use of Iterative Problem Solving for the Traveling Salesperson Problem with Changing Time Window Constraints",
+      "abstract": "In many real-world settings, problem instances that need to be solved are quite similar, and knowledge from previous optimization runs can potentially be utilized. We explore this for the Traveling Salesperson problem with time windows (TSPTW), which often arises in settings where the travel-time matrix is fixed but time-window constraints change across related tasks. Existing TSPTW studies, however, have not systematically compared solving such task sequences independently with sequential transfer from previously solved tasks. We address this gap using a multi-task benchmark in which each base instance is expanded into five related tasks under two environments: partial time-window expansion and swap-additive time reassignment. We compare a standard from-scratch protocol with an iterative protocol that initializes each task from the best tour of the previous task, using the popular local search approaches LNS, VNS, and LKH-3 under a common penalized-score objective. Our experimental results show that the iterative protocol is consistently superior in the progressive-relaxation setting and generally competitive under swap-additive changes, with improvements increasing on more difficult instances.",
+      "authors": [
+        "Hy Nguyen",
+        "Thanh Nguyen Pham",
+        "Helen Yuliana Angmalisang",
+        "Liam Wigney",
+        "Frank Neumann"
+      ],
+      "primary_category": "cs.NE",
+      "categories": [
+        "cs.NE"
+      ],
+      "published": "2026-04-16T07:57:06+00:00",
+      "link": "https://arxiv.org/pdf/2604.14745v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Traveling Salesperson problem with changing time window constraints and sequential transfer",
+      "llm_evidence_cn": "带变化时间窗约束的旅行商问题与序列迁移",
+      "llm_evidence": "带变化时间窗约束的旅行商问题与序列迁移",
+      "canonical_evidence": "带变化时间窗约束的旅行商问题与序列迁移",
+      "llm_tldr_en": "Explores iterative solving and knowledge transfer for TSP with time windows under changing constraints.",
+      "llm_tldr_cn": "研究带时间窗TSP问题在约束变化时的迭代求解与知识迁移，提升相关任务的优化效率。",
+      "llm_tldr": "研究带时间窗TSP问题在约束变化时的迭代求解与知识迁移，提升相关任务的优化效率。",
+      "llm_tags": [
+        "query:q4"
+      ],
+      "matched_query_tag": "query:q4",
+      "matched_query_text": "dynamic pick-up and delivery problem optimization",
+      "matched_requirement_id": "req-4",
+      "selection_source": "fresh_fetch"
+    },
+    {
+      "id": "2604.15190v1",
+      "source": "arxiv",
+      "title": "Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation",
+      "abstract": "Simulating group-level user behavior enables scalable counterfactual evaluation of merchant strategies without costly online experiments. However, building a trustworthy simulator faces two structural challenges. First, information incompleteness causes reasoning-based simulators to over-rationalize when unobserved factors such as offline context and implicit habits are missing. Second, mechanism duality requires capturing both interpretable preferences and implicit statistical regularities, which no single paradigm achieves alone. We propose Policy-Guided Hybrid Simulation (PGHS), a dual-process framework that mines transferable decision policies from behavioral trajectories and uses them as a shared alignment layer. This layer anchors an LLM-based reasoning branch that prevents over-rationalization and an ML-based fitting branch that absorbs implicit regularities. Group-level predictions from both branches are fused for complementary correction. We deploy PGHS on Meituan with 101 merchants and over 26,000 trajectories. PGHS achieves a group simulation error of 8.80%, improving over the best reasoning-based and fitting-based baselines by 45.8% and 40.9% respectively.",
+      "authors": [
+        "Ziyang Chen",
+        "Renbing Chen",
+        "Daowei Li",
+        "Jinzhi Liao",
+        "Jiashen Sun",
+        "Ke Zeng",
+        "Xiang Zhao"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI",
+        "cs.CL"
+      ],
+      "published": "2026-04-16T16:23:13+00:00",
+      "link": "https://arxiv.org/pdf/2604.15190v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 9.0,
+      "llm_evidence_en": "Meituan merchant business diagnosis and user simulation",
+      "llm_evidence_cn": "美团商户业务诊断与用户模拟",
+      "llm_evidence": "美团商户业务诊断与用户模拟",
+      "canonical_evidence": "美团商户业务诊断与用户模拟",
+      "llm_tldr_en": "A hybrid simulation framework for Meituan to evaluate merchant strategies via behavioral trajectories.",
+      "llm_tldr_cn": "美团提出的混合模拟框架，通过行为轨迹评估商户策略。",
+      "llm_tldr": "美团提出的混合模拟框架，通过行为轨迹评估商户策略。",
+      "llm_tags": [
+        "query:q2"
+      ],
+      "matched_query_tag": "query:q2",
+      "matched_query_text": "Meituan instant delivery dispatching system and algorithms",
+      "matched_requirement_id": "req-2",
+      "selection_source": "fresh_fetch"
+    }
+  ],
+  "quick_skim": [
+    {
+      "id": "2604.10778v1",
+      "source": "arxiv",
+      "title": "Pseudoconvex Problems in Operational Decision Systems: Algorithms for Joint Learning and Optimization",
+      "abstract": "We consider joint optimization and learning problems arising in real-time decision systems. While most existing work focuses primarily on convex, revenue-based objectives, we extend this line of research to multi-objective formulations. In energy systems, for instance, we incorporate metrics such as renewable penetration and generation costs. Our key focus, however, is on a class of problems with a pseudoconvex structure - a natural relaxation of convexity. Representative examples include fractional objectives in energy management and logit-based revenue models in retail. The outer-level problem optimizes these pseudoconvex objectives, while the inner-level problem involves training a machine learning model using historical data. Our contributions are twofold. First, we propose a simultaneous learning-and-optimization framework that iteratively updates both inner- and outer-level variables. Second, we develop convergent algorithms for these problem classes under realistic mathematical assumptions. Using real-world datasets, we evaluate the computational performance of our methods and highlight an important observation: there exist clear trade-offs between inexact learning and computational time when assessing final solution quality.",
+      "authors": [
+        "Zijun Li",
+        "Aswin Kannan"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC"
+      ],
+      "published": "2026-04-12T19:02:43+00:00",
+      "link": "https://arxiv.org/pdf/2604.10778v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "joint optimization and learning for multi-objective operational decision systems",
+      "llm_evidence_cn": "多目标运营决策系统的联合优化与学习",
+      "llm_evidence": "多目标运营决策系统的联合优化与学习",
+      "canonical_evidence": "多目标运营决策系统的联合优化与学习",
+      "llm_tldr_en": "Extends joint learning and optimization to multi-objective pseudoconvex problems in decision systems.",
+      "llm_tldr_cn": "将联合学习与优化扩展到决策系统中的多目标伪凸问题。",
+      "llm_tldr": "将联合学习与优化扩展到决策系统中的多目标伪凸问题。",
+      "llm_tags": [
+        "query:q9"
+      ],
+      "matched_query_tag": "query:q9",
+      "matched_query_text": "multi objective optimization for balancing efficiency and user experience in logistics",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.12382v1",
+      "source": "arxiv",
+      "title": "Traffic-Aware Domain Partitioning and Load-Balanced Inter-Domain Routing for LEO Satellite Networks",
+      "abstract": "Low Earth Orbit (LEO) satellite networks provide global coverage and low latency, yet high node mobility, uneven traffic distribution, and stochastic link failures pose severe challenges for inter-domain routing. Existing approaches either neglect graph-structured topology or lack dynamic awareness of real-time link states, struggling to balance load distribution and routing reliability. This paper proposes DTAR, a traffic-aware deep reinforcement learning approach for inter-domain routing in LEO satellite networks. A multi-objective NSGA-II algorithm first generates an offline domain partition maximizing intra-domain traffic ratio and minimizing load imbalance. A Graph Attention Network dynamically encodes inter-domain link traffic intensity, load distribution, and fault status, upon which an action-masked PPO agent learns routing decisions online. Simulations on a 288-satellite Walker constellation against multiple baselines demonstrate that DTAR significantly reduces link load imbalance and end-to-end delay, while improving routing success rate and reducing packet loss rate across normal, traffic surge, and fault scenarios.",
+      "authors": [
+        "Chen Zhou",
+        "Jiangtao Luo",
+        "Yongyi Ran"
+      ],
+      "primary_category": "cs.NI",
+      "categories": [
+        "cs.NI"
+      ],
+      "published": "2026-04-14T07:17:50+00:00",
+      "link": "https://arxiv.org/pdf/2604.12382v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "Deep reinforcement learning and multi-objective optimization for dynamic routing under stochastic failures",
+      "llm_evidence_cn": "针对随机故障下动态路由的深度强化学习与多目标优化",
+      "llm_evidence": "针对随机故障下动态路由的深度强化学习与多目标优化",
+      "canonical_evidence": "针对随机故障下动态路由的深度强化学习与多目标优化",
+      "llm_tldr_en": "Combines NSGA-II and DRL for multi-objective load balancing and routing in dynamic networks.",
+      "llm_tldr_cn": "结合NSGA-II和深度强化学习，实现动态网络中的多目标负载均衡与路由。",
+      "llm_tldr": "结合NSGA-II和深度强化学习，实现动态网络中的多目标负载均衡与路由。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.14897v1",
+      "source": "arxiv",
+      "title": "Mix-CALADIN: A Distributed Algorithm for Consensus Mixed-Integer Optimization",
+      "abstract": "This paper addresses distributed consensus optimization problems with mixed-integer variables, with a specific focus on Boolean variables. We introduce a novel distributed algorithm that extends the Consensus Augmented Lagrangian Alternating Direction Inexact Newton (CALADIN) framework by incorporating specialized techniques for handling Boolean variables without relying on local mixed-integer solvers. Under the mild assumption of Lipschitz continuity of the objective functions, we establish rigorous convergence guarantees for both convex and nonconvex mixed-integer programming problems. Numerical experiments demonstrate that the proposed algorithm achieves competitive performance compared to existing approaches while providing rigorous convergence guarantees.",
+      "authors": [
+        "Boyu Han",
+        "Xu Du",
+        "Karl H. Johansson",
+        "Apostolos I. Rikos"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "eess.SY"
+      ],
+      "published": "2026-04-16T11:40:37+00:00",
+      "link": "https://arxiv.org/pdf/2604.14897v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.5,
+      "llm_evidence_en": "Distributed algorithm for consensus mixed-integer optimization applicable to logistics scheduling",
+      "llm_evidence_cn": "适用于物流调度的共识混合整数优化分布式算法",
+      "llm_evidence": "适用于物流调度的共识混合整数优化分布式算法",
+      "canonical_evidence": "适用于物流调度的共识混合整数优化分布式算法",
+      "llm_tldr_en": "Introduces a distributed algorithm for mixed-integer optimization problems with convergence guarantees.",
+      "llm_tldr_cn": "引入一种具有收敛保证的混合整数优化问题分布式算法。",
+      "llm_tldr": "引入一种具有收敛保证的混合整数优化问题分布式算法。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.10953v1",
+      "source": "arxiv",
+      "title": "Diffusion Reinforcement Learning Based Online 3D Bin Packing Spatial Strategy Optimization",
+      "abstract": "The online 3D bin packing problem is important in logistics, warehousing and intelligent manufacturing, with solutions shifting to deep reinforcement learning (DRL) which faces challenges like low sample efficiency. This paper proposes a diffusion reinforcement learning-based algorithm, using a Markov decision chain for packing modeling, height map-based state representation and a diffusion model-based actor network. Experiments show it significantly improves the average number of packed items compared to state-of-the-art DRL methods, with excellent application potential in complex online scenarios.",
+      "authors": [
+        "Jie Han",
+        "Tong Li",
+        "Qingyang Xu",
+        "Yong Song",
+        "Bao Pang",
+        "Xianfeng Yuan"
+      ],
+      "primary_category": "cs.RO",
+      "categories": [
+        "cs.RO"
+      ],
+      "published": "2026-04-13T03:50:12+00:00",
+      "link": "https://arxiv.org/pdf/2604.10953v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "diffusion reinforcement learning for online 3D bin packing in logistics",
+      "llm_evidence_cn": "用于物流在线3D装箱问题的扩散强化学习",
+      "llm_evidence": "用于物流在线3D装箱问题的扩散强化学习",
+      "canonical_evidence": "用于物流在线3D装箱问题的扩散强化学习",
+      "llm_tldr_en": "Optimizes online 3D bin packing using diffusion reinforcement learning for improved logistics efficiency.",
+      "llm_tldr_cn": "利用扩散强化学习优化在线3D装箱问题，提升物流效率。",
+      "llm_tldr": "利用扩散强化学习优化在线3D装箱问题，提升物流效率。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.12667v2",
+      "source": "arxiv",
+      "title": "Safe reinforcement learning with online filtering for fatigue-predictive human-robot task planning and allocation in production",
+      "abstract": "Human-robot collaborative manufacturing, a core aspect of Industry 5.0, emphasizes ergonomics to enhance worker well-being. This paper addresses the dynamic human-robot task planning and allocation (HRTPA) problem, which involves determining when to perform tasks and who should execute them to maximize efficiency while ensuring workers' physical fatigue remains within safe limits. The inclusion of fatigue constraints, combined with production dynamics, significantly increases the complexity of the HRTPA problem. Traditional fatigue-recovery models in HRTPA often rely on static, predefined hyperparameters. However, in practice, human fatigue sensitivity varies daily due to factors such as changed work conditions and insufficient sleep. To better capture this uncertainty, we treat fatigue-related parameters as inaccurate and estimate them online based on observed fatigue progression during production. To address these challenges, we propose PF-CD3Q, a safe reinforcement learning (safe RL) approach that integrates the particle filter with constrained dueling double deep Q-learning for real-time fatigue-predictive HRTPA. Specifically, we first develop PF-based estimators to track human fatigue and update fatigue model parameters in real-time. These estimators are then integrated into CD3Q by making task-level fatigue predictions during decision-making and excluding tasks that exceed fatigue limits, thereby constraining the action space and formulating the problem as a constrained Markov decision process (CMDP).",
+      "authors": [
+        "Jintao Xue",
+        "Xiao Li",
+        "Nianmin Zhang"
+      ],
+      "primary_category": "cs.AI",
+      "categories": [
+        "cs.AI"
+      ],
+      "published": "2026-04-14T12:38:21+00:00",
+      "link": "https://arxiv.org/pdf/2604.12667v2",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.5,
+      "llm_evidence_en": "Dynamic task planning and allocation with worker well-being constraints using reinforcement learning",
+      "llm_evidence_cn": "使用强化学习处理考虑工人福祉约束的动态任务规划与分配",
+      "llm_evidence": "使用强化学习处理考虑工人福祉约束的动态任务规划与分配",
+      "canonical_evidence": "使用强化学习处理考虑工人福祉约束的动态任务规划与分配",
+      "llm_tldr_en": "Addresses dynamic task allocation and planning using RL while balancing efficiency and worker fatigue.",
+      "llm_tldr_cn": "研究使用强化学习在保证效率的同时平衡工人疲劳的动态任务分配问题。",
+      "llm_tldr": "研究使用强化学习在保证效率的同时平衡工人疲劳的动态任务分配问题。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.15308v1",
+      "source": "arxiv",
+      "title": "RAD-2: Scaling Reinforcement Learning in a Generator-Discriminator Framework",
+      "abstract": "High-level autonomous driving requires motion planners capable of modeling multimodal future uncertainties while remaining robust in closed-loop interactions. Although diffusion-based planners are effective at modeling complex trajectory distributions, they often suffer from stochastic instabilities and the lack of corrective negative feedback when trained purely with imitation learning. To address these issues, we propose RAD-2, a unified generator-discriminator framework for closed-loop planning. Specifically, a diffusion-based generator is used to produce diverse trajectory candidates, while an RL-optimized discriminator reranks these candidates according to their long-term driving quality. This decoupled design avoids directly applying sparse scalar rewards to the full high-dimensional trajectory space, thereby improving optimization stability. To further enhance reinforcement learning, we introduce Temporally Consistent Group Relative Policy Optimization, which exploits temporal coherence to alleviate the credit assignment problem. In addition, we propose On-policy Generator Optimization, which converts closed-loop feedback into structured longitudinal optimization signals and progressively shifts the generator toward high-reward trajectory manifolds. To support efficient large-scale training, we introduce BEV-Warp, a high-throughput simulation environment that performs closed-loop evaluation directly in Bird's-Eye View feature space via spatial warping. RAD-2 reduces the collision rate by 56% compared with strong diffusion-based planners. Real-world deployment further demonstrates improved perceived safety and driving smoothness in complex urban traffic.",
+      "authors": [
+        "Hao Gao",
+        "Shaoyu Chen",
+        "Yifan Zhu",
+        "Yuehao Song",
+        "Wenyu Liu",
+        "Qian Zhang",
+        "Xinggang Wang"
+      ],
+      "primary_category": "cs.CV",
+      "categories": [
+        "cs.CV"
+      ],
+      "published": "2026-04-16T17:59:44+00:00",
+      "link": "https://arxiv.org/pdf/2604.15308v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.5,
+      "llm_evidence_en": "Reinforcement learning for motion planning under multimodal future uncertainties",
+      "llm_evidence_cn": "针对多模态未来不确定性的运动规划强化学习",
+      "llm_evidence": "针对多模态未来不确定性的运动规划强化学习",
+      "canonical_evidence": "针对多模态未来不确定性的运动规划强化学习",
+      "llm_tldr_en": "Proposes a generator-discriminator RL framework for robust closed-loop planning under uncertainty.",
+      "llm_tldr_cn": "提出一种生成器-判别器强化学习框架，用于不确定性下的鲁棒闭环规划。",
+      "llm_tldr": "提出一种生成器-判别器强化学习框架，用于不确定性下的鲁棒闭环规划。",
+      "llm_tags": [
+        "query:q8"
+      ],
+      "matched_query_tag": "query:q8",
+      "matched_query_text": "deep reinforcement learning for real time vehicle routing problems",
+      "matched_requirement_id": "req-8",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.11507v1",
+      "source": "arxiv",
+      "title": "Deep Learning for Sequential Decision Making under Uncertainty: Foundations, Frameworks, and Frontiers",
+      "abstract": "Artificial intelligence (AI) is moving increasingly beyond prediction to support decisions in complex, uncertain, and dynamic environments. This shift creates a natural intersection with operations research and management sciences (OR/MS), which have long offered conceptual and methodological foundations for sequential decision-making under uncertainty. At the same time, recent advances in deep learning, including feedforward neural networks, LSTMs, transformers, and deep reinforcement learning, have expanded the scope of data-driven modeling and opened new possibilities for large-scale decision systems. This tutorial presents an OR/MS-centered perspective on deep learning for sequential decision-making under uncertainty. Its central premise is that deep learning is valuable not as a replacement for optimization, but as a complement to it. Deep learning brings adaptability and scalable approximation, whereas OR/MS provides the structural rigor needed to represent constraints, recourse, and uncertainty. The tutorial reviews key decision-making foundations, connects them to the major neural architectures in modern AI, and discusses leading approaches to integrating learning and optimization. It also highlights emerging impact in domains such as supply chains, healthcare and epidemic response, agriculture, energy, and autonomous operations. More broadly, it frames these developments as part of a wider transition from predictive AI toward decision-capable AI and highlights the role of OR/MS in shaping the next generation of integrated learning--optimization systems.",
+      "authors": [
+        "I. Esra Buyuktahtakin"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "cs.AI",
+        "cs.LG",
+        "eess.SY",
+        "stat.ML"
+      ],
+      "published": "2026-04-13T14:11:06+00:00",
+      "link": "https://arxiv.org/pdf/2604.11507v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "deep reinforcement learning for sequential decision making in dynamic environments",
+      "llm_evidence_cn": "深度强化学习用于动态环境下的序列决策",
+      "llm_evidence": "深度强化学习用于动态环境下的序列决策",
+      "canonical_evidence": "深度强化学习用于动态环境下的序列决策",
+      "llm_tldr_en": "A tutorial on deep learning and OR/MS foundations for sequential decision-making under uncertainty.",
+      "llm_tldr_cn": "综述了深度学习与运筹学在不确定环境下序列决策中的应用，涵盖深度强化学习等前沿技术。",
+      "llm_tldr": "综述了深度学习与运筹学在不确定环境下序列决策中的应用，涵盖深度强化学习等前沿技术。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.10012v1",
+      "source": "arxiv",
+      "title": "A simulation-optimization approach for fractional, profitability-oriented inventory control under service-level type constraints",
+      "abstract": "Managing stock efficiently remains a core issue in modern logistics, where companies must reconcile cost efficiency with dependable service despite unpredictable market conditions. Conventional models often overlook the direct connection between investment in inventory and overall financial performance. This study introduces a data-driven decision framework that combines stochastic simulations with a profit-oriented optimization routine to enhance decision-making under uncertainty. The simulation stage generates performance estimates across multiple operating scenarios, providing realistic data on expenditures, revenues, and service reliability. These outcomes inform a fractional optimization process that searches for policies yielding the highest financial returns while maintaining required availability levels. The algorithm iteratively refines parameter values through feedback between simulated outcomes and optimization results, ensuring adaptability to dynamic enterprise systems. Computational experiments using representative business settings confirm that this approach improves both service consistency and financial yield. Overall, the framework demonstrates a practical, data-driven path for firms seeking to align operational responsiveness with sustainable profitability.",
+      "authors": [
+        "Tianxiao Sun",
+        "Noah Schwarzkopf"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC",
+        "eess.SY"
+      ],
+      "published": "2026-04-11T03:55:37+00:00",
+      "link": "https://arxiv.org/pdf/2604.10012v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "stochastic simulations and profit-oriented optimization for logistics inventory control",
+      "llm_evidence_cn": "物流库存控制的随机模拟与利润导向优化",
+      "llm_evidence": "物流库存控制的随机模拟与利润导向优化",
+      "canonical_evidence": "物流库存控制的随机模拟与利润导向优化",
+      "llm_tldr_en": "Combines stochastic simulation with optimization to balance cost efficiency and service reliability.",
+      "llm_tldr_cn": "结合随机模拟与优化算法，在物流库存管理中平衡成本效率与服务可靠性。",
+      "llm_tldr": "结合随机模拟与优化算法，在物流库存管理中平衡成本效率与服务可靠性。",
+      "llm_tags": [
+        "query:q9"
+      ],
+      "matched_query_tag": "query:q9",
+      "matched_query_text": "multi objective optimization for balancing efficiency and user experience in logistics",
+      "matched_requirement_id": "req-9",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    },
+    {
+      "id": "2604.09926v1",
+      "source": "arxiv",
+      "title": "Convex Synthesis of First-Order Methods for Time-Varying Smooth Strongly Convex Optimization",
+      "abstract": "Time-varying optimization is fundamental to decision-making in dynamic environments, where objectives evolve over time due to exogenous signals or data streams. However, algorithms designed for static problems yield suboptimal decisions in dynamic scenarios, even asymptotically. In this paper, we develop a robust control synthesis framework to systematically design first-order methods for smooth strongly convex problems that vary in time. Our approach leverages both convex robust control synthesis in the static setting and the internal model principle by directly embedding a model of the underlying variability into the designed algorithm.",
+      "authors": [
+        "Bryan Van Scoy",
+        "Gianluca Bianchin"
+      ],
+      "primary_category": "math.OC",
+      "categories": [
+        "math.OC"
+      ],
+      "published": "2026-04-10T21:45:08+00:00",
+      "link": "https://arxiv.org/pdf/2604.09926v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 6.0,
+      "llm_evidence_en": "Optimization for time-varying smooth strongly convex problems in dynamic environments",
+      "llm_evidence_cn": "动态环境下时变平滑强凸问题的优化",
+      "llm_evidence": "动态环境下时变平滑强凸问题的优化",
+      "canonical_evidence": "动态环境下时变平滑强凸问题的优化",
+      "llm_tldr_en": "Designs first-order methods for optimization problems where objectives evolve over time.",
+      "llm_tldr_cn": "为目标随时间演变的优化问题设计了一阶方法。",
+      "llm_tldr": "为目标随时间演变的优化问题设计了一阶方法。",
+      "llm_tags": [
+        "query:q10"
+      ],
+      "matched_query_tag": "query:q10",
+      "matched_query_text": "stochastic and dynamic optimization for on demand delivery networks",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "6"
+    },
+    {
+      "id": "2604.11954v1",
+      "source": "arxiv",
+      "title": "Dynamic Multi-Robot Task Allocation under Uncertainty and Communication Constraints: A Game-Theoretic Approach",
+      "abstract": "We study dynamic multi-robot task allocation under uncertain task completion, time-window constraints, and incomplete information. Tasks arrive online over a finite horizon and must be completed within specified deadlines, while agents operate from distributed hubs with limited sensing and communication. We model incomplete information through hub-based sensing regions that determine task visibility and a communication graph that governs inter-hub information exchange. Using this framework, we propose Iterative Best Response (IBR), a decentralized policy in which each agent selects the task that maximizes its marginal contribution to the locally observed welfare. We compare IBR against three baselines: Earliest Due Date first (EDD), Hungarian algorithm, and Stochastic Conflict-Based Allocation (SCoBA), on a city-scale package-delivery domain with up to 100 drones and varying task arrival scenarios. Under full and sparse communication, IBR achieves competitive task-completion performance with lower computation time.",
+      "authors": [
+        "Maria G. Mendoza",
+        "Pan-Yang Su",
+        "Bryce L. Ferguson",
+        "S. Shankar Sastry"
+      ],
+      "primary_category": "eess.SY",
+      "categories": [
+        "eess.SY",
+        "cs.GT",
+        "cs.RO"
+      ],
+      "published": "2026-04-13T18:48:51+00:00",
+      "link": "https://arxiv.org/pdf/2604.11954v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 8.0,
+      "llm_evidence_en": "dynamic multi-robot task allocation under uncertainty and time-window constraints",
+      "llm_evidence_cn": "不确定性和时间窗约束下的动态多机器人任务分配",
+      "llm_evidence": "不确定性和时间窗约束下的动态多机器人任务分配",
+      "canonical_evidence": "不确定性和时间窗约束下的动态多机器人任务分配",
+      "llm_tldr_en": "Develops a decentralized policy for online task allocation with uncertain completion and deadlines.",
+      "llm_tldr_cn": "针对具有不确定完成时间和截止日期的在线任务分配，开发了一种去中心化策略。",
+      "llm_tldr": "针对具有不确定完成时间和截止日期的在线任务分配，开发了一种去中心化策略。",
+      "llm_tags": [
+        "query:q10"
+      ],
+      "matched_query_tag": "query:q10",
+      "matched_query_text": "stochastic and dynamic optimization for on demand delivery networks",
+      "matched_requirement_id": "req-10",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "8plus"
+    },
+    {
+      "id": "2604.10073v1",
+      "source": "arxiv",
+      "title": "Graph-RHO: Critical-path-aware Heterogeneous Graph Network for Long-Horizon Flexible Job-Shop Scheduling",
+      "abstract": "Long-horizon Flexible Job-Shop Scheduling~(FJSP) presents a formidable combinatorial challenge due to complex, interdependent decisions spanning extended time horizons. While learning-based Rolling Horizon Optimization~(RHO) has emerged as a promising paradigm to accelerate solving by identifying and fixing invariant operations, its effectiveness is hindered by the structural complexity of FJSP. Existing methods often fail to capture intricate graph-structured dependencies and ignore the asymmetric costs of prediction errors, in which misclassifying critical-path operations is significantly more detrimental than misclassifying non-critical ones. Furthermore, dynamic shifts in predictive confidence during the rolling process make static pruning thresholds inadequate. To address these limitations, we propose Graph-RHO, a novel critical-path-aware graph-based RHO framework. First, we introduce a topology-aware heterogeneous graph network that encodes subproblems as operation-machine graphs with multi-relational edges, leveraging edge-feature-aware message passing to predict operation stability. Second, we incorporate a critical-path-aware mechanism that injects inductive biases during training to distinguish highly sensitive bottleneck operations from robust ones. Third, we devise an adaptive thresholding strategy that dynamically calibrates decision boundaries based on online uncertainty estimation to align model predictions with the solver's search space. Extensive experiments on standard benchmarks demonstrate that \\mbox{Graph-RHO} establishes a new state of the art in solution quality and computational efficiency. Remarkably, it exhibits exceptional zero-shot generalization, reducing solve time by over 30\\% on large-scale instances (2000 operations) while achieving superior solution quality. Our code is available \\href{https://github.com/IntelliSensing/Graph-RHO}{here}.",
+      "authors": [
+        "Yujie Li",
+        "Jiuniu Wang",
+        "Mugen Peng",
+        "Guangzuo Li",
+        "Wenjia Xu"
+      ],
+      "primary_category": "cs.LG",
+      "categories": [
+        "cs.LG",
+        "cs.AI"
+      ],
+      "published": "2026-04-11T07:35:09+00:00",
+      "link": "https://arxiv.org/pdf/2604.10073v1",
+      "tags": [
+        "keyword:即时配送",
+        "query:即时配送"
+      ],
+      "llm_score": 7.0,
+      "llm_evidence_en": "Rolling Horizon Optimization for long-horizon scheduling with graph-structured dependencies",
+      "llm_evidence_cn": "针对长周期调度问题的滚动时域优化与图结构依赖建模",
+      "llm_evidence": "针对长周期调度问题的滚动时域优化与图结构依赖建模",
+      "canonical_evidence": "针对长周期调度问题的滚动时域优化与图结构依赖建模",
+      "llm_tldr_en": "Proposes Graph-RHO for long-horizon job-shop scheduling using heterogeneous graph networks.",
+      "llm_tldr_cn": "提出Graph-RHO框架，利用异构图网络解决长周期柔性作业车间调度问题。",
+      "llm_tldr": "提出Graph-RHO框架，利用异构图网络解决长周期柔性作业车间调度问题。",
+      "llm_tags": [
+        "query:profile-1:composite"
+      ],
+      "matched_query_tag": "query:profile-1:composite",
+      "matched_query_text": "Papers central to 互联网工业界即时配送与随机路径规划的智能调度算法研究, especially work that connects or combines: m; Meituan instant delivery dispatching system and algorithms; real-time order assignment problem in logistics; dynamic pick-up and delivery problem optimization; vehicle routing problem with stochastic requests; multi-objective optimization for rider experience and consumer satisfaction; industrial applications of machine learning in instant delivery scheduling; deep reinforcement learning for real time vehicle routing problems; multi objective optimization for balancing efficiency and user experience in logistics; stochastic and dynamic optimization for on demand delivery networks.",
+      "matched_requirement_id": "req-composite-profile-1",
+      "selection_source": "fresh_fetch",
+      "quick_tier": "7"
+    }
+  ]
+}

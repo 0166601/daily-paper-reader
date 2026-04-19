@@ -1,0 +1,30 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.09926v1/fig-001.webp",
+      "caption": "Figure 1: Asymptotic (averaged over the last 100 iterations) relative tracking error versus the order p of the temporal variation, comparing gradient descent and the accelerated triple momentum method [8] on the time-varying quadratic problem f(z, θk) = z⊤Qz + θ⊤k z, with Q random (eigenvalues in [1, 50]) and θk+1 = Sθk, S ∈ Rp×p. As p increases, the performance of the accelerated method degrades relative to gradient descent, highlighting the need for acceleration schemes that explicitly account for temporal variability.",
+      "page": 1,
+      "index": 1,
+      "width": 511,
+      "height": 247
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09926v1/fig-002.webp",
+      "caption": "Figure 6: Rate ρ of the synthesized algorithm as a function of exosystem frequency θ with µ = 1, L = 10, and ℓ = 1.",
+      "page": 7,
+      "index": 2,
+      "width": 454,
+      "height": 302
+    },
+    {
+      "url": "assets/figures/arxiv/2604.09926v1/fig-003.webp",
+      "caption": "Figure 4: Equivalent robust control setup after exponential scaling and filtering. Signals are scaled by Tρ−1 , e.g., ū = Tρ−1u, and the plant is transformed as P̄ = Tρ−1 ◦ P ◦ Tρ, and similarly for the uncertainty and controller. The input z̄ and output w̄ of the transformed uncertainty ∆̄ are then passed through a static map, with the first output p̄ then passed through a dynamic filter ψ resulting in r̄.",
+      "page": 5,
+      "index": 3,
+      "width": 442,
+      "height": 281
+    }
+  ]
+}

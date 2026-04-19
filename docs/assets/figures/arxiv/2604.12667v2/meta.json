@@ -1,0 +1,134 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-001.webp",
+      "caption": "Figure 3: Network architecture of our method PF-CD3Q.",
+      "page": 11,
+      "index": 1,
+      "width": 1015,
+      "height": 486
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-002.webp",
+      "caption": "Figure 5: Case study: Human episodic fatigue variation, fatigue model parameter estimation, and task-level fatigue prediction.",
+      "page": 15,
+      "index": 2,
+      "width": 1008,
+      "height": 1344
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-003.webp",
+      "caption": "Figure 2: Illustration of our method PF-CD3Q: fatigue-predictive HRTPA algorithm with CD3Q and online filtering.",
+      "page": 7,
+      "index": 3,
+      "width": 1017,
+      "height": 719
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-004.webp",
+      "caption": "Figure 13: PF-CD3Q vs D3QN: Case study of real-time HRTPA in the production process.",
+      "page": 22,
+      "index": 4,
+      "width": 1006,
+      "height": 993
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-005.webp",
+      "caption": "Table 1 Static and dynamic values of human fatigue model parameters, as detailed in Sec. 3.3 and Sec. 4.1 for parameter definitions.",
+      "page": 14,
+      "index": 5,
+      "width": 500,
+      "height": 681
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-006.webp",
+      "caption": "Figure 8: Algorithms performance in training stage.",
+      "page": 18,
+      "index": 6,
+      "width": 1009,
+      "height": 628
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-007.webp",
+      "caption": "Figure 15: Ablation Study: training stage metrics.",
+      "page": 28,
+      "index": 7,
+      "width": 1009,
+      "height": 628
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-008.webp",
+      "caption": "Figure 4: Experimental environment, entities, human-robot-machine task descriptions, and task dependency graph",
+      "page": 13,
+      "index": 8,
+      "width": 1003,
+      "height": 1232
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-009.webp",
+      "caption": "Figure 11: Sensitivity analysis of fatigue constraints: comparison of PF-CD3Q and PPO-Lag.",
+      "page": 19,
+      "index": 9,
+      "width": 964,
+      "height": 605
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-010.webp",
+      "caption": "Figure 10: Algorithm performance in various human-robot settings.",
+      "page": 19,
+      "index": 10,
+      "width": 1002,
+      "height": 624
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-011.webp",
+      "caption": "Table 4 Training hyper-parameters across each algorithm family.",
+      "page": 27,
+      "index": 11,
+      "width": 1029,
+      "height": 368
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-012.webp",
+      "caption": "Figure 14: Filter latency and algorithm performance in the test stage, varying number particles.",
+      "page": 27,
+      "index": 12,
+      "width": 982,
+      "height": 357
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-013.webp",
+      "caption": "Figure 12: Multi-metric algorithm ability: radar chart visualization.",
+      "page": 20,
+      "index": 13,
+      "width": 435,
+      "height": 352
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-014.webp",
+      "caption": "Figure 1: Illustration of the real-time production process flow and state information.",
+      "page": 5,
+      "index": 14,
+      "width": 1006,
+      "height": 616
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-015.webp",
+      "caption": "Figure 6: Comparison of prediction loss and parameter accuracy for PF, KF, and EKF.",
+      "page": 16,
+      "index": 15,
+      "width": 1007,
+      "height": 327
+    },
+    {
+      "url": "assets/figures/arxiv/2604.12667v2/fig-016.webp",
+      "caption": "Figure 7: Measurement noise analysis: filter accuracy and PF-CD3Q performance on test stage.",
+      "page": 16,
+      "index": 16,
+      "width": 1002,
+      "height": 335
+    }
+  ]
+}

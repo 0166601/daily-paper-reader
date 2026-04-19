@@ -1,0 +1,846 @@
+Title: A simulation-optimization approach for fractional, profitability-oriented inventory control under service-level type constraints
+
+URL Source: https://arxiv.org/pdf/2604.10012v1
+
+Published Time: Tue, 14 Apr 2026 00:25:33 GMT
+
+Number of Pages: 16
+
+Markdown Content:
+# A simulation-optimization approach for fractional, profitability-oriented inventory control under service-level type constraints 
+
+Tianxiao Sun, Ph.D ∗, Noah Schwarzkopf 
+
+> Independent Researcher, Charlotte, NC, USA
+
+Abstract 
+
+Managing stock e ffi ciently remains a core issue in modern logistics, where companies must reconcile cost effi ciency with dependable service despite unpredictable market conditions. Conventional models often overlook the direct connection between investment in inventory and overall financial performance. This study introduces a data-driven decision framework that combines stochastic simulations with aprofit-oriented optimization routine to enhance decision-making under uncertainty. The simulation stage generates performance estimates across multiple operating scenarios, providing realistic data on expenditures, revenues, and service reliability. These outcomes inform a fractional optimization process that searches for policies yielding the highest financial returns while maintaining required availability levels. The algorithm iteratively refines parameter values through feedback between simulated outcomes and optimization results, ensuring adaptability to dynamic enterprise systems. Computational experiments using representative business settings confirm that this approach improves both service consistency and financial yield. Overall, the framework demonstrates a practical, data-driven path for firms seeking to align operational responsiveness with sustainable profitability. 
+
+Keywords: Supply Chain Profitability, Inventory Optimization, Safety Stock, Stochastic Simulation, Fractional Programming 
+
+1. Introduction 
+
+Eff ective inventory control remains a central challenge in supply chain management, where companies must balance profitability and service performance under stochastic demand and operational uncertainty. Traditional inventory optimization models predominantly focus on cost minimization or service-level maximization, often treating financial performance as a secondary outcome. In practice, particularly in large retail and distribution environments, inventory decisions are increasingly evaluated using profitability-oriented metrics such as Gross Margin Return on Inventory Investment (GMROI), defined as the ratio of gross margin to average inventory investment, which directly measure how e ff ectively inventory capital is converted into gross margin [1]. Despite its managerial relevance, optimizing GMROI in realistic supply chain environments is challenging for two reasons. First, GMROI is a ratio-based metric, which gives rise to a fractional optimization problem. Second, in modern enterprise systems, key performance measures such as margin, inventory investment, and service levels are typically unavailable in closed form and must be estimated through stochastic simulation. This is particularly evident in large-scale complex distribution networks     
+
+> ∗Corresponding author
+> Email addresses: tianx.sun@gmail.com (Tianxiao Sun, Ph.D), noahschwarzkopf98@gmail.com (Noah Schwarzkopf)
+
+1
+
+> arXiv:2604.10012v1 [math.OC] 11 Apr 2026
+
+with heterogeneous products and stochastic demand, such as modern distribution centers (J Sainsbury’s DC, shown on Figure 1). 
+
+> Figure 1: Distribution centre (J Sainsbury’s). Source: Nick Saltmarsh, via Wikimedia Commons, licensed under CC BY 2.0.
+
+Motivated by these challenges, this paper studies profitability-oriented inventory planning under service-level type constraints in simulation-driven enterprise environments. We consider a setting in which key performance measures are obtained through stochastic simulation and inventory decisions are evaluated using GMROI as the primary objective. 
+
+1.1. Related Work 
+
+Inventory optimization under uncertainty has been extensively studied in the operations research and supply chain literature. Classical analytical approaches address safety stock determination and service-level control using stochastic inventory theory, dynamic programming, robust optimization, and mixed-integer linear programming (MILP) [2][3]. While these models provide strong theoretical guarantees, they rely on restrictive assumptions regarding demand distributions, lead times, and cost structures, limiting their applicability in large-scale, data-driven enterprise environments. To overcome these limitations, simulation-based and hybrid simulation-optimization (sim-opt) approaches have gained increasing attention [4]. Monte Carlo simulation is commonly used in practice to evaluate inventory policies under stochastic demand and to estimate nonlinear performance measures such as revenue, inventory investment, and service levels [5][6]. Early sim-opt studies embed heuristic or evolutionary search procedures within simulation to identify high-performing inventory policies [7][8]. More recent work integrates Monte Carlo simulation with modern black-box optimization techniques, such as Bayesian and hybrid optimization, to improve search e ffi ciency under uncertainty [5][9][10]. Sim-opt often incurs substantial computational cost, as evaluating candidate policies typically requires repeated stochastic simulation runs when key performance measures such as service levels, revenues, and inventory investment are unavailable in closed form. This burden is particularly pronounced in large-scale enterprise settings with global coupling constraints and nonlinear performance measures. To improve scalability, metamodel-based and surrogate-assisted optimization methods have been proposed and shown 2to significantly reduce computational e ff ort in safety stock optimization [11], with recent surveys confirming their growing maturity [12][13]. Beyond computational considerations, simulation-based inventory optimization is further complicated by the presence of multiple, often conflicting objectives, such as cost e ffi ciency and service performance. In the absence of a natural scalar objective, ranking-and-selection procedures [14] and Pareto-based evolutionary algorithms are commonly employed to explore trade-o ff s among competing objectives. While informative, such multi-objective approaches do not directly align the optimization objective with profitability-oriented managerial metrics. In particular, optimizing GMROI leads to a fractional objective that is not well represented by weighted-sum or Pareto-based formulations. Such ratio-based objectives naturally fall within the scope of fractional programming. Foundational work by Charnes and Cooper [15], together with e ffi cient solution methods such as Dinkelbach’s algorithm [16], establishes strong theoretical and algorithmic foundations for fractional optimization. Recent studies on benefit-cost and ratio optimization further underscore the importance of fractional objectives in large-scale decision-making contexts [17]. Overall, the literature reveals a clear gap at the intersection of simulation-based inventory optimization, profitability-oriented fractional objectives, and explicit service-level type constraints. In particular, existing studies tend to address these dimensions in isolation, leaving the joint problem of simulation-driven performance evaluation, ratio-based profitability optimization, and service-level control largely unexplored. 
+
+1.2. Our Contributions 
+
+This paper makes the following contributions: 
+
+• We develop a simulation-driven inventory planning framework in which Monte Carlo simulation generates scenario-based estimates of gross margin, inventory investment, and service performance for alternative inventory policies at the SKU level. 
+
+• We formulate inventory planning at the level of SKU groups (referred to as buckets) as a constrained fractional optimization problem that maximizes Gross Margin Return on Inventory Investment (GMROI) while enforcing service performance requirements expressed in terms of product availability, thereby aligning the optimization objective with profitability-oriented managerial metrics. 
+
+• We apply Dinkelbach’s algorithm [16] to the resulting discrete fractional program and show that, under the simulation-induced scenario structure, the algorithm converges in a finite number of iterations to a globally optimal solution. 
+
+• Through large-scale computational experiments using production-style data, we demonstrate that the proposed approach attains solutions that are numerically indistinguishable from the exact optimum, while delivering substantial computational advantages over standard integer optimization solvers and providing quantitative insight into service-profit trade-o ff s. 
+
+2. Problem Formulation 
+
+We consider an optimization framework defined over groups of SKUs, where each group represents a collection of products that are planned and evaluated jointly. Throughout the paper, we refer to such SKU groups as buckets. Inventory performance is evaluated through stochastic simulation at the SKU level, and optimization is performed over the resulting simulated scenarios aggregated to the group level. In this work, service performance is measured using in-stock percentage (ISP), which serves as the operational 3representation of service level. The objective is to maximize bucket-level GMROI subject to a minimum ISP requirement. For each bucket, inventory and replenishment behavior is simulated at the SKU level over a future planning horizon under di ff erent safety stock settings. For a given SKU, each simulation scenario corresponds to operating the inventory system with a fixed safety stock level, where stochastic demand depletes inventory and replenishment orders are triggered according to a reorder point type policy in which the safety stock determines the reorder threshold. This process generates a characteristic sawtooth shaped inventory trajectory over time. From each simulated trajectory, gross margin, average inventory investment, and in-stock percentage are estimated at the SKU scenario level and then aggregated across SKUs to form the bucket-level GMROI objective and averaged in-stock percentage constraint used in the subsequent optimization. In detail, let 
+
+• Mi j ≥ 0 denote the gross margin dollars, 
+
+• Ii j ≥ 0 denote the average inventory dollars, 
+
+• S i j ∈ [0 , 1] denote the in-stock percentage (ISP), and 
+
+• CS ∈ [0 , 1] denote the minimum required in-stock percentage goal at bucket level, for SKU i, simulated scenario j, where i ∈ I = {1, 2, . . . , n} representing the SKU ID, and j ∈ Ji is the index of the jth scenario for SKU i. Note that scenarios are dynamically chosen based on the demand and replenishment nature of SKUs. We introduce binary decision variables 
+
+xi j =
+
+
+
+1, if for SKU i scenario j is selected, 0, otherwise. Under a selected combination of scenarios, the resulting total gross margin is given by 
+
+M(x) =
+
+X
+
+> i∈I
+
+X
+
+> j∈Ji
+
+Mi j xi j ,
+
+while the corresponding aggregate inventory investment is 
+
+I(x) =
+
+X
+
+> i∈I
+
+X
+
+> j∈Ji
+
+Ii j xi j ,
+
+and the averaged in-stock percentage can be represented as 
+
+S (x) = 1
+
+n
+
+X
+
+> i∈I
+
+X
+
+> j∈Ji
+
+S i j xi j ,
+
+where x ∈ X := {xi j ∈ { 0, 1} : ∀ j ∈ Ji, ∀i ∈ I} lives in a heterogeneous product space with a total dimension 
+
+Pni=1 |Ji|. We want to solve the following optimization problem: max 
+
+> x
+
+M(x)
+
+I(x) (Objective: GMROI at bucket level) s.t. S (x) ≥ CS , (Constraint: in-stock percentage goal) 
+
+X
+
+> j∈Ji
+
+xi j = 1, ∀i ∈ I , (Constraint: regularization) 
+
+x ∈
+
+> n
+
+Y
+
+> i=1
+
+{0, 1}|Ji|, (Feasible set: multi-dimensional binary space) (FP) 4Furthermore, define the fractional objective 
+
+F(x) = M(x)
+
+I(x)which corresponds exactly to the bucket-level GMROI; and the feasible region of the above program as 
+
+D = {S (x) ≥ CS and 
+
+X
+
+> j∈Ji
+
+xi j = 1, ∀i ∈ I | x ∈
+
+> n
+
+Y
+
+> i=1
+
+{0, 1}|Ji|},
+
+then (FP) could be rewritten as max {F(x) | x ∈ D} .With the above settings, we make the following assumptions in the rest of the paper: 
+
+Assumption 2.1. (Positivity) For all feasible selections x ∈ D , the total inventory investment satisfies 
+
+I(x) > 0, i.e., the aggregate inventory dollars are strictly positive for any feasible combination of scenarios. 
+
+Assumption 2.2. (Feasibility) The scenario sets generated in the simulation stage are constructed such that, for any prescribed in-stock threshold CS , at least one feasible combination of SKU-level scenarios satisfies the aggregate service requirement. 
+
+3. Algorithmic Framework to Optimize Constrained Fractional Binary Programming 
+
+In this section, we introduce an iterative algorithmic framework to solve fractional programming (FP) and establish its convergence properties. 
+
+3.1. Fractional Programming via Dinkelbach’s Algorithm 
+
+We implement the Dinkelbach’s algorithm [16] to solve the fractional programming (FP), with pseudocode provided in Algorithm 1. Our decision variables are binary, and the feasible domain D is a finite set. Under this discrete setting, the convergence behavior of Dinkelbach’s method exhibits finite-step termination rather than asymptotic convergence, and the solution obtained is globally optimal. This reduces the number of iterations needed to reach the optimum and o ff ering notable e ffi ciency gains for large-scale problem instances. A rigorous proof of finite-step termination and its theoretical bound is provided in Appendix A. The convergence tolerance, ϵ, is defined as a small positive constant and is used to ensure numerical robustness in practice. Although Dinkelbach’s algorithm involves solving a sequence of linearized fractional subproblems in the SOLVE step, ensuring the computational tractability of each iteration remains essential for achieving e ffi cient convergence in large-scale instances. In particular, since W(λ) is strictly decreasing with a unique zero at the optimal ratio, the stopping condition W(λk) < ϵ serves as a numerically stable stopping criterion under finite-precision arithmetic. 
+
+3.2. Binary Integer Programming subproblem 
+
+At each iteration of Dinkelbach’s algorithm, the resulting subproblem is formulated as a binary integer linear program (BIP) : the objective function is linear and all decision variables are binary. The subproblem is solved exactly at each iteration. From a computational perspective, this BIP is NP-hard, and solving it to optimality can be computationally demanding for large-scale instances with many SKUs and simulated scenarios. In our implementation, the subproblem is solved using standard integer optimization solvers through Python interfaces, including the CBC solver via PuLP and OR-Tools . We additionally tested GLPK and HiGHS through PuLP and SCIP through the OR-Tools interface; however, these alternatives exhibited inferior performance or reduced robustness on the instances considered. Consequently, CBC is adopted as the baseline exact solver for the computational experiments reported in this study. Although modern integer solvers employ advanced branch-and-bound and cutting-plane techniques, the worst-case complexity of the subproblem remains exponential, which motivates the acceleration strategy introduced in the next subsection. 5Algorithm 1 Dinkelbach’s Algorithm for Maximizing GMROI  
+
+> 1:
+
+INITIALIZE k ← 0 and λk ← 0.  
+
+> 2:
+
+repeat  
+
+> 3:
+
+SOLVE the Subproblem 
+
+W(λk) = max  
+
+> x∈D
+
+{M(x) − λk I(x)},
+
+and denote the solution by x⋆ 
+
+> k
+
+. 
+
+> 4:
+
+if W(λk) < ϵ then  
+
+> 5:
+
+STOP ; x⋆ 
+
+> k
+
+is the optimal solution and λ⋆ = λ⋆ 
+
+> k
+
+is the optimal ratio.  
+
+> 6:
+
+else  
+
+> 7:
+
+UPDATE 
+
+λk+1 = M(x⋆ 
+
+> k
+
+)
+
+I(x⋆ 
+
+> k
+
+) , k ← k + 1, 
+
+> 8:
+
+and return to the SOLVE step.  
+
+> 9:
+
+end if  
+
+> 10:
+
+until convergence 
+
+3.3. Acceleration Strategy 
+
+To accelerate the computation of the inner subproblem W(λk), we adopt a Lagrangian relaxation approach [18], as shown in Algorithm 2. The main idea is to relax the coupling constraint S (x) ≥ CS by introducing a nonnegative Lagrange multiplier μ ≥ 0 and incorporating it into the objective function. For a fixed λk, the relaxed subproblem can be written as 
+
+Wμ(λk) = max  
+
+> x∈X
+
+{M(x) − λk I(x) − μ (CS − S (x)) } . (1) Ignoring the constant term −μCS and recalling that T (x) = 1
+
+> n
+
+Pi∈I
+
+P j∈Ji S i j xi j , the objective function can be expanded as max 
+
+> x∈X
+
+X
+
+> i∈I
+
+X
+
+> j∈Ji
+
+
+
+Mi j − λk Ii j + μ
+
+n S i j 
+
+
+
+xi j . (2) Define Wi j = Mi j − λk Ii j . Since each SKU i is subject only to the local constraint P j∈Ji xi j = 1, the relaxed problem is separable across SKUs. In particular, for each SKU i, the optimal scenario can be selected independently as 
+
+j∗(i) = arg max 
+
+> j∈Ji
+
+
+
+Wi j + μ
+
+n S i j 
+
+
+
+. (3) which reduces the computational complexity of the subproblem from a binary integer program to a series of independent local decisions. 
+
+Optimality of the Subproblem 
+
+The Lagrangian relaxation gives rise to a one-dimensional convex dual problem of the form min  
+
+> μ≥0
+
+max  
+
+> x∈X
+
+L(x, μ ).
+
+Rather than solving this min–max problem explicitly, we exploit the monotonicity of the induced service level S (x(μ)) and recover the optimal multiplier e ffi ciently via binary search. For a fixed λk, consider the Lagrangian relaxation of the bucket-level service constraint. The associated dual function is 
+
+ϕ(μ) = max  
+
+> x∈X
+
+{M(x) − λk I(x) + μS (x)} − μCS , μ ≥ 0.
+
+6Algorithm 2 Lagrangian Relaxation for the Subproblem W(λk)
+
+Require: Wi j = Mi j − λk Ii j , S i j for all ( i, j), threshold CS
+
+Ensure: Optimal solution x∗ for the constrained Subproblem W(λk) 
+
+> 1:
+
+function Enumerate Solve (μ) 
+
+> 2:
+
+for each i ∈ I do  
+
+> 3:
+
+j∗(i) ← arg max j∈Ji
+
+Wi j + μ 
+
+> n
+
+S i j 
+
+ 
+
+> 4:
+
+end for  
+
+> 5:
+
+return x (μ) = { j∗(i) : i ∈ I}  
+
+> 6:
+
+end function  
+
+> 7:
+
+Initialize μlow ← 0, μhigh ← 1 
+
+> 8:
+
+while S (x(μhigh )) < CS do  
+
+> 9:
+
+x(μhigh ) ← Enumerate Solve (μhigh ) 
+
+> 10:
+
+μhigh ← 2 μhigh  
+
+> 11:
+
+end while  
+
+> 12:
+
+while μhigh − μlow > ε do  
+
+> 13:
+
+μ ← (μlow + μhigh )/2 
+
+> 14:
+
+x(μ) ← Enumerate Solve (μ) 
+
+> 15:
+
+if S (x(μ)) ≥ CS then  
+
+> 16:
+
+μhigh ← μ, x∗ ← x(μ) 
+
+> 17:
+
+else  
+
+> 18:
+
+μlow ← μ 
+
+> 19:
+
+end if  
+
+> 20:
+
+end while  
+
+> 21:
+
+return x ∗, W(x∗)For any fixed μ, the inner maximization decomposes across SKUs, and the corresponding primal solution x(μ) is obtained by independently selecting j∗(i) according to Algorithm 2. The dual function 
+
+ϕ(μ) is convex and piecewise linear in μ, with subgradient 
+
+∂ϕ (μ) = {CS − S (x(μ)) }.
+
+An optimal multiplier μ∗ satisfies the complementary slackness condition μ∗(CS − S (x∗)) = 0, where 
+
+x∗ = x(μ∗). When the service constraint is binding, μ∗ > 0 and S (x∗) = CS ; otherwise, the constraint is non-binding and μ∗ = 0. In either case, the optimal multiplier can be e ffi ciently identified via one-dimensional search over μ.Although the decision variables are restricted to binary selections, the Lagrangian relaxation yields an exact solution for the relaxed subproblem. Any potential duality gap with respect to the original constrained binary integer program is discussed in the Remark of Section 4.4. 
+
+Acceleration E ff ect 
+
+Compared with directly solving W(λk) via a general integer programming solver (e.g., PuLP or OR-Tools ), the Lagrangian relaxation exploits the separable structure of the problem. Each iteration only requires evaluating arg max j∈Ji
+
+Wi j + μ 
+
+> n
+
+S i j 
+
+, which has linear complexity in the number of SKUs. Moreover, since 
+
+μ is a scalar variable, the binary search converges in O(log( μmax /μ min )) iterations. This substantially reduces the computational time while maintaining the same optimality guarantee for the subproblem. 
+
+3.4. Degenerate Unconstrained Regime 
+
+In practical supply chain applications, we observe that for certain SKU buckets and planning horizons, the simulated scenario sets are su ffi ciently rich relative to the prescribed service-level threshold. In such 7cases, the aggregate service constraint does not e ff ectively restrict feasible decisions and the optimization problem degenerates into an unconstrained variant. Formally, define 
+
+S = 1
+
+n
+
+X
+
+> i∈I
+
+min 
+
+> j∈Ji
+
+S i j .
+
+When S ≥ CS , the aggregate service-level constraint S (x) ≥ CS is satisfied for all feasible selections 
+
+x ∈ X . Consequently, the feasible region D = {x ∈ X : S (x) ≥ CS } coincides with X, and the bucket-level fractional program reduces to an unconstrained GMROI maximization problem subject only to the per-SKU selection constraints. Although the fractional objective remains globally coupled across SKUs and the overall problem therefore remains jointly defined and non-decomposable, the Dinkelbach transformation resolves this coupling iteratively. As a result, each linearized subproblem W(λ) = max x∈X {M(x) − λI(x)} is separable across SKUs. From a computational perspective, this structural simplification benefits all solution approaches. For exact integer solvers such as PuLP and OR-Tools , the removal of the aggregate service-level constraint yields tighter linear relaxations and significantly reduces branch-and-bound e ff ort within each Dinkelbach iteration. For the proposed Lagrangian relaxation method, the uniformly non-binding regime corresponds to an optimal Lagrange multiplier μ⋆ = 0 derived from the complementary slackness condition. Under this condition, the relaxed subproblem reduces to a purely separable maximization across SKUs and admits a closed-form solution obtained by independently selecting, for each SKU, the scenario that maximizes 
+
+Wi j = Mi j − λIi j . Algorithm 3 summarizes this simplified solver, which can be interpreted as a degenerate specialization of Algorithm 2. The numerical experiments in Section 4 explicitly report results from this regime and confirm the associated computational gains. 
+
+Algorithm 3 Lagrangian Relaxation for the Subproblem W(λk) (Unconstrained) 
+
+Require: Wi j = Mi j − λk Ii j for all ( i, j)
+
+Ensure: Optimal selection x⋆ for the unconstrained subproblem  
+
+> 1:
+
+for each SKU i ∈ I do  
+
+> 2:
+
+j⋆(i) ← arg max j∈Ji Wi j  
+
+> 3:
+
+end for  
+
+> 4:
+
+return x ⋆ = { j⋆(i) : i ∈ I} 
+
+4. Numerical Experiments 
+
+This section evaluates the performance of the proposed bucket-level GMROI optimization framework on production-scale data. We compare three solution approaches: a binary integer programming (BIP) formulation solved via the PuLP Python interface [19], an equivalent formulation solved using 
+
+OR-Tools [20], and the proposed Lagrangian relaxation method integrated with the Dinkelbach outer loop. The experiments focus on solution quality, constraint satisfaction, and computational e ffi ciency across multiple buckets of increasing scale. 
+
+4.1. Experimental environment and data 
+
+All experiments were conducted in a cloud-based Linux environment on an x86_64 platform equipped with an 8-core 2.25 GHz processor. The purpose of the experimental setup is to evaluate solver behavior and scalability under controlled conditions, with relative performance comparisons across solution approaches as the primary focus. The input data consist of representative synthetic inventory data calibrated to reflect the characteristics of a large-scale enterprise replenishment system. Prior to optimization, an isotonic regression procedure was applied to enforce monotonic relationships between safety stock levels and simulated performance 8metrics. In particular, gross margin, average inventory investment, and in-stock percentage are expected to be non-decreasing as safety stock increases; isotonic regression is used to smooth stochastic noise while preserving this structural relationship. The experimental instances follow the bucket-level optimization framework described in Section 2. For each bucket, scenario-level performance metrics are precomputed and used as inputs to the GMROI maximization problem subject to an in-stock percentage constraint. 
+
+4.2. Buckets and solver configurations 
+
+A set of representative SKU buckets was selected for evaluation in each experimental regime, spanning nearly two orders of magnitude in problem size. The smallest bucket contains 3,944 SKUs and 234,160 simulated scenarios, while the largest bucket includes 91,155 SKUs and more than five million scenarios. For each bucket and each target regime, all solution approaches were initialized with identical input data, in-stock percentage goals, and convergence tolerances. The fractional GMROI objective was handled consistently using the Dinkelbach procedure, and exact integer solutions were obtained using PuLP and 
+
+OR-Tools , while the proposed Lagrangian relaxation was applied as described in Section 3.3. This experimental design isolates the impact of problem structure on solver performance and facilitates a controlled comparison across buckets and regimes. The ISP goals were chosen deliberately to examine both constrained and unconstrained regimes of the bucket-level optimization problem. Specifically, we considered two classes of ISP goals. First, for each bucket, we selected a potentially binding ISP goals, defined as the midpoint between the empirically observed lower and upper bounds of achievable bucket-level ISP across all feasible scenario selections. This construction ensures that the service constraint is neither uniformly non-binding nor trivially infeasible, and that the e ff ective degree of constraint tightness is comparable across buckets of di ff erent scales. As a result, the constrained instances reflect a consistent binding intensity, enabling a fair comparison of solver behavior and computational effi ciency. Second, we additionally evaluated unconstrained instances by selecting ISP goals that lie below the achievable lower bound, rendering the aggregate service constraint uniformly non-binding. These instances serve to illustrate the degenerate regime discussed in Section 3.4, in which the optimization problem reduces to an unconstrained GMROI maximization and all solvers benefit from structural simplification. In addition to the baseline configurations, we conducted supplementary experiments to examine the eff ect of the ISP constraint tightness on computational performance. For each bucket, the ISP goal was systematically varied within the achievable range to induce di ff erent degrees of constraint binding, from weakly operative to strongly restrictive regimes. This experimental setup is designed to evaluate how solution time scales with increasing constraint severity across di ff erent solution approaches. 
+
+4.3. Results 
+
+This section summarizes the optimization outcomes and computational performance across all buckets and solution approaches. We first report baseline results under the primary in-stock configurations, followed by additional analyses that isolate the constrained regime and examine the e ff ect of service-level tightness on solver runtime. Throughout this section, solution quality is assessed using the metric TAR_ERR, which measures the relative deviation of a realized solution from the exact GMROI optimum and is defined as TAR_ERR = |F(x⋆
+
+> exact
+
+) − F(x⋆
+
+> solver
+
+)|
+
+max {1, |F(x⋆
+
+> exact
+
+)|} .
+
+Here, x⋆ 
+
+> exact
+
+denotes the exact GMROI-optimal solution obtained using PuLP , while x⋆ 
+
+> solver
+
+denotes the solution returned by the solver under evaluation. Throughout this paper, solutions obtained from PuLP and 
+
+OR-Tools are treated as exact, as both solvers consistently return numerically identical GMROI values under the prescribed convergence tolerance. When a table entry is reported as EXACT , the corresponding 9optimal value is attained at the solver level and is numerically indistinguishable from the true optimum; in such cases we observe TAR_ERR ≤ 10 −14 .
+
+> Table 1: Optimization results and runtimes
+
+Type#SKU-#SCEN PuLP-CBC OR-Tools-CBC Lagrangian Relaxation #ITER t[s] #ITER t[s] #ITER t[s] TAR_ERR 
+
+constrained 
+
+C03944-0234160 3 118 4 82 3 0.184 3.2e-07 C07158-0421147 3 427 4 366 3 0.389 8.5e-06 C11045-0650493 3 497 4 600 3 0.621 2.0e-06 C34280-1975791 3 1,876 4 2,885 4 3.09 6.6e-07 C40533-2178351 4 3,961 4 3.060 4 3.3 EXACT 
+
+C47200-2644766 4 9,627 4 8,874 4 4.16 1.4e-06 C59813-3242787 3 10,495 - N/A∗ 4 5.09 1.4e-06 C71925-3762114 4 18,637 4 12,834 4 5.77 2.7e-07 C91155-5035313 4 27,119 - N/A∗ 4 9.43 1.2e-08 
+
+unconstrained 
+
+U03944-0234160 3 33.7 3 7.47 3 0.051 EXACT 
+
+U07158-0421147 3 63 3 16.7 3 0.102 EXACT 
+
+U11045-0650493 3 95 3 22.6 3 0.151 EXACT 
+
+U34280-1975791 4 318 4 85 4 0.534 EXACT 
+
+U40533-2178351 4 324 4 90 4 0.614 EXACT 
+
+U47200-2644766 3 438 3 129 3 0.731 EXACT 
+
+U59813-3242787 4 481 4 135 4 0.913 EXACT 
+
+U71925-3762114 4 890 4 277 4 1.01 EXACT 
+
+U91155-5035313 4 1,211 4 406 4 1.48 EXACT  
+
+> ∗Run exceeded the predefined computational limits under the experimental environment.
+
+Baseline Results 
+
+The constrained part of Table 1 summarizes the bucket-level optimization baseline outcomes across all solution approaches under the primary in-stock configurations described in Section 4.2. For each bucket and solver, we report the number of SKUs and simulated scenarios, the number of Dinkelbach iterations required for convergence, the achieved GMROI, the realized in-stock percentage (ISP), and the overall wall-clock time. Across all buckets, the proposed Lagrangian-based method attains GMROI values that are numerically indistinguishable from those obtained by exact integer solvers, while consistently satisfying the prescribed service-level requirements. The maximum observed deviation in GMROI relative to the PuLP 
+
+baseline is on or under the order of 10 −5, which is negligible at production scale. In addition to solution quality, substantial di ff erences are observed in computational e ffi ciency. As illustrated in Figure 2, the wall-clock time required by the Lagrangian relaxation method is orders of magnitude smaller than that of the exact integer solvers on larger buckets. These performance di ff erences become increasingly pronounced as problem size grows, motivating the detailed computational analysis presented in the next subsection. 
+
+Unconstrained Regime 
+
+In the uniformly non-binding regime described in Section 3.4, the optimization problem reduces to an unconstrained GMROI maximization. As reported in the unconstrained part of Table 1 and shown in Figure 3, all solvers benefit from the removal of the aggregate coupling constraint, exhibiting substantially 10 C03 C07 C11 C34 C40 C47 C59 C71 C91        
+
+> Bucket (sorted by #SKUs)
+> 1 ms
+> 10 ms
+> 100 ms
+> 1 s
+> 10 s
+> 1 m
+> 10 m
+> 30 m
+> 1 h
+> 4 h
+> 8 h
+> 16 h
+> Wall-clock time (log scale)
+> 1m58s
+> 7m07s 8m17s
+> 31m16s
+> 1h06m
+> 2h40m 2h54m
+> 5h10m
+> 7h31m
+> 1m22s
+> 6m06s
+> 10m00s
+> 48m05s 51m00s
+> 2h27m
+> 3h33m
+> 184 ms
+> 389 ms
+> 621 ms
+> 3.1 s 3.3 s 4.2 s 5.1 s 5.8 s
+> 9.4 s
+> PuLP-CBC
+> OR-Tools-CBC
+> LGRG-Relax
+
+Figure 2: Wall-clock time across solvers in the constrained regime (log scale) 
+
+reduced solution times relative to their constrained counterparts, while producing numerically identical GMROI-optimal selections, and among all solvers, the Lagrangian-based approach still achieves the lowest wall-clock times. 
+
+Eff ect of Constraint Tightness 
+
+Figure 4 examines the e ff ect of constraint tightness using a medium-sized bucket (C11 /U11) as a representative case. The numeric annotations shown next to each data point indicate the number of Dinkelbach iterations required for convergence under the corresponding constraint tightness. For confidentiality, constraint tightness is reported on a normalized relative scale, which preserves the relative ordering of constraint severity while abstracting away absolute service-level values. The in-stock requirement is varied across its empirically feasible range on a normalized relative scale, from an eff ectively unconstrained regime to a strongly binding upper limit (near 100%). As the constraint is tightened, the realized GMROI declines relative to the unconstrained optimum. This loss is initially modest but becomes increasingly pronounced as the constraint approaches its most restrictive regime, highlighting the increasing marginal economic cost associated with more restrictive service-level requirements. Each subplot in Figure 4 illustrates the relationship between constraint tightness and runtime for a specific solution approach. For both the Lagrangian relaxation and the PuLP solver, runtime exhibits a clearly non-monotonic pattern: the longest solution times occur at intermediate levels of constraint tightness, while both the unconstrained regime and the fully binding regime are comparatively easier to solve. This behavior is consistent with the discrete nature of the problem. In the unconstrained regime, the service constraint is inactive and the problem simplifies structurally, while near the binding upper limit the feasible region becomes highly restricted, often yielding fewer admissible solutions. In contrast, intermediate targets induce the greatest combinatorial ambiguity, with multiple near-feasible and near-optimal selections competing, which is also reflected in a higher number of Dinkelbach iterations (e.g., 4 iterations in the mid-range compared with 2-3 near the extremes). Comparing the two panels of Figure 4 further highlights the computational advantage of the proposed 11 U03 U07 U11 U34 U40 U47 U59 U71 U91 
+
+Bucket (sorted by #SKUs) 
+
+1 ms 
+
+10 ms 
+
+100 ms 
+
+1 s 
+
+10 s 
+
+1 m 
+
+10 m 
+
+30 m 
+
+1 h         
+
+> Wall-clock time (log scale)  33.7 s
+> 1m03s
+> 1m35s
+> 5m18s 5m24s
+> 7m18s 8m01s
+> 14m50s
+> 20m11s
+> 7.5 s
+> 16.7 s
+> 22.6 s
+> 1m25s 1m30s
+> 2m09s 2m15s
+> 4m37s
+> 6m46s
+> 51 ms
+> 102 ms
+> 151 ms
+> 534 ms 614 ms 731 ms 913 ms 1.0 s
+> 1.5 s
+
+PuLP-CBC 
+
+OR-Tools-CBC 
+
+LGRG-Relax Figure 3: Wall-clock time across solvers in the unconstrained regime (log scale) 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%                              
+
+> Normalized In-Stock% Tightness
+> 0.2
+> 0.3
+> 0.4
+> 0.5
+> 0.6
+> 0.7
+> 0.8
+> Runtime (seconds)
+> 3
+> 3
+> 3
+> 333
+> 4
+> 33
+> 33
+> 4
+> 33
+> 4
+> 33333
+> 2
+> Unconstrained Binding Upper Limit
+> LGRG-Relax
+> Runtime (s)
+> Relative GMROI
+> 0% 10% 20% 30% 40% 50% 60% 70% 80% 90% 100%
+> Normalized In-Stock% Tightness
+> 100
+> 200
+> 300
+> 400
+> 500
+> 600
+> 700
+> Runtime (seconds)
+> 3
+> 3
+> 33
+> 3
+> 3
+> 4
+> 33
+> 3
+> 3
+> 33333
+> 3
+> 333
+> 2
+> Unconstrained Binding Upper Limit
+> PuLP-CBC
+> Runtime (s)
+> Relative GMROI
+> 82.5%
+> 85.0%
+> 87.5%
+> 90.0%
+> 92.5%
+> 95.0%
+> 97.5%
+> 100.0%
+> Relative GMROI
+> 82.5%
+> 85.0%
+> 87.5%
+> 90.0%
+> 92.5%
+> 95.0%
+> 97.5%
+> 100.0%
+> Relative GMROI
+
+Figure 4: Runtime and Relative GMROI vs Normalized In-Stock Tightness 
+
+Lagrangian relaxation. Across all levels of constraint tightness, the Lagrangian-based method is consistently and substantially faster than the exact PuLP solver, often by several orders of magnitude in wall-clock time. Notably, this speedup is achieved without sacrificing solution quality, as both solvers exhibit nearly identical relative GMROI trends across the entire tightness spectrum. 
+
+4.4. Computational performance 
+
+The computational e ffi ciency of the proposed Lagrangian–Dinkelbach framework is primarily driven by its structural decomposition of the inner optimization problem. Solving the BIP subproblem directly requires global branch-and-bound over a large discrete decision space, which is computationally expensive. The Lagrangian relaxation removes the bucket-level service constraint and decomposes the subproblem into independent SKU-level decisions for a fixed multiplier. As a result, each inner iteration reduces to a set of simple local maximization operations rather than a combinatorial search. Moreover, the Lagrangian multiplier is one-dimensional and can be e ffi ciently updated via binary search, while the Dinkelbach outer loop converges in a small number of iterations. Together, these properties significantly reduce the overall computational burden while preserving solution quality. 12 Remark on Duality Gap in the Integer Setting 
+
+Algorithm 2 relies on a Lagrangian relaxation of the bucket-level service constraint and is exact for the associated continuous relaxation. When the decision variables are restricted to multiple-choice binary selections, a nonzero duality gap may in principle arise because the service-level constraint couples otherwise separable SKU-level decisions. Such linking constraints are well known to induce duality gaps in integer programs. Consistent with this theory, the Lagrangian solution is not guaranteed to be globally optimal for the original binary integer program. However, the numerical experiments demonstrate that the resulting gap is negligible in practice: across all buckets, the Lagrangian method attains GMROI values that are numerically indistinguishable from those produced by exact integer optimization solvers, while satisfying the ISP constraints. This behavior suggests that, for the bucket structures encountered in production, the Lagrangian relaxation is extremely tight and provides an e ff ective approximation to the true integer optimum with substantial computational savings. 
+
+5. Conclusion 
+
+This paper proposes a scalable simulation–optimization framework for bucket-level GMROI maximization with discrete SKU decisions under a global service performance constraint (operationalized as an in-stock percentage requirement). By combining stochastic simulation with a Dinkelbach-based fractional programming formulation, the approach enables profitability-oriented decision-making while explicitly accounting for service performance requirements. The proposed Lagrangian relaxation further exploits the separable structure of the problem, yielding substantial computational gains without compromising solution quality. Beyond demonstrating algorithmic e ffi ciency, our results provide managerial insight into the role of constraint tightness. By systematically varying the in-stock percentage (ISP) within its empirically feasible range, we show that increasingly stringent ISP requirements lead to a growing degradation in realized GMROI. While moderate ISP targets impose only limited economic penalties, aggressively high ISP requirements incur disproportionately large profitability losses. This finding underscores the necessity for supply chain practitioners to carefully balance service ambitions against financial returns, rather than treating service targets, implemented through ISP requirements, as exogenous or cost-free design parameters. Taken together, the results illustrate both the operational value and the practical relevance of the proposed framework. From an optimization perspective, the method o ff ers a tractable and scalable solution to large-scale, service-constrained fractional programs. From a supply chain management perspective, it provides a quantitative basis for evaluating service–profit trade-o ff s, supporting informed and economically grounded inventory decisions in complex, data-driven enterprise environments. 
+
+Acknowledgments 
+
+This research was conducted using data, resources, and project support provided by an industry partner. The authors sincerely thank the partner for enabling this study and for the insights and collaboration that made this work possible. 
+
+# Appendix A Convergence and Finite-Step Termination Proofs 
+
+Theorem A.1 (General Convergence of Dinkelbach’s Algorithm) 
+
+Consider the fractional programming problem 
+
+max  
+
+> x∈D
+
+F(x) = M(x)
+
+I(x) ,
+
+13 where D is compact and nonempty, and I (x) satisfies I (x) > 0 for all x ∈ D . Assume further that I is lower semicontinuous on D. Define 
+
+Φ(λ) = max  
+
+> x∈D
+
+{M(x) − λI(x)}, λ⋆ = max 
+
+> x∈D
+
+M(x)
+
+I(x) .
+
+If each subproblem of the Dinkelbach iteration 
+
+xk ∈ arg max  
+
+> x∈D
+
+{M(x) − λk I(x)}, λk+1 = M(xk)
+
+I(xk) ,
+
+is solved exactly, then the sequence {λk} satisfies: 
+
+(a) {λk} is monotonically increasing and bounded above by λ⋆;
+
+(b) λk → λ⋆ as k → ∞ ;
+
+(c) xk → x⋆ ∈ arg max x∈D F(x).Proof. From the iteration rule, 
+
+λk+1 − λk = M(xk)
+
+I(xk) − λk = Φ(λk)
+
+I(xk) .
+
+For each λ ∈ R, the function 
+
+Φ(λ) = max  
+
+> x∈D
+
+{M(x) − λI(x)}
+
+is continuous and strictly decreasing, as it is the pointwise maximum of a ffi ne functions in λ.Therefore, whenever Φ(λk) > 0 = Φ (λ⋆), we have λk+1 > λ k; thus the sequence {λk} is monotonically increasing. Since F(x) ≤ λ⋆ for all x ∈ D , we have λk+1 ≤ λ⋆, so the sequence is bounded above and hence convergent to some ¯ λ ≤ λ⋆. Taking limits and using continuity of Φ. Since I > 0 and lower semicontinuous, 0 = lim 
+
+> k→∞
+
+(λk+1 − λk) = lim 
+
+> k→∞
+
+Φ(λk)
+
+I(xk) =⇒ Φ(¯ λ) = 0.
+
+By the uniqueness of the zero of Φ, it follows that ¯ λ = λ⋆. Consequently, xk converges to an optimal solution x⋆ ∈ arg max x∈D F(x). 
+
+Corollary A.2 (Finite-Step Termination for Discrete Feasible Sets) 
+
+Suppose the feasible set D in Theorem A.1 is finite and I (x) > 0 for all x ∈ D . Let 
+
+R = n M(x)
+
+I(x) : x ∈ D o, λ⋆ = max R,
+
+then the Dinkelbach algorithm terminates in a finite number of iterations, returning a globally optimal pair 
+
+(x⋆, λ ⋆) satisfying F (x⋆) = λ⋆. If |R| = r, at most r iterations are required. Proof. Each λk equals the ratio M(xk)/I(xk) for some feasible xk, so λk ∈ R . Because D is finite, the set 
+
+R is also finite. According to Theorem A.1, {λk} is a monotonically increasing series and converges to λ⋆.Hence the sequence forms a strictly increasing chain of distinct elements in the finite set R, and thus must reach the maximal element λ⋆ in at most r steps. 14 References 
+
+[1] M. A. Gokce, Optimization of sourcing decisions in supply chains, North Carolina State University, 2002. [2] J. M. Smith, B. Tan, Handbook of stochastic models and analysis of manufacturing system operations, volume 20013, Springer, 2013. [3] D. Bertsimas, A. Thiele, A robust optimization approach to inventory theory, Operations research 54 (2006) 150–168. [4] J. N. Gonçalves, M. S. Carvalho, P. Cortez, Operations research models and methods for safety stock determination: A review, Operations research perspectives 7 (2020) 100164. [5] J. A. d. Cruz, L. L. d. Salles-Neto, C. M. Schenekemberg, An integrated production planning and inventory management problem for a perishable product: optimization and monte carlo simulation as a tool for planning in scenarios with uncertain demands, Top 32 (2024) 263–303. [6] N. Vandeput, Inventory optimization: Models and simulations, Walter de Gruyter GmbH & Co KG, 2020. [7] M. G. Avci, H. Selim, A multi-objective, simulation-based optimization framework for supply chains with premium freights, Expert Systems with Applications 67 (2017) 95–106. [8] S. S. Pitty, W. Li, A. Adhitya, R. Srinivasan, I. A. Karimi, Decision support for integrated refinery supply chains: Part 1. dynamic simulation, Computers & Chemical Engineering 32 (2008) 2767– 2786. [9] T. Ogura, H. Wang, Q. Wang, A. Kiuchi, C. Gupta, N. Uchihira, Bayesian optimization methods for inventory control with agent-based supply-chain simulator, IEICE Transactions on Fundamentals of Electronics, Communications and Computer Sciences 105 (2022) 1348–1357. [10] S. Maitra, Inventory management under stochastic demand: A simulation-optimization approach, arXiv preprint arXiv:2406.19425 (2024). [11] S. M. E. Sharifnia, S. A. Biyouki, R. Sawhney, H. Hwangbo, Robust simulation optimization for supply chain problem under uncertainty via neural network metamodeling, Computers & Industrial Engineering 162 (2021) 107693. [12] J. V. S. do Amaral, J. A. B. Montevechi, R. de Carvalho Miranda, W. T. de Sousa Junior, Metamodel-based simulation optimization: A systematic literature review, Simulation Modelling Practice and Theory 114 (2022) 102403. [13] L. J. Hong, X. Zhang, Surrogate-based simulation optimization, in: Tutorials in Operations Research: Emerging Optimization Methods and Modeling Techniques with Applications, INFORMS, 2021, pp. 287–311. [14] S. C. Tsai, S. T. Chen, A simulation-based multi-objective optimization framework: A case study on inventory management, Omega 70 (2017) 148–159. [15] A. Charnes, W. W. Cooper, Programming with linear fractional functionals, Naval Research logistics quarterly 9 (1962) 181–186. [16] W. Dinkelbach, On nonlinear fractional programming, Management science 13 (1967) 492–498. 15 [17] F. Miller, Y. B. Kaya, G. L. Dimas, R. Konrad, K. L. Maass, A. C. Trapp, et al., On the optimization of benefit to cost ratios for public sector decision making, arXiv preprint arXiv:2212.04534 (2022). [18] M. L. Fisher, The lagrangian relaxation method for solving integer programming problems, Management science 27 (1981) 1–18. [19] S. Mitchell, Pulp: A linear programming toolkit for python, Optimization Online (2011). URL: 
+
+https://optimization-online.org/wp-content/uploads/2011/09/3178.pdf .[20] L. Perron, F. Didier, Cp-sat, 2025. URL: https://developers.google.com/optimization/cp/ cp_solver/ .16

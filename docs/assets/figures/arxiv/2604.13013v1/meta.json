@@ -1,0 +1,62 @@
+{
+  "version": 2,
+  "extractor": "pdffigures2",
+  "figures": [
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-001.webp",
+      "caption": "Fig. 4. Convergence trends on the large-scale instances.",
+      "page": 11,
+      "index": 1,
+      "width": 1060,
+      "height": 384
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-002.webp",
+      "caption": "Fig. 3. The eight move operators illustrated by simplified route segments.",
+      "page": 7,
+      "index": 2,
+      "width": 838,
+      "height": 365
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-003.webp",
+      "caption": "TABLE VI OBJECTIVE VALUE COMPARISON WITH STATE-OF-THE-ART ALGORITHMS USING THE MAX EVALS STOP CRITERION",
+      "page": 10,
+      "index": 3,
+      "width": 982,
+      "height": 975
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-004.webp",
+      "caption": "TABLE I SUMMARY OF NOTATION USED IN THE BILEVEL E-CVRP MODEL.",
+      "page": 3,
+      "index": 4,
+      "width": 1072,
+      "height": 636
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-005.webp",
+      "caption": "Fig. 5. Comparative solution with and without M8 operator on E30.",
+      "page": 12,
+      "index": 5,
+      "width": 522,
+      "height": 241
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-006.webp",
+      "caption": "TABLE VII ABLATION STUDY ON THE EFFECTS OF GREEDY DESCENT (G), CHARGING REFINEMENT (F ), AND BILEVEL FRAMEWORK",
+      "page": 12,
+      "index": 6,
+      "width": 504,
+      "height": 948
+    },
+    {
+      "url": "assets/figures/arxiv/2604.13013v1/fig-007.webp",
+      "caption": "TABLE V RANK CORRELATION AND TOP-k% SET OVERLAP BETWEEN ϕ(x) AND F (x, y∗(x)).",
+      "page": 9,
+      "index": 7,
+      "width": 500,
+      "height": 277
+    }
+  ]
+}
