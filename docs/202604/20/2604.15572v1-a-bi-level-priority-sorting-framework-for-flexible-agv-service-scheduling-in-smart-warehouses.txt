@@ -1,0 +1,628 @@
+Title: A bi-level priority sorting framework for flexible AGV service scheduling in smart warehouses
+
+URL Source: https://arxiv.org/pdf/2604.15572v1
+
+Published Time: Mon, 20 Apr 2026 00:25:02 GMT
+
+Number of Pages: 31
+
+Markdown Content:
+# A bi-level priority sorting framework for flexible AGV service scheduling in smart warehouses 
+
+Xiaozhu Sun 1* and Bilal Farooq 2
+
+> 1*
+
+Laboratory of Innovations in Transportation (LiTrans), Toronto Metropolitan University, 350 Victoria St, Toronto, M5B 2K3, Ontario, Canada. 
+
+> 2
+
+Laboratory of Innovations in Transportation (LiTrans), Toronto Metropolitan University, 350 Victoria St, Toronto, M5B 2K3, Ontario, Canada. *Corresponding author(s). E-mail(s): xiaozhu.sun@torontomu.ca; Contributing authors: bilal.farooq@torontomu.ca; 
+
+Abstract 
+
+This paper proposes a bi-level optimization framework to coordinate Automated Guided Vehicle (AGV) flexible operations in smart independent warehouses, addressing the critical challenge of balancing high-throughput order fulfillment with stringent cost control. The framework is designed to simultaneously opti-mize flexible customer service level, system cost, and operational efficiency. The first level dynamically adjusts real-time scheduling parameters, such as order commitment times and delay tolerance, based on predefined customer priority categories. The second level performs real-time routing optimization for each AGV by identifying the shortest feasible paths while avoiding conflicts. For com-plex multi-capacity package picking tasks, two heuristic rules, priority, deadline, with shortest path (PDSP) and delay cost with shortest path (DCSP), are applied to multi-capacity package picking tasks and further training is carried out using the reinforcement learning algorithm of A* guided deep Q-learning (AGDQN). Comprehensive simulation experiments, conducted across diverse warehouse lay-outs and order demand patterns, demonstrate that the proposed framework equipped with both heuristic rules consistently reduces average order delay and total system costs by over 50% during peak demand periods. This is achieved while maintaining a service level above 90% and maximizing AGV utilization. The method also exhibits superior flexibility and sustained efficiency under nor-mal and fluctuating demand scenarios. Additional ablation studies confirm that 
+
+1 
+
+> arXiv:2604.15572v1 [math.OC] 16 Apr 2026 the proposed priority sorting mechanism delivers robust performance advantages when tested with various other reinforcement learning baselines.
+> Keywords: AGV, heuristic-based reinforcement learning, level of service, priority, sorting method, smart warehouse
+
+# 1 Introduction 
+
+Logistics automation is an important link in the supply chain, ensuring the efficient circulation of commodities (Yan et al. 2022). The rapid expansion of e-commerce, express delivery, smart factories, and smart cities has propelled intelligent logistics to the forefront of industrial and academic research fields. Within this domain, the integration of smart warehousing systems with automated guided vehicles (AGVs) rep-resents a transformative advancement, significantly enhancing operational efficiency and effectiveness (Fazlollahtabar and Saidi-Mehrabad 2015). As autonomous material-handling devices, AGVs are extensively deployed in manufacturing(Lin et al. 2019), automated storage and retrieval systems (AS/RS)(Cano et al. 2023), and port termi-nals(Xie et al. 2025). In automated sorting operations, AGVs offer superior endurance and consistent performance compared with manual or semi-automated alternatives. The effective scheduling of AGV fleets is paramount, enabling continuous operation and ensuring timely order fulfillment, thereby elevating overall customer service levels (Liu et al. 2019). The optimization of warehouse operations is economically crucial, with order pick-ing alone accounting for approximately 55% of the total operational costs (Larco et al. 2017). Research on AGV-based systems has evolved in both macro- and micro-dimensions. At the macro (system) level, studies have focused on integrated challenges such as multi-AGV task scheduling, cooperative path planning, and optimal fleet sizing to maximize throughput by Sun and Zhao (2025) and Chaikovskaia et al. (2025). At the micro-level, investigations delve into real-time collision avoidance, energy consumption minimization, and motion control. In flexible manufacturing and logistics contexts, key performance objectives consistently include minimizing makespan, optimizing deliv-ery routes, reducing work-in-process inventory, and ensuring timely material delivery by Zhang et al. (2023) and Riazi et al. (2020). This study is motivated by a pressing real-world challenge in e-commerce logistics: the need to dynamically balance system efficiency with differentiated customer service. Modern sales and inventory strategies often necessitate the assignment of dual priority levels to orders to cater to diverse customer segments (e.g., premium vs. standard) by Vicil (2021) and Uzunoglu Kocer and Yalcin (2020). This creates a complex operational dilemma in which a homogeneous “first-come, first-served” AGV scheduling strategy becomes suboptimal. The core problem transcends simple path planning and involves a bi-level decision-making process: first, dynamically adjusting scheduling priorities based on real-time order attributes and customer categories; second, optimizing the physical routing of a fleet of multi-capacity AGVs under those priorities to minimize systemic costs and delays. 2To address this gap, we propose a novel bilevel optimization framework that enhances the classical dial-a-ride problem (DARP) model by Hyyti¨ a et al. (2012) for smart warehouse sorting. Our framework explicitly models the trade-off between global system efficiency (e.g., total cost and AGV utilization) and customer-oriented metrics (e.g., service level and delay). A weighted cost model was employed to inte-grate these competing objectives. At its core is a bi-level priority sorting framework: the first level handles the external optimization of order scheduling parameters (such as deadline and delay tolerance) per customer category; the second level conducts the internal optimization of AGV routing by calculating the shortest feasible paths that satisfy the high-level priorities. The main contributions are following: 1. Integration of dynamic order priorities and delay constraints into multi-load AGV scheduling rules: We propose two heuristic strategies, DCSP (delay cost and shortest path) and PDSP (priority, deadline, and shortest path), which explic-itly incorporate real-time order priority and delivery delay considerations into the dispatching logic of multi-load AGVs. These rules jointly optimize energy consump-tion and customer satisfaction, providing a practical and scalable decision-making flexible framework for dynamic warehouse environments. 2. Dual-metric evaluation framework based on operational workload and service Level: 
+
+This study introduces a systematic evaluation approach that links operational workload with service-level performance. For the first time, this framework was applied to continuous multi-node picking using automated guided vehicles (AGVs), enabling comprehensive sensitivity analysis, scalability testing, and system state assessment. The results offer actionable insights for the scheduling model design in cloud warehouses, complex task environments, and distribution centers. 3. Extensive experimental validation of the bilevel optimization architecture: Under consistent experimental settings, the proposed method was compared with sev-eral state-of-the-art reinforcement learning algorithms. The results demonstrate its superior adaptability, sensitivity, and robustness, confirming that the coordinated two-level optimization effectively enhances the overall system performance in terms of time, cost, and energy efficiency. The remainder of this paper is organized as follows. Section 2 reviews the relevant literature. Section 3 describes the application scenarios, underlying assumptions and problem formulation. Section 4 presents the proposed mathematical model and opti-mization methods. Section 5 presents the case studies and comparative performance analyses. Finally, Section 7 concludes the paper and discusses the future research directions. 
+
+# 2 Related Works 
+
+In the existing literature, AGVs have been extensively studied in manufacturing work-shops, focusing on order sorting, priority setting, delivery timeliness, and dynamic programming. However, most research on AGV applications in warehouses empha-sizes minimizing path costs, addressing single-task operations, managing shelf transfer 3vehicles, and solving operational challenges such as deadlocks and congestion. These studies often assumed static scheduling frameworks. This study draws on three major categories of relevant research: recent developments in tactical optimization meth-ods, system analysis and evaluation techniques, including commonly used performance indicators, and classic and contemporary sorting strategies in smart logistics environ-ments. The limitations of existing multi-priority sorting methods are also highlighted, with a comparative analysis of prior models to identify research gaps. 
+
+2.1 Tactical Optimization 
+
+Strategic issues in AGV path optimization often involve vehicle design, facility layout, and route selection, which are typically addressed using multi-objective models. Li et al. (2019) proposed a three-objective model using harmony search to reduce AGV travel time. Zhang et al. (2021) developed an energy-aware optimization model that considers turning energy consumption and evaluated it using particle swarm optimiza-tion (PSO). Zhang et al. (2024) proposed a stage-based dynamic prioritization and rerouting approach to reduce congestion and delays in multi-AGV systems. Nishi et al. (2011) applied mixed-integer linear programming (MILP) to decouple high-level pro-duction scheduling from low-level AGV routing. Wang et al. (2020) employed queuing theory within a two-stage robotic mobile fulfillment system (RMFS) framework to analyze system performance. Once target nodes are determined, enhancing AGV responsiveness and trans-port efficiency often focuses on shortest-path algorithms. Guo et al. (2023) enhanced the traditional A* algorithm by reducing sharp turns in single-AGV paths and minimizing intersection conflicts among multiple AGVs through the introduction of penalty values for overlapping path segments. Zhang et al. (2024) applied the A* algorithm to evaluate different scheduling modes involving inter-AGV transfers. Xie et al. (2025) proposed a GAHA algorithm for dynamic and conflict-free AGV scheduling in container terminals to improve efficiency. Jiang et al. (2024) addressed AGV routing problems with simultaneous pickup and delivery under mixed time-window constraints. Liu et al. (2019) proposed a multi-objective AGV task scheduling model integrated with adaptive genetic algorithms (AGA and MAGA), with schedul-ing results visualized using Gantt charts based on a practical sorting layout. These methods collectively support greater AGV flexibility in smart logistics systems. Durst et al. (2023) developed an adaptive deep reinforcement learning (DRL)-based real-time AGV scheduling approach to optimize multiple efficiency-related objec-tives in a job shop environment, employing a linear reward function and proximal policy optimization (PPO) with a deep neural network (DNN) for policy iteration. Similarly, Liu et al. (2020) proposed a DRL framework integrating actor and critic networks with convolutional and fully connected layers, enabling agents to learn appro-priate behaviors across diverse operational scenarios while estimating state values through a parallel training strategy that combines asynchronous updates with deep deterministic policy gradient (DDPG). In their approach, the reward function was manually designed and required adjustment across different environments during the optimization process. 42.2 System Assessment 
+
+AGV performance in smart warehousing systems must be evaluated differently from traditional vehicle metrics, encompassing AGV-specific performance degradation, inventory impacts, and responsiveness to orders and service sequences. Inventory optimization has yielded significant results in this field. For instance, Vicil (2021) introduced two ordering policy models, one of which assumed zero tolerance for wait-ing among high-priority customers and used continuous-time Markov chain (CTMC) modeling for approximation. Kocer and Yalcin (2020) investigated a lost-sales (s,Q) inventory system serving two customer classes. By comparing equal and graded poli-cies, they concluded that prioritizing high-priority customers yields lower supplier costs and better service levels than the latter. Chen et al. (2010) emphasized that selecting appropriate priority strategies is complex, requiring trade-offs among handled volume, service level, and operational costs. Gupta et al. (2020) modeled dual-warehouse systems with delayed payments; Goh and Lim (2014) explored inventory classifications and system costs. Energy and routing efficiency are also important, while Qiu et al. (2015) modeled energy use by weight and distance in high-bay settings. Delay-related costs are increasingly relevant. Gao and Wang (2020) incorporated soft time window constraints and quantified waiting and delay costs across four urban scenarios. Arnold and Yuce (2013) examined Maersk Line’s use of an economic frame-work to accelerate value delivery, analyzing delay costs based on benefits, urgency, and value of information. Anderson (2012) formally introduced the concept of cost of delay (CoD) within Kanban-based product development, arguing that understanding CoD is essential for optimizing work prioritization and customer value delivery. Despite the relevance of these concepts, few studies have combined them with AGV systems. 
+
+2.3 Priority Evaluation 
+
+To enhance the flexibility and responsiveness of logistics systems, scholars have differ-entiated between internal and external priorities. Olsson (2008) distinguished internal priorities such as improving process efficiency, optimizing resource allocation, and min-imizing costs from external priorities, which include customer requirements, market trends, and delivery deadlines. Arshinina (2019) set internal priorities serve the long-term operational goals of the organization, while external priorities focus on satisfying immediate customer needs and enhancing market competitiveness. In AGV systems, the first-come-first-served (FCFS) rule (Chretienne 1995) is a widely applied classical strategy. This rule is used to determine the order in which vehicles are dispatched based on the sequence in which requests arrive, ensuring fair-ness, but often at the expense of overall efficiency. In practice, this rule is the most prevalent queuing strategy in AGV dispatching systems. However, many studies have explored alternative scheduling rules to further refine vehicle coordination. Goldberg (1977) applied the earliest due date (EDD) rule to manage queues, aiming to reduce delay penalties by prioritizing tasks with the earliest possible deadlines. Jackson (1955) designed scheduling mechanisms that minimize job tardiness, forming the basis of many modern dispatching approaches. Smith (1956) proposed the shortest processing 5time (SPT) rule, which prioritizes tasks requiring the least processing time, effectively reducing average waiting time and increasing system throughput. Beyond these heuristic rules, priority modeling based on cost functions has emerged in queuing and service systems research. Maglaras et al. (2018) examined packet delays in single server queues by modeling priority through delay cost functions, enabling the system to prioritize tasks based on the economic impact of delay. Similarly, Amiri (1998) introduced external priority attributes into transportation planning, including time costs, expected workload, and backup service requirements. Their model allows for more nuanced scheduling decisions that better align with customer and operational requirements. 
+
+2.4 Remarks on Existing Literature 
+
+Despite significant advances, several critical gaps remain in AGV optimization research. Dynamic scheduling methods in warehouse logistics are underdeveloped com-pared to those in flexible manufacturing systems. Although traditional transportation and smart factory designs offer some integrated optimization methods, innovative approaches for dynamic multi-capacity, multi-task AGV fleet scheduling in logistics environments are limited. Most existing studies focus on individual AGV scheduling or fleet size reduction, emphasizing algorithmic improvements for the shortest path search or vehicle count minimization. However, they often overlook external strategic and marginal factors such as cus-tomer satisfaction, inventory economics, and priority differentiation. Moreover, there is a lack of research addressing simultaneous improvements in order responsiveness, travel time reduction, and energy efficiency for both loaded and empty states. More-over, the prevalent assumption of a single-order capacity per AGV does not reflect real-world operations, where AGVs frequently carry multiple orders, significantly boosting operational efficiency. 
+
+# 3 Problem Description 
+
+In traditional warehouses, operations follow a sequence of picking, packing, staging, scheduling, and dispatching (Kim 2020), whereas in smart warehouses, AS/RS fetch items based on customer orders and deliver them via conveyors to the packaging area (Liu et al. 2019). Packaged items are then conveyed to the sorting zone, where AGVs handle the sorting and delivery, as illustrated in Figure 1, with the system layout shown in Figure 2. Each 24-hour cycle begins with a static planning phase that allocates tasks and schedules any remaining orders from the previous cycle, followed by dynamic planning as new orders and retrieval tasks emerge throughout the day. AGVs continuously update their tasks in real time, retrieving assignments in the delivery zone, anticipating subsequent tasks, and automatically starting new cycles after completing each operational loop. In a grid-based warehouse map, each delivery location is assigned specific coor-dinates, and lines denote navigable AGV paths. To minimize backorders and lost sales by Vicil (2021) and Uzunoglu Kocer and Yalcin (2020), the system incorporates 6Fig. 1 : Delivery processes. 
+
+Fig. 2 : Considered partial layout of the warehouse. 
+
+customer priority classes, giving higher weights and stricter delay penalties to high-priority customers, whereas lower-priority customers receive lighter penalties. Because the number of AGVs is typically far fewer than the volume of items awaiting transport, queuing and delays are unavoidable, and optimal routing must adapt dynamically to fleet size. The model first considers a single AGV handling all orders, recalculat-ing and reordering tasks as new orders arrive, optimal tasks emerge, or scheduled orders are canceled, and sometimes requires mid-task redirection. It is then extended to multi-AGV coordination, enabling the global optimization of task allocation and routing. The following assumptions were made to facilitate the path optimization of AGVs in the warehouse environment: 
+
+• Each AGV carries up to four units, adjustable as needed. 
+
+• AGVs move at constant speed for safety and predictability. 
+
+• Loading/unloading times are excluded from transport time. 
+
+• Corridors allow only one AGV; conflicts are resolved by priority rules. 
+
+• An AGV must finish its current loop before new tasks. 
+
+# 4 Methodology 
+
+This study extends the classical dial-a-ride problem (DARP) by Hyyti¨ a et al. (2012), traditionally used in demand-responsive transport on urban road networks, to AGV-based warehouse logistics. Both systems involve capacity-constrained and time-sensitive pickup and delivery tasks. Although their evaluation criteria differ slightly, 7Fig. 3 : Concept of the proposed methodology. 
+
+the core objective remains minimizing operational costs while maintaining high service quality. In warehouse micro-transportation, AGVs must navigate dynamic conditions to meet similar efficiency and service requirements. To adapt the DARP to AGV-based logistics, we introduce two key performance metrics: system effort and time-varying level of service (LoS). The system effort accounts for the AGV travel distance, idle time, and energy consumption, reflecting the overall operational efficiency. In contrast, the time-varying LoS evaluates how effectively AGVs meet demand under changing conditions, such as customer wait times, delivery punctuality, and throughput. These metrics enable a comprehensive evaluation of the performance under dynamic logistics scenarios. A bi-level optimization framework was developed to integrate these metrics into AGV scheduling. The internal level prioritizes task assignments based on distance and inventory fluctuations, whereas the external level reflects service-driven factors such as customer priority, time sensitivity, and delay tolerance. Two model-based sorting mechanisms guide AGV coordination for order-picking and delivery. Depending on the system constraints, minimizing the workload and maximizing the LoS may require trade-offs or produce mutually beneficial outcomes, as illustrated in Figure 3. This study models AGV routing as a many-to-one ride-matching problem, in which one AGV can carry multiple orders, but each order is assigned to only one AGV. The orders include spatial coordinates, service attributes, priority levels, and destinations. Internal and external priorities guide the allocation to minimize the total system cost, which is evaluated using an enhanced DARP framework. Based on the dynamic DARP theory, the model targets two objectives: minimizing AGV energy consumption (system effort) and reducing the total system time, including waiting and delivery delays (level of service, LoS). As these objectives may conflict, the model minimizes the weighted sum to balance efficiency and service quality. The detailed notations and related definitions are in Table 1, as well as the mathematical formulas, are shown below. 8Table 1 : Notations and definitions 
+
+Type Notation 1 Notation 2 Symbol Definition Symbol Definition 
+
+Indices 
+
+i Order index, i = 1 , . . . , N j Load index, j = 0 , . . . , M cl Priority class, cl ∈{A, B, C, D }
+
+k AGV index, k = 1 , . . . , K t Time window index (i, j ) Arc from node i to j
+
+Sets 
+
+Pi Orders in one loop pj Tasks in one trip 
+
+Oi Origin nodes of tasks Di Destination nodes of tasks 
+
+Cicl Orders with class cl Ak Attributes of AGV k
+
+Ot Active orders at time t N Set of warehouse nodes 
+
+K Set of AGVs A Set of network arcs 
+
+gi Task weight (kg) 
+
+Parameters 
+
+N Number of orders M AGV capacity 
+
+K Number of AGVs C Number of priority classes 
+
+G0 AGV self-weight (kg) R Conveyor coordinates 
+
+TB Battery tolerance time (h) v Velocity (m/s) 
+
+EP Electricity price δ1, δ 2 Power coefficients 
+
+CO Waiting cost Cpcl Delay cost rate 
+
+β Penalty factor dij Distance between nodes i and 
+
+j (m) 
+
+nmax  
+
+> ij
+
+Arc capacity Tddi Order deadline (s) 
+
+Variables 
+
+toi Order arrival time tai Arrival time at pickup 
+
+tdi Departure time Poi Power consumption of order iP kunit Power rate of AGV k Tri Running time 
+
+GL Full-load weight wt Dynamic weight 
+
+Ti Total transport time Twi Waiting time 
+
+Tui Uniform waiting baseline di Transport distance 
+
+xijk Routing decision variable yik Assignment variable 
+
+si Service start time ui Subtour elimination variable 
+
+Ek Energy consumption of AGV 
+
+kCP ower Power cost 
+
+CT ime Time-related cost Gk Carried weight of AGV k
+
+4.1 Objective Function 
+
+In each time window, the system receives a batch of new orders with assigned priority levels, prompting the AGVs to re-evaluate and optimize the dispatch routes accord-ingly. Traditional objective functions often fall short of meeting multi-class customer demands. To overcome this, a dynamic weighting mechanism in Equation 1 is intro-duced, assigning higher weights to urgent orders or applying queue-time penalties. When the waiting times exceed the set thresholds, the penalty coefficients are adjusted based on the customer priority classes. 
+
+min F = wt × E[P ower ] + (1 − wt) × E[T ime ] (1) 
+
+where E[P ower ] represents the expected monetary cost of the AGV energy con-sumption, which is influenced by the vehicle velocity, transport distance, and payload weight. E[T ime ] denotes the expected cost associated with the system time, including travel, waiting, and delay durations. The parameter wt adjusts the trade-off between the energy and time costs. The system dynamically tunes this weight in response to operational factors such as order priority, customer importance, and upstream and downstream supply chain impacts. 94.1.1 Enhanced Power Function 
+
+The power consumption model in Equation 2 is designed with flexibility. However, for this study, we assume that AGVs operate at a constant speed while transferring electrical loads, consistent with large-capacity transport systems (Qiu et al. 2015). As the AGVs were assumed to operate continuously, a motion coefficient was applied for AGVs carrying a payload based on prior work (Mei et al. 2006). 
+
+P kunit = δ1 × Gk + δ2 (2) 
+
+where the total weight Gk includes AGV tare weight and dynamic payload: 
+
+Gk = K × G0 +
+
+> n
+
+X
+
+> i=1
+
+gi × yik + X
+
+> (i,j )∈A
+
+qijk (3) Total power consumption over distance Lk traveled by AGV k:
+
+P o k = P kunit × Lk (4) 
+
+Lk = X
+
+> (i,j )∈A
+
+dij × xijk (5) where dij is the distance between nodes i and j.
+
+4.1.2 Comprehensive Time Function 
+
+The system defines a uniform waiting time for all orders but with different thresholds for each class. When the waiting time for an order exceeds the threshold, the excess time is classified as a delay. In Equations 8 and 9, T (waiting ) and T (delay ) denote the cumulative waiting and delay times for all orders in a given time window. 
+
+CT ime = Cwaiting + β × Cdelay (6) 
+
+CT ime =
+
+> n
+
+X
+
+> i=1
+
+h
+
+fCO (Twi ) + β × fCicl (Tdelay )
+
+i
+
+(7) 
+
+T (waiting ) = 
+
+> n
+
+X
+
+> i=1
+
+Twi (8) 
+
+where Twi = max(0 , s i − ri) is the waiting time for order i, si is the service start time and ri is the request time. 
+
+T (delay ) = 
+
+> n
+
+X
+
+> i=1
+
+|Tddi − Twi | (9) 
+
+4.1.3 Conversion Function 
+
+To enable cost normalization, both the power and time metrics were converted into monetary values. The electricity cost was calculated using the unit industrial power rate, whereas the time-related costs were derived based on order-specific penalties. 10 Similarly, we obtain unit costs for different time types and calculate the lost costs. 
+
+CO is the parameter of unit storage-based time cost, β is the weight of delay cost in Equations 10 and 11. 
+
+CP o = EP ×
+
+> K
+
+X
+
+> k=1
+
+Ek (10) 
+
+Ctime = fCO (T (waiting )) + β × fCicl 
+
+(T (delay )) (11) 
+
+Waiting time costs are directly influenced by inventory holding costs (Gupta et al. 2020), which typically comprise approximately rate γ ≃ 25%of annual inventory expenses (Goh and Lim 2014). This relationship is expressed linearly in Equations 12 and 13, where U IHC denotes the unit inventory holding cost. 
+
+fCO (T (waiting )) = UIHC × Twi (12) UIHC(min) = γ × AverageAnnualInventoryCost 
+
+365 × 24 × 60 × P ackageQuantity (13) 
+
+The unit delay cost represents the dollar value of a feature, reflecting the value of the information discovered and how that value decays over time (Arnold and Yuce 2013). It is calculated by assessing the impact of the potential losses. In this study, order types are categorized into four delay cost profiles: expedite, standard urgency, intangible, and fixed date (Anderson 2012). Expedited orders are high-priority and require immediate service, with zero tolerance for delays. Fixed Date orders are time-sensitive but allow flexibility, incurring costs only when deadlines are missed. Standard Urgency orders gradually accumulate costs, which then taper off to a stable level. Intangible orders, which are low-priority or optional, tolerate extended delays and may even be canceled if necessary. Order classification is determined by delivery attributes, urgency, service deadlines and strategic supply chain positioning. Each class has a predefined deadline, rate of cost escalation, and maximum allowable loss, as shown in Figure 4 and formalized in Equation 14. 
+
+fCacl (T (delay )) = 
+
+(
+
+λ1 × T (delay ) , T wi < T ddi 
+
+CA , T wi ≥ Tddi 
+
+(14a) 
+
+fCbcl 
+
+(T (delay )) = 
+
+(
+
+0 , T wi < T ddi 
+
+CB , T wi ≥ Tddi 
+
+(14b) 
+
+fCccl (T (delay )) = 
+
+
+
+0 , T wi < T ddi 
+
+eλ2×T (delay ) , T ddi < T wi < T u
+
+CC , T wi ≥ Tu
+
+(14c) 
+
+fCdcl 
+
+(T (delay )) = 
+
+
+
+0 , T wi < T ddi 
+
+λ3 × T (delay ) , T ddi < T wi < T u
+
+CD , T wi ≥ Tu
+
+(14d) 
+
+11 (a) Expedite. (b) Fixed Date. (c) Standard Urgency. (d) Intangible. 
+
+Fig. 4 : Delay curves of four classes. 
+
+4.1.4 Constraints 
+
+The constraint (15) keeps flow conservation, constraint (16) demonstrates order assign-ment, constraint (17) is a flow conservation constraint which is fundamental to ensuring that AGV routes are continuous and valid circuits, constraint (18) show the limitation of AGV capacity, constraint (19) illustrates the load of orders is under AGV’s weight limitation, constraint (20) defines total processing duration fitting within the fixed time window, constraint (21) makes sure the deadline of orders are later than arriving time, constraint (22) explains the sequence of different classes for deadlines, constraint (23) constrains the weighting factor between energy consumption and service time to remain within the normalized range of 0 to 1, and constraint (24) assigns stricter delivery deadlines and higher delay cost penalties to higher priority orders, reflecting their urgency. 
+
+X
+
+> j∈N
+
+xijk − X
+
+> j∈N
+
+xjik = 0 , ∀i ∈ N , ∀k ∈ K (15) 
+
+> K
+
+X
+
+> k=1
+
+yik = 1 , ∀i ∈ O (16) 
+
+uik − ujk + n × xijk ≤ n − 1, ∀i, j ∈ O , i ̸ = j, ∀k ∈ K (17) 
+
+> n
+
+X
+
+> i=1
+
+gi · yik ≤ M, ∀k ∈ K (18) 
+
+> m
+
+X
+
+> i=1
+
+gi ≤ GL, ∀i ∈ Pi (19) 
+
+> K
+
+X
+
+> k=1
+
+X
+
+> (i,j )∈A
+
+tij × xijk ≤ TB (20) 
+
+tdi ≥ tai , ∀i ∈ Pi (21) 
+
+12 Tddi ≤ Tddj ∀i ∈ Ca, j ∈ Cb ∪ Cc ∪ Cd (22)             
+
+> 0≤wt≤1(23)
+> CA≥CB≥CC≥CD(24)
+
+4.2 Priority Rules 
+
+This study incorporates four classical sorting rules from operations research and intro-duces two new strategies tailored for AGV-based warehouse logistics. The FCFS rule (Chretienne 1995) schedules orders strictly by arrival time, assigning each AGV four sequential tasks per cycle. The SPT rule (Smith 1956) schedules based on arrival time and the shortest travel distance, minimizing the path length in each cycle. The Earliest Due Time (EDT) rule (Goldberg 1977) prioritizes tasks with the nearest dead-lines, aiming to reduce tardiness, although its correlation with the overall service cost is limited. The Least Delay Cost (LDC) rule assigns tasks based on projected delay penalties, thereby reducing the financial impact of service delays. Based on these, the PDSP rule integrates external priorities, such as customer class and deadlines, with internal route optimization to minimize the travel distance. In contrast, the DCSP rule omits customer classification and prioritizes tasks solely based on the delay cost before optimizing the route sequence. Both proposed methods improve the service quality by balancing the energy efficiency, inventory cost, and delivery performance. A detailed flowchart of the six rules is presented in Figure 5. 
+
+4.3 Simulation-Based Optimization 
+
+4.3.1 Frameworks of Simulation 
+
+We developed a simulation-based optimization framework using A*guiding multi-agent deep Q-network (A*guiding MADQN) pathfinding and six sorting heuristics within a Python-based transport simulator, extending by Luo et al. (2023) with dynamic priorities and capacity constraints. The simulator processes dynamically generated orders with coordinates, time windows, weight, and priority: ( xi, y i, t oi , t ddi , g i, c i). These nodes are fed into A* navigation for local delivery routing, and the data are trained using DQN. Nonlinear delay-cost functions model real-time penalties in four priority classes. Each order’s penalty parameters are updated periodically or upon new arrivals for dynamic service evaluation. Two task-sorting strategies are proposed. 
+
+PDSP-AGMADQN: This method integrates external priorities (customer classes) and internal routing efficiency. Orders are first sorted by class (A to D) and then by a tolerance window (deadline minus arrival time). After grouping tasks by AGV capacity, A* computes a minimal distance route by optimizing node adjacency and avoiding redundant travel. The data were trained using the MADQN method to achieve the simultaneous collaboration of multiple AGVs. 
+
+DCSP-AGMADQN: This approach ignores the customer class and prioritizes tasks purely based on delay cost, dynamically sorting orders based on nonlinear penalty functions. A* then determines the shortest route for the selected tasks and trains the 13 (a) FCFS (b) SPT 
+
+(c) EDT (d) LDC 
+
+(e) PDSP (f) DCSP 
+
+Fig. 5 : Sorting rules. 
+
+14 model again. Owing to DCSP’s sensitivity of the DCSP to time lags, careful scheduling is required to avoid costly deadline violations. 
+
+4.3.2 Algorithm Application 
+
+Enhanced A* variants for AGV applications include variants such as dynamic win-dow integration (Chen et al. 2022), hybridized models with ant colony optimization (ACO), the dynamic window approach (DWA) by Li et al. (2023) and congestion-aware priority extensions by Zhang et al. (2020).Combining this approach with reinforce-ment learning algorithms has also yielded promising results. In terms of convergence, reward calculation, and loss function performance, the AGMADQN algorithm (Luo et al. 2023) used in this study is one of the best to date, to the best of our knowl-edge. The main idea of the algorithm is to use A* to generate the shortest path and apply the trained neural network to a test structure. By combining two convolutional layers and two linear computations, it extracts features from the warehouse environ-ment (obstacles, shelves, other AGVs, etc.), the position and motion information of the AGV (position coordinates, movement direction, etc.). The adaptability of the method was verified by varying the conditions. This method requires only the current system layout information to guide the AGV through a series of randomly assigned tasks, significantly reducing the training time and increasing the accumulated rewards, thereby ensuring algorithm stability and accuracy. A* estimates the total cost f (n) as:     
+
+> f(n) = g(n) + h(n)(25)
+
+where g(n) is the actual cost from the start node to the node n, h(n) means the heuristic estimated cost from n to the destination node. The state representation function for AGV shows more information and the state 
+
+sti for AGV i at time t is defined as: 
+
+sti =
+
+
+
+pti, vti , B, St, Gti , T ti , At
+
+> −i
+
+
+
+(26) where pti = ( xti, y ti ) represents the current position and vti = ( vtx, v ty ) shows the velocity of AGVs. For environment, we set obstacles as static barriers and shelves in 
+
+B = {(xk, y k)}Kk=1 and St = {(xtl , y tl )}Ll=1 . Furthermore, AGVs follow multiple trips for several tasks and finally move to the picking location. The goal hierarchy is shown in Equation 27, which illustrates the sub-goals for multiple orders and the final goal position of the picking station at the end of the journal. 
+
+Gti =
+
+
+
+{g1, g2, g3, g4}
+
+| {z }
+
+> Sub-goals
+
+, gpick 
+
+| {z } 
+
+> Final goal
+
+
+
+(27) As for task attributes, we define the labels for each AGV in Equation 28 and collect other AGVs’ states in At 
+
+> −i
+
+= {ptj , vtj }j̸ =i .
+
+T ti =  priority , deadline , cost , visited-subgoals  (28) The deep q-network (DQN) training iteration follows the update rule in Equation 29, and the loss is calculated using Equation 30, where yt is the target Q-value, rt is 15 the immediate reward received after taking action at state st, γ is the discount factor, and θ− is the target network.            
+
+> yt=
+> (
+> rtif st+1 is terminal ,rt+γmax a′Qθ−(st+1 , a ′)otherwise .(29)
+
+L(θ) = rt + γ · max 
+
+> at+1
+
+Q(st+1 , a t+1 ) − Q(st, a t) (30) The detailed pseudocode for PDSP-AGMADQN and DCSP-AGMADQN is provided in Algorithm 1. 
+
+# 5 Case Study 
+
+This study utilized the publicly available e-commerce shipping data (EDA) dataset from the Kaggle platform as a representative case study (Yadav 2021). The dataset contains over 10,000 shipment records and provides comprehensive information on customer orders, product specifications, and delivery conditions. In this study, order quantities were determined based on unique customer IDs and their associated prod-uct serial numbers. The warehouse environment is categorized into three scales(small, medium, and large) based on storage capacity. The corresponding order thresholds are adjusted according to the warehouse scale. Spatially, the warehouse layout was partitioned into areas labeled A through F. An analysis of the dataset indicated that Area F had the highest demand density. To minimize the transportation time for high-demand items, Area F is strategically positioned nearest to the conveyor belt. Areas A through D exhibit relatively balanced demand and are therefore uniformly distributed across the remaining grid spaces. Product storage locations are assigned (x, y ) coordinates based on the area classification, with multiple items allowed per grid cell. Customer priority is determined using the customer rating attribute of the dataset. Customers rated as level 1 were classified as having the highest external pri-ority (priority A), whereas those with ratings of 4 and 5 were considered to have the lowest external priority (priority D). The delay penalty for priority D customers is modeled using a time-dependent delay cost curve, and the proportion of each customer class adheres to the empirical distribution in the dataset. The product value is used to estimate the inventory holding cost, assuming that delayed deliveries increase storage expenses. The weight of each product (in grams) directly affects the AGV load dynam-ics. Items are accumulated sequentially until the AGV reaches its full capacity before being dispatched to the conveyor system. Throughout transportation, the energy con-sumption varies as a function of both the payload and distance traveled. The AGV type employed in this study was a multilevel bin-handling autonomous vehicle with a payload capacity of 270 kg, self-weight of approximately 450 kg, battery capacity of 42 Ah, and voltage of 24 V. Under full load, the AGV can operate for an average of 5 h at a constant speed of 1 m/s (Qiu et al. 2015). Table 2 provides the summary statistics of the selected data. The dataset does not contain any personal information of customers owing to privacy protection. The following features describe the data. These features collectively inform the simulation model, guiding decisions related to AGV routing, priority scheduling, and cost-sensitive optimization under dynamic 16 Algorithm 1 PDSP-AGDQN & DCSP-AGDQN 
+
+Require: 
+
+1: Order requests Q = {(xi, y i, t oi , t ddi , g i, c i)}ni=1 
+
+2: AGV fleet {Ak } with capacity and weight limitation 3: Warehouse environment with obstacles and stations 4: Heuristic function f (n) = g(n) + h(n)5: Number of tasks per AGV: m
+
+6: Initialization: 
+
+7: Create DQN Q(s, a ; θ) and target network ˆQ(s, a ; θ−)8: Initialize replay memory D with capacity N
+
+9: Set ϵ ←, ξ ← ▷ Exploration and A* probabilities 10: for episode = 1 to M do 
+
+11: Reset warehouse environment, order attributes, get initial state s0
+
+12: for t = 1 to Tmax do 
+
+13: Task Assignment: 
+
+14: if PDSP then 
+
+15: Sort Q by: ci (priority), then tddi (deadline) 16: else if DCSP then 
+
+17: Compute for each task: cost i ← f (cost )18: Sort Q by cost i
+
+19: end if 
+
+20: AGV Task Allocation: 
+
+21: for each Ak in AGV fleet do 
+
+22: Ak .tasks ← Next m available tasks from sorted Q
+
+23: Mark these tasks as assigned 24: end for 
+
+25: Path Optimization: 
+
+26: for each Ak in AGV fleet do 
+
+27: if rand() < ξ then ▷ A* guidance 28: path k ← Optimal path visiting all m tasks using A* 29: ak ← ConvertP athT oAction (path k )30: else ▷ DQN selection 31: if rand() < ϵ then 
+
+32: ak ← random valid action sequence 33: else 
+
+34: ak ← argmax aQ(st, a ; θ)35: end if 
+
+36: end if 
+
+37: at ← at ∪ { ak }
+
+38: end for 
+
+39: Execute joint action at, observe rt, st+1 , done 
+
+40: Store ( st, a t, r t, s t+1 , done ) in D
+
+41: Learning: 
+
+42: if |D| ≥ batch size then 
+
+43: Sample batch from D
+
+44: Compute targets: yj = rj + γ · max a′ ˆQ(sj+1 , a ′; θ−) · (1 − done j )45: Update θ via SGD on 1
+
+> B
+
+P(yj − Q(sj , a j ; θ)) 2
+
+46: Every C steps: θ− ← θ
+
+47: end if 
+
+48: ϵ ← max( ϵmin , ϵ · ϵdecay )49: if done then break 
+
+50: end if 
+
+51: end for 
+
+52: end for return Optimized policy π(s) = argmax aQ(s, a ; θ)
+
+warehousing conditions. All the simulation scenarios are shown in Figure 6. In these scenarios, the simulation managed congestion when more than one AGV appeared in a close position. The vehicle with a smaller serial number has a higher priority, and other vehicles would stop and wait until the former vehicle completes its last action and leaves. 17 Table 2 : Data Description                   
+
+> Title Description Ranges Unit ID Unique identifier of each order [1,10977] —-Warehouse block Flat 2D warehouse layout of 5 districts A,B,C,D,E Categorical Customer rating Priority classification of customer [1,5] Categorical Price of the product Each price of an order 96–310 Dollars Weight of the product Each weight of an order 1001–7846 Grams
+
+(a) Small warehouse (b) Middle warehouse (c) Large warehouse 
+
+Fig. 6 : Warehouse set-ups. 
+
+# 6 Results 
+
+This section presents a comprehensive evaluation of the proposed methods, including both performance assessment and sensitivity analysis, within the context of the case study. 
+
+6.1 Performance Evaluation 
+
+To evaluate the system performance, 12 key performance indices (KPIs) were defined based on service quality and AGV transportation efficiency. The service metrics included travel time, waiting time, operation time, delay cost, inventory cost, and order-related energy consumption, whereas AGV efficiency was assessed using idle time, running time, and AGV energy use. Two composite indicators, namely the total energy cost and total time cost, captured the overall trade-off, with values recorded in seconds, USD, and Wh. The simulations tested ten scenarios across varying order volumes (1,000 to 10,000) and AGV fleet sizes (1 to 10) using six scheduling methods and class-based delivery penalties that were dynamically updated every 10 s. 
+
+Service time results (cf. Figure 7) show that FCFS achieves the shortest travel time in all scenarios, reducing transport time by 13.34% on average due to immediate path assignment. However, PDSP and DCSP have the longest travel times because of prioritization and rescheduling. For waiting time, SPT consistently performed the best, whereas EDT exceeded the best methods by 16.46% to 61.33%. As fleet size, 18 orders, and warehouse scale increase, the average waiting time decreases significantly by 10%–20% in small or medium-scale systems and over 40% in large-scale systems, indicating higher responsiveness during peak load periods. 
+
+Fig. 7 : Service Time. Service cost results (cf. Figure 8) highlight inventory and delay costs as key economic factors. Inventory costs are mainly driven by waiting time and are highest under EDT and LDC. Delay costs are most sensitive during peak scenarios, with the PDSP and DCSP reducing them by 50% to 80%, and up to 90% in large-scale settings (e.g., 8,000 to 9,000 orders with 8 to 9 AGVs). When the vehicle supply is sufficient (e.g., 10,000 orders with 10 AGVs), both the proposed method and SPT yield minimal delay costs. 
+
+Fig. 8 : Service Cost. 
+
+19 Transport and system time findings (cf. Figure 9) reveal FCFS causes the highest AGV idle time due to lack of optimization. In contrast, SPT, DCSP, and PDSP reduce the idle time by 30% to 50% via cycle-based order sorting. The AGV running time increases with the number of orders, vehicles, and warehouse scales. SPT achieves the shortest runtime, whereas LDC and EDT achieve the longest. 
+
+Fig. 9 : System Time. Energy consumption analysis (cf. Figure 10) separates consumption into goods and AGV movement. FCFS had the lowest order-related energy use, whereas PDSP was often the highest. AGV energy use mirrors the running time trends, with SPT being the most efficient and EDT or LDC the least efficient. 
+
+Fig. 10 : Energy Consumption. 
+
+20 System cost analysis (cf. Figure 11) combines time and energy costs equally. The PDSP is the most cost-effective on small or medium scales, whereas the DCSP outperforms as the scale increases, achieving the best results in terms of time cost and second-best in terms of energy cost. Overall, the PDSP or DCSP cut system costs by 50% to 90% during high-load periods compared to other methods. 
+
+Fig. 11 : System Cost. 
+
+The warehouse scale and layout critically impact these results. As the AGV count and orders increase, larger warehouses increase transport distances and belt loads, driving up time-related costs, such as travel time, waiting time, and delay costs. 
+
+6.2 Sensitivity Analysis 
+
+Sensitivity comparison between the two methods is shown in Table 3 and Table 4 show how order demand, AGV fleet size, order generation frequency, and delay time windows affect PDSP and DCSP performance across three warehouse scales. Increasing the vehicle count (e.g., from 3 to 5 for 5000 orders or 6 to 10 for 10000 orders) significantly reduces the waiting time, inventory, and delay costs, although the travel time slightly increases (1% to 2%) owing to corridor congestion. Increasing the order quantity while holding the fleet size constant (e.g. Five AGVs for 3000 to 5000 orders) leads to proportional increases in all service indicators except travel time, which the PDSP and DCSP methods effectively control. The DCSP cost increase rates (67.56% and 64.24%) are higher than those of the PDSP (52.93% and 44.58%), showing that the PDSP has a more stable response to rising demand. When the order frequency increases (e.g., from 0 to 8s to 0 to 2s), the system costs also rise owing to nonstop AGV tasks and higher energy use, whereas slower frequencies allow some idle time but reduce inventory costs, where the DCSP reduces the cost by 77% and the PDSP by 61%. Varying delay time windows (from 5 min to 24 h) show that longer windows lower the delay and system costs, with the DCSP showing sharper sensitivity to time pressure. PDSP’s increase is smoother, and both 21 Table 3 : Sensitivity Analysis (DCSP) 
+
+> Sensitivity parameters  Service  Transportation  System Layout  FS OQ  OWT(s)DTW(h)  TrT(s) WT(s)  OpT(s)  E(1)(wh) CoI( $) CoD( $) EmT(s)  RT(s)  E(2)(wh)  E(wh)  CoE( $) CoT( $) SRT(s)  CoS( $)middle 3 5000  0-5  (1,2,4,4)  59.74  13437.88  13497.63  47.36  103.41  1612.65  6297.83  39733.67  4065.23  4112.59  49.35  1716.06  39817.50  1765.41 4 5000  0-5  (1,2,4,4)  60.73  8799.52  8860.25  48.08  68.62  1131.56  2724.45  30381.60  4144.54  4192.62  50.31  1200.18  30411.67  1250.49 5 5000  0-5  (1,2,4,4)  61.86  5937.81  5999.68  48.94  47.05  334.40  2959.22  24747.52  4219.95  4268.89  51.23  381.45  24730.50  432.68 5 3000  0-5  (1,2,4,4)  62.57  3712.60  3775.16  21.51  17.34  12.20  1699.80  14938.22  2547.27  2568.78  30.83  29.54  14979.60  60.36 5 3500  0-5  (1,2,4,4)  62.50  4266.50  4329.01  27.83  23.33  34.04  2000.38  17460.40  2977.35  3005.18  36.06  57.37  17451.80  93.43 5 4000  0-5  (1,2,4,4)  62.10  4832.81  4894.91  35.05  30.34  61.68  2337.04  19845.33  3384.03  3419.08  41.03  92.02  19865.80  133.05 5 4500  0-5  (1,2,4,4)  62.05  5464.22  5526.28  42.41  38.60  99.95  2646.24  22323.92  3806.67  3849.08  46.19  138.56  22360.10  184.75 5 5000  0-2  (1,2,4,4)  71.00  9122.57  9184.32  48.94  71.00  1204.56  3043.78  24765.40  4223.00  4271.94  51.26  1275.56  24768.60  1326.83 5 5000  0-8  (1,2,4,4)  61.52  2519.72  2581.24  48.82  20.07  6.98  2777.98  24671.70  4207.02  4255.83  51.07  27.05  24621.90  78.12 5 5000  0-5  (1/12,0.3,2,2)  61.79  6057.94  6119.73  48.89  45.23  2151.34  3134.12  24779.92  4225.47  4274.36  51.29  2196.58  24796.10  2247.87 5 5000  0-5  (0.3,1,3,3)  61.92  6023.90  6085.83  49.04  46.49  1361.73  2971.46  24685.00  4209.29  4258.32  51.10  1408.22  24781.00  1459.32 5 5000  0-5  (1.3,2.3,5.3,5.3) 61.90  5890.08  5951.98  49.04  46.91  79.02  2912.34  24755.10  4221.24  4270.28  51.24  125.94  24742.30  177.18 5 5000  0-5  (2,4,8,8)  62.15  5928.39  5990.54  49.55  47.32  6.15  2787.06  24787.64  4226.79  4276.34  51.32  53.47  24803.00  104.78 5 5000  0-5  (5,10,24,24)  60.80  5847.23  5908.03  48.09  46.66  0.00  2735.08  24426.44  4165.20  4213.29  50.56  46.66  24445.50  97.22 large 6 100000  0-5  (1,2,4,4)  69.31  10947.94  11017.25  121.66  180.28  2947.66  6746.83  47563.23  9732.58  9854.24  118.25 3127.95  47575.80  3246.20 8 100000  0-5  (1,2,4,4)  70.60  5345.71  5416.31  124.42  91.08  652.78  4588.36  36473.91  9951.25  10075.67  120.91 743.85  36476.00  864.76 10  100000  0-5  (1,2,4,4)  71.08  2039.54  2110.61  124.68  34.61  0.08  3602.64  26912.46  9178.23  9302.91  111.63 34.69  29628.40  146.32 8 6000  0-5  (1,2,4,4)  70.59  3419.59  3490.19  71.29  33.49  18.84  2691.43  21854.60  5962.63  6033.92  72.41  52.33  21896.90  124.74 8 7000  0-5  (1,2,4,4)  70.80  3859.75  3930.55  84.47  45.04  39.75  3143.19  25546.75  6969.97  7054.44  84.65  84.80  25588.40  169.45 8 8000  0-5  (1,2,4,4)  70.85  4379.75  4450.59  98.20  59.00  89.24  3654.74  29251.16  7980.65  8078.85  96.95  148.24  29292.30  245.19 8 9000  0-5  (1,2,4,4)  70.93  5002.66  5073.59  111.48  76.42  306.71  4131.05  32944.69  8988.37  9099.84  109.20 383.13  32990.50  492.33 8 10000  0-2  (1,2,4,4)  70.73  11804.70  11875.43  124.30  193.52  3079.51  4731.41  36554.76  9973.31  10097.61  121.17 3273.03  36568.50  3394.20 8 10000  0-8  (1,2,4,4)  28.90  86.52  115.42  46.54  1.37  0.00  – 39582.93  10799.49  10846.03  130.15 1.37  40436.40  131.52 8 10000  0-5  (1/12,0.3,2,2)  71.07  5572.47  5643.54  124.78  86.19  4384.32  4811.00  36715.85  10017.26  10142.04  121.70 4470.51  36700.20  4592.22 8 10000  0-5  (0.3,1,3,3)  71.13  5559.26  5630.39  124.76  91.69  2684.74  4739.64  36625.76  9992.68  10117.44  121.41 2776.43  36690.40  2897.84 8 10000  0-5  (1.3,2.3,5.3,5.3) 70.49  5212.62  5283.11  99.19  71.16  99.09  4544.34  36418.05  9936.01  10035.20  120.42 170.24  36462.40  290.66 8 10000  0-5  (2,4,8,8)  70.10  5256.28  5326.38  98.57  71.70  11.51  4460.40  36292.73  9901.82  10000.39  120.00 83.21  36323.40  203.21 8 10000  0-5  (5,10,24,24)  69.12  5162.84  5231.96  97.02  70.39  0.00  4406.85  35983.08  9817.34  9914.35  118.97 70.39  35997.00  189.36
+> Note: FS: fleet size, OQ: order quantity, OTW: time window of orders, DTW: time window of delay, TrT: travel time, WT: waiting time, OpT: operation time; CoI: total inventory cost, CoD: cost of order delay, E(1): order energy consumption; EmT: AGV empty time, RT: AGV running time, E(2): AGV energy consumption, E: system energy consumption; SRT: system round time, CoE: cost of total energy consumption, CoT: cost of total time, CoS: total cost of system.
+
+22 Table 4 : Sensitivity Analysis (PDSP) 
+
+> Sensitivity parameters  Service  Transportation  System Layout  FS OQ  OWT(s)DTW(h)  TrT(s) WT(s)  OpT(s)  E(1)(wh) CoI( $) CoD( $) EmT(s)  RT(s)  E(2)(wh)  E(wh)  CoE( $) CoT( $) SRT(s)  CoS( $)middle 3 5000  0-5  (1,2,4,4)  60.30  13678.51  13738.81  47.81  107.85  737.72  4900.17  40075.47  4100.20  4148.01  49.78  845.57  40068.70  895.35 4 5000  0-5  (1,2,4,4)  61.55  8933.21  8994.76  48.71  70.33  695.81  3728.48  30725.45  4191.44  4240.16  50.88  766.14  30676.40  817.02 5 5000  0-5  (1,2,4,4)  62.92  6194.13  6257.05  49.82  48.76  345.06  3033.50  25071.54  4275.20  4325.02  51.90  393.82  25087.60  445.72 5 3000  0-5  (1,2,4,4)  62.41  3772.02  3834.43  21.47  17.64  34.70  1840.26  14944.14  2548.27  2569.74  30.84  52.35  14982.40  83.19 5 3500  0-5  (1,2,4,4)  62.79  4376.55  4439.34  28.00  23.86  87.16  2110.32  17512.16  2986.17  3014.17  36.17  111.02  17524.50  147.19 5 4000  0-5  (1,2,4,4)  62.91  4970.25  5033.17  35.59  31.06  158.12  2404.10  20004.56  3411.18  3446.76  41.36  189.18  20048.70  230.54 5 4500  0-5  (1,2,4,4)  62.74  5570.27  5633.01  42.85  39.15  241.37  2754.24  22483.30  3833.85  3876.70  46.52  280.51  22527.60  327.03 5 5000  0-2  (1,2,4,4)  62.49  9203.11  9265.60  49.46  72.62  656.73  3047.90  24912.30  4248.05  4297.50  51.57  729.35  24930.90  780.92 5 5000  0-8  (1,2,4,4)  63.01  2693.65  2756.66  49.97  21.25  38.81  3033.72  25067.20  4274.46  4324.43  51.89  60.05  25103.90  111.94 5 5000  0-5  (1/12,0.3,2,2)  62.62  6076.13  6138.75  49.58  47.83  550.39  3035.54  24954.46  4255.23  4304.82  51.66  598.22  29710.60  649.87 5 5000  0-5  (0.3,1,3,3)  62.79  6175.85  6238.65  49.74  48.62  544.49  3047.96  25019.96  4266.40  4316.14  51.79  593.11  25058.30  644.90 5 5000  0-5  (1.3,2.3,5.3,5.3) 62.81  6130.16  6192.96  49.75  48.27  185.06  3021.32  25034.78  4268.93  4318.68  51.82  233.32  25064.40  285.15 5 5000  0-5  (2,4,8,8)  62.62  6148.81  6211.42  49.64  48.40  3.50  3028.48  24989.92  4261.28  4310.92  51.73  51.91  24993.20  103.64 5 5000  0-5  (5,10,24,24)  62.74  6138.18  6200.92  49.67  48.33  0.00  3041.80  24987.18  4260.81  4310.48  51.73  48.33  25019.90  100.05 large 6 100000  0-5  (1,2,4,4)  69.93  11076.31  11146.24  122.81  183.94  836.01  6085.68  47842.92  9789.81  9912.61  118.95 1019.95  47844.60  1138.90 8 100000  0-5  (1,2,4,4)  71.60  5661.96  5733.56  125.83  94.33  816.88  4690.34  36822.28  10046.30  10172.12  122.07 911.21  36862.80  1033.28 10  100000  0-5  (1,2,4,4)  73.72  2454.04  2527.76  129.62  41.44  40.08  3859.81  27582.71  9406.81  9536.42  114.44 81.52  30403.80  195.95 8 6000  0-5  (1,2,4,4)  71.97  3624.46  3696.43  72.19  34.82  130.54  2819.14  22149.03  6042.96  6115.15  73.38  165.37  22212.00  238.75 8 7000  0-5  (1,2,4,4)  71.98  4120.53  4192.51  85.63  46.80  250.81  3294.10  25870.14  7058.20  7143.83  85.73  297.62  25919.70  383.34 8 8000  0-5  (1,2,4,4)  71.94  4608.95  4680.89  99.46  60.50  404.88  3756.85  28577.45  7796.84  7896.31  94.76  465.37  29622.80  560.13 8 9000  0-5  (1,2,4,4)  71.53  5086.20  5157.73  112.20  75.82  582.99  4208.29  33108.56  9033.07  9145.28  109.74 658.81  33121.20  768.55 8 10000  0-2  (1,2,4,4)  71.62  11981.84  12053.46  125.76  199.35  1342.67  4696.49  36848.85  10053.55  10179.30  122.15 1542.03  36858.90  1664.18 8 10000  0-8  (1,2,4,4)  29.68  93.35  123.03  47.16  1.48  0.00  – 39860.06  10875.10  10922.26  131.07 1.48  40472.80  132.54 8 10000  0-5  (1/12,0.3,2,2)  71.74  5663.69  5735.43  126.02  94.38  811.35  4680.40  36871.15  10059.63  10185.65  122.23 905.72  36913.90  1027.95 8 10000  0-5  (0.3,1,3,3)  71.72  5616.72  5688.45  126.11  93.62  858.00  4686.58  36904.24  10068.66  10194.76  122.34 951.62  36907.30  1073.96 8 10000  0-5  (1.3,2.3,5.3,5.3) 71.80  5668.64  5740.43  100.96  75.57  460.75  4686.51  36925.48  10074.45  10175.41  122.10 536.32  36936.20  658.43 8 10000  0-5  (2,4,8,8)  71.64  5598.37  5670.01  100.63  74.66  70.11  4690.20  36831.33  10048.77  10149.40  121.79 144.77  36873.00  266.56 8 10000  0-5  (5,10,24,24)  71.73  5602.32  5674.04  100.78  74.70  0.00  4681.64  36810.14  10042.98  10143.76  121.73 74.70  36853.70  196.43
+> Note: FS: fleet size, OQ: order quantity, OTW: time window of orders, DTW: time window of delay, TrT: travel time, WT: waiting time, OpT: operation time; CoI: total inventory cost, CoD: cost of order delay, E(1): order energy consumption; EmT: AGV empty time, RT: AGV running time, E(2): AGV energy consumption, E: system energy consumption; SRT: system round time, CoE: cost of total energy consumption, CoT: cost of total time, CoS: total cost of system.
+
+23 methods offer cost advantages during off-peak or relaxed service windows. Finally, tuning system weights between energy and time (e.g., w = 0.9 for energy focus, w = 0.1 for time-critical scenarios) enhances adaptability, allowing managers to shift priorities based on operational conditions. 
+
+6.3 Algorithms Comparison 
+
+In this section, we combine the two ranking methods, PDSP and DCSP, with newer advanced reinforcement learning algorithms to compare their adaptability and dif-ferences under different algorithms. In this section, we combine the two ranking methods, PDSP and DCSP, with newer advanced reinforcement learning algorithms to compare their adaptability and differences under different algorithms. The main combination algorithms involved are PDSP/DCSP-AGMADQN, PDSP/DCSP-DQN, PDSP/DCSP-AC (Actor Critic), and PDSP/DCSP-A*, which have been used in the literature in this field recently. Considering the computing time and cost, in the algo-rithm comparison section, we used a small batch of fleets and orders to verify the performance of this method under different reinforcement learning algorithms. The main indicators include operational indicators, such as order completion (throughput per unit time), delay costs, energy consumption costs, and total system costs, as well as algorithm adaptability indicators, such as convergence speed, stability, rewards, and robustness. 
+
+6.3.1 Algorithms Performance 
+
+The analysis of cumulative rewards revealed distinct differences in the convergence speed and learning efficiency among the algorithms. In 1000 episodes, we set two AGVs working in a small-scale warehouse for 200 dynamic orders, as shown in Figure 12. The standard PDSP/DCSP-DQN exhibited slower and more gradual improve-ment as it struggled with environmental instability, whereas the PDSP/DCSP-AC algorithm showed moderate speed, balancing the policy and value updates. In con-trast, PDSP/DCSP-AGMADQN consistently achieved higher cumulative rewards and maintained a stable growth pattern, indicating its superior capability in handling multi-agent interactions and dynamic scheduling tasks. The final asymptotic performance, where the cumulative reward curves plateau, indicates the ultimate learning efficiency for 5000 episodes; the algorithm that achieves the highest stable cumulative reward is the most efficient learner. Furthermore, the smoothness of the reward curves is a direct indicator of training stability. A smooth, monotonically increasing curve for AGMADQN suggests high stability. Examining the loss values provides insight into the internal learning dynamics and robustness of each algorithm, as shown in Figure 13. The rapid decrease and stabiliza-tion of the critic (or Q-value) loss in MADQN and AC would correlate with their fast convergence, signifying the quick learning of accurate value estimates. The DQN loss shows greater volatility, reflecting its struggle with a moving data distribution. The robustness of each model can be inferred from its consistent performance across multi-ple runs with different random seeds. The MADQN, designed for multi-agent settings, should show low variance in both the final reward and loss between runs, indicating robustness to the initial conditions and the inherent randomness of the environment. 24 (a) DCSP-AGMADQN cumulative reward 
+
+(b) PDSP-AGMADQN cumulative reward 
+
+Fig. 12 : Algorithm Comparison. 
+
+Conversely, a higher variance in the DQN results highlights its sensitivity and lower robustness. Ultimately, the combination of a high cumulative reward, low final loss, and minimal performance variance positions the MADQN as the superior algorithm in this multi-agent context, effectively balancing speed, stability, and robustness. 
+
+Fig. 13 : Loss Value 
+
+25 6.3.2 Operational Testing 
+
+For operational testing, this paper simulates a scenario where an AGV picks up 20 dynamic orders in a small-scale warehouse. The PDSP-AGDQN algorithm is trained 10,000 episodes and the obtained test results of scheduling and routing policy are compared with those of PDSP-A* as shown in Figure 14.    
+
+> (a) Testing Order Sequence (b) Testing AGV Path
+
+Fig. 14 : Testing Results. 
+
+The left subplot illustrates the generated order service sequence, demonstrating that the AGV can continuously pick up orders from multiple storage locations accord-ing to its training memory and the priority order set by the PDSP. The right subplot visualizes the AGV’s corresponding travel path within the warehouse grid environ-ment. After sufficient training, the agent’s learned strategy generates a continuous and collision-free path, efficiently connecting all assigned order nodes in the warehouse. This trajectory shows that the AGV can successfully complete all test orders by reason-ably executing path consistency and reducing unnecessary detours while maintaining low overall cost. In conclusion, the results confirm that, after sufficient training, the agent can generate practical order fulfillment paths in the test scenario. 
+
+# 7 Conclusion 
+
+This study introduces a bi-level priority sorting strategy for smart warehouse systems, integrating an enhanced DARP framework to optimize AGV routing, scheduling, and energy efficiency. The mathematical model minimizes the operating time and energy 26 consumption by incorporating external priority, delay time, and shortest-path rout-ing. A real-world case study evaluated the system performance in terms of service satisfaction, resource utilization, and operational efficiency. Simulation results demonstrate that the proposed PDSP and DCSP strate-gies consistently outperform traditional benchmarks in high-density, peak-time, and service-sensitive scenarios, achieving cost reductions of 50% to 90%. Sensitivity anal-ysis confirms that the PDSP is more stable and robust for large-scale problems than the DCSP while maintaining less delay and energy costs under varying order volumes and time windows. Their dynamic configurability further enables warehouse managers to adjust fleet size, delay tolerance, and priority weights to achieve diverse operational objectives. Therefore, we also applied these two methods to more advanced reinforcement learning algorithms to compare their performance and adaptability in different algo-rithms. Among them, the PDSP/DCSP-AGMADQN method demonstrated the best performance, with good convergence rate, learning ability, and robustness. In addition, the use of reinforcement learning methods can effectively reduce collisions between AGVs, and the algorithm is faster and more accurate than other methods. Owing to the limitations of the computational time and scale of reinforcement learning, this study only discusses cases in small-scale scenarios; however, it is sufficient to demon-strate the superiority of our method. For currently common large-scale problems, such as large scenarios, a large number of orders, and high-density demand, this study recommends that users model and evaluate within the framework of PDSP/DCSP-A*. Building on this research, we will expand it in future studies. For example, we will transform the fixed delay curve into a dynamic one influenced by external warehouse factors, enabling the system to truly achieve internal and external linkage and ensuring the effectiveness and timeliness of services; we will combine the actual transportation results of the last mile with the optimization of warehouse scheduling to form a closed loop for the automated system; and we will explore more AI or reinforcement learning methods to make the automated logistics system more intelligent and stable. 
+
+# Declarations 
+
+• Funding: This research is funded by a grant from the Canada Research Chair pro-gram in Disruptive Transportation Technologies and Services (CRC-2021-00480) and NSERC Discovery (RGPIN-2020-04492) fund. 
+
+• Conflict of interest: The authors declare no competing interests. 
+
+• Ethics approval and consent to participate: Not applicable. This study uses only publicly available, anonymized data. 
+
+• Data availability: The primary dataset used in this study is the publicly available from the Kaggle platform. The dataset can be accessed at its permanent repository: https://www.kaggle.com/datasets/prachi13/customer-analytics. During the analy-sis, exploratory work was also conducted using the public Kaggle notebook https:// www.kaggle.com/code/niteshyadav3103/eda-e-commerce-shipping-data. All data used is fully anonymized. 27 • Consent for publication and Data availability: This study utilizes a publicly avail-able, fully anonymized dataset sourced from the Kaggle platform . The data has been thoroughly de-identified to ensure no individual can be identified. Therefore, no additional ethical approval or participant consent is required for the publication of this research. 
+
+• Materials availability: This is a computational study that did not generate any unique physical materials. All analyses were performed using publicly available dig-ital data and code, the availability of which is detailed in the “Data availability” and “Code availability” statements above. 
+
+• Code availability: All custom code and algorithms supporting the findings of this study will be made publicly available upon acceptance of the manuscript. The code repository will be hosted on GitHub. During the peer-review process, the code is available from the corresponding author upon reasonable request. 
+
+• Author contribution: Xiaozhu Sun : Conceptualization, Methodology, Validation, Data Curation, Writing- Original draft preparation, Software. Bilal Farooq :Resources, Conceptualization, Methodology, Writing- Reviewing and Editing, Fund-ing acquisition, Supervision. 
+
+# References 
+
+Yan, B., Dong, Q., Li, Q., Yang, L., Amin, F.U.I.: A study on the interaction between logistics industry and manufacturing industry from the perspective of integration field. PLoS One 17 (3), 0264585 (2022) Fazlollahtabar, H., Saidi-Mehrabad, M.: Methodologies to optimize automated guided vehicle scheduling and routing problems: A review study. Journal of Intelligent & Robotic Systems 77 (3-4), 525–545 (2015) Lin, J.T., Chiu, C.-C., Chang, Y.-H.: Simulation-based optimization approach for simultaneous scheduling of vehicles and machines with processing time uncertainty in fms. Flexible services and manufacturing journal 31 (1), 104–141 (2019) Cano, J.A., Cort´ es, P., Mu˜ nuzuri, J., Correa-Espinal, A.: Solving the picker routing problem in multi-block high-level storage systems using metaheuristics. Flexible services and manufacturing journal 35 (2), 376–415 (2023) Xie, T., Yu, F., Yang, Y.: Agv scheduling at u-shaped automated container terminals considering dual threshold charging strategy. Flexible services and manufacturing journal (2025) Liu, Y., Ji, S., Su, Z., Guo, D.: Multi-objective agv scheduling in an automatic sort-ing system of an unmanned (intelligent) warehouse by using two adaptive genetic algorithms and a multi-adaptive genetic algorithm. PloS one 14 (12), 0226161 (2019) Larco, J.A., Koster, R., Roodbergen, K.J., Dul, J.: Managing warehouse efficiency and worker discomfort through enhanced storage assignment decisions. International 28 Journal of Production Research 55 (21), 6407–6422 (2017) Sun, Y., Zhao, N.: Benchmark for multi-agent pickup and delivery problem in a robotic mobile fulfillment system. Flexible services and manufacturing journal 37 (3), 697– 729 (2025) Chaikovskaia, M., Gayon, J.-P., Quilliot, A.: Optimization of a fleet of reconfigurable robots. Flexible services and manufacturing journal (2025) Zhang, W., Zhang, Y., Zhang, H.: A dynamic conflict-free routing algorithm for multi-agv systems based on priority and time windows. IEEE Transactions on Industrial Informatics 19 (5), 6365–6376 (2023) Riazi, S., Bengtsson, K., Lennartson, B.: Energy optimization of large-scale agv sys-tems. IEEE Transactions on automation science and engineering 18 (2), 638–649 (2020) Vicil, O.: Inventory rationing on a one-for-one inventory model for two priority customer classes. IISE Transactions 53 (4), 472–495 (2021) Uzunoglu Kocer, U., Yalcin, B.: Continuous review (s, q) inventory system with random lifetime and two demand classes. Opsearch 57 (1), 104–118 (2020) Hyyti¨ a, E., Penttinen, A., Sulonen, R.: Non-myopic vehicle and route selection in dynamic darp with travel time and workload objectives. Computers & Operations Research 39 (12), 3021–3030 (2012) Li, G., Li, X., Gao, L., Zeng, B.: Tasks assigning and sequencing of multiple agvs based on an improved harmony search algorithm. Journal of Ambient Intelligence and Humanized Computing 10 (11), 4533–4546 (2019) Zhang, Z., Wu, L., Zhang, W., Peng, T., Zheng, J.: Energy-efficient path planning for a single-load automated guided vehicle in a manufacturing workshop. Computers & Industrial Engineering 158 , 107397 (2021) Zhang, T., Xu, M., Ma, Z., Ma, F., Yu, L.: A scheduling optimization method for mul-tiple automated guided vehicle systems. International Journal of Advanced Robotic Systems 21 (2) (2024) Nishi, T., Hiranaka, Y., Grossmann, I.E.: A bilevel decomposition algorithm for simultaneous production scheduling and conflict-free routing for automated guided vehicles. Computers & Operations Research 38 (5), 876–888 (2011) Wang, W., Wu, Y., Zheng, J., Chi, C.: A comprehensive framework for the design of modular robotic mobile fulfillment systems. IEEE Access 8, 13259–13269 (2020) Guo, H.-L., Hao, Y.-Y., Wang, J.: Warehouse agv path planning based on improved a* algorithm. In: Proc. 8th Int. Conf. Electromechanical Control Technol. Transp. 29 (ICECTT) (2023) Jiang, Z., et al.: Research on vehicle path planning of automated guided vehicle with simultaneous pickup and delivery with mixed time windows. IET Collaborative Intelligent Manufacturing, 12105 (2024) Durst, P., Jia, X., Li, L.: Multi-objective optimization of agv real-time scheduling based on deep reinforcement learning. In: 2023 42nd Chinese Control Conference (CCC), pp. 5535–5540 (2023). IEEE Liu, C.-L., Chang, C.-C., Tseng, C.-J.: Actor-critic deep reinforcement learning for solving job shop scheduling problems. IEEE access 8, 71752–71762 (2020) Kocer, U.U., Yalcin, B.: Continuous review (s, q) inventory system with random lifetime and two demand classes. Opsearch 57 (1), 104–118 (2020) Chen, C.-M., Gong, Y., De Koster, R.B., Van Nunen, J.A.: A flexible evaluative frame-work for order picking systems. Production and operations management 19 (1), 70–82 (2010) Gupta, M., Tiwari, S., Jaggi, C.K.: Retailer’s ordering policies for time-varying dete-riorating items with partial backlogging and permissible delay in payments in a two-warehouse environment. Annals of Operations Research 295 (1), 139–161 (2020) Goh, S.H., Lim, B.L.: Centralizing slow-moving items in a retail network–a case study. In: Proc. Int. Conf. Ind. Eng. Oper. Manage., Bali, Indonesia, pp. 1–10 (2014) Qiu, L., Wang, J., Chen, W., Wang, H.: Heterogeneous agv routing problem consider-ing energy consumption. In: Proc. IEEE Int. Conf. Robot. Biomimetics (ROBIO), pp. 1894–1899 (2015) Gao, Y., Wang, X.: Research on optimization model of dynamic distribution path based on intelligent logistics. Journal of Physics: Conference Series 1650 (3), 032169 (2020) Arnold, J.J., Yuce, O.: Black swan farming using cost of delay: Discover, nurture and speed up delivery of value. In: Proc. Agile Conf., pp. 101–116 (2013) Anderson, D.J.: Kanban: Successful Evolutionary Change for Your Technology Business. Blue Hole Press, ??? (2012) Olsson, N.O.: External and internal flexibility–aligning projects with the busi-ness strategy and executing projects efficiently. International Journal of Project Organisation and Management 1(1), 47–64 (2008) Arshinina, P.: Strategic management for logistics. In: International Scientific Confer-ence Strategic Management and Decision Support Systems in Strategic Management (2019) 30 Chretienne, P.: Scheduling theory and its applications. John Wiley & Sons, Chichester (1995) Goldberg, H.M.: Analysis of the earliest due date scheduling rule in queueing systems. Mathematics of Operations Research 2(2), 145–154 (1977) Jackson, J.R.: Scheduling a production line to minimize maximum tardiness. Tech. rep., University of California, Los Angeles, CA, USA (1955) Smith, W.E.: Various optimizers for single-stage production. Naval Research Logistics Quarterly 3(1-2), 59–66 (1956) Maglaras, C., Yao, J., Zeevi, A.: Optimal price and delay differentiation in large-scale queueing systems. Management Science 64 (5), 2427–2444 (2018) Amiri, A.: The design of service systems with queueing time cost, workload capacities, and backup service. European Journal of Operational Research 104 (1), 201–217 (1998) Kim, T.Y.: Improving warehouse responsiveness by job priority management: A euro-pean distribution centre field study. Computers & Industrial Engineering 139 ,105564 (2020) Mei, Y., Lu, Y.-H., Hu, Y.C., Lee, C.S.G.: Deployment of mobile robots with energy and timing constraints. IEEE Transactions on Robotics 22 (3), 507–522 (2006) Luo, L., Zhao, N., Zhu, Y., Sun, Y.: A* guiding dqn algorithm for automated guided vehicle pathfinding problem of robotic mobile fulfillment systems. Computers & Industrial Engineering 178 , 109112 (2023) Chen, X., Li, Y., Wang, M.: Optimized path planning for autonomous guided vehicle through fusion of improved a* and dynamic window approach. IEEE Transactions on Industrial Electronics 69 (8), 8148–8158 (2022) Li, J., Wang, H., Zhang, K., Liu, Y.: A hybrid path planning algorithm combining a* and improved ant colony optimization with dynamic window approach for enhancing energy efficiency in warehouse environments. Expert Systems with Applications 
+
+213 , 119947 (2023) Zhang, Y., Chen, X., Li, W.: Improved a* algorithms for multi-agv path planning in automated warehouses. IEEE Transactions on Industrial Informatics 16 (4), 2303– 2314 (2020) Yadav, N.: EDA: E-commerce shipping data. Kaggle Code Notebook (2021). https: //www.kaggle.com/code/niteshyadav3103/eda-e-commerce-shipping-data 31

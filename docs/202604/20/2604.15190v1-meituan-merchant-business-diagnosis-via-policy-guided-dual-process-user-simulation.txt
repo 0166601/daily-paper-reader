@@ -1,0 +1,298 @@
+Title: Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation
+
+URL Source: https://arxiv.org/pdf/2604.15190v1
+
+Published Time: Fri, 17 Apr 2026 01:12:37 GMT
+
+Number of Pages: 5
+
+Markdown Content:
+# Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation 
+
+## Ziyang Chen 
+
+LongCat Interaction Team, Meituan Inc. Beijing, China chenziyang319@163.com 
+
+## Renbing Chen 
+
+LongCat Interaction Team, Meituan Inc. Beijing, China chenrb@meituan.com 
+
+## Daowei Li 
+
+LongCat Interaction Team, Meituan Inc. Beijing, China lidaowei@meituan.com 
+
+## Jinzhi Liao 
+
+Independent Researcher Changsha, China jinzhiliao19@163.com 
+
+## Jiashen Sun Ke Zeng 
+
+sunjiashen@meituan.com zengke02@meituan.com LongCat Interaction Team, Meituan Inc. Beijing, China 
+
+## Xiang Zhao ∗
+
+Independent Researcher Changsha, China xiangz@aliyun.com 
+
+Abstract 
+
+Simulating group-level user behavior enables scalable counterfac-tual evaluation of merchant strategies without costly online ex-periments. However, building a trustworthy simulator faces two structural challenges. First, information incompleteness causes reasoning-based simulators to over-rationalize when unobserved factors such as offline context and implicit habits are missing. Sec-ond, mechanism duality requires capturing both interpretable pref-erences and implicit statistical regularities, which no single para-digm achieves alone. We propose Policy-Guided Hybrid Simulation (PGHS), a dual-process framework that mines transferable deci-sion policies from behavioral trajectories and uses them as a shared alignment layer. This layer anchors an LLM-based reasoning branch that prevents over-rationalization and an ML-based fitting branch that absorbs implicit regularities. Group-level predictions from both branches are fused for complementary correction. We deploy PGHS on Meituan with 101 merchants and over 26,000 trajectories. PGHS achieves a group simulation error of 8.80%, improving over the best reasoning-based and fitting-based baselines by 45.8% and 40.9% respectively. 
+
+CCS Concepts 
+
+• Information systems → Information systems applications .
+
+Keywords 
+
+Merchant Business Diagnosis, User Behavior Simulation, Large Language Models  
+
+> ∗Corresponding author.
+> This work is licensed under a Creative Commons Attribution-NonCommercial-NoDerivatives 4.0 International License.
+> SIGIR ’26, Melbourne, VIC, Australia.
+> ©2026 Copyright held by the owner/author(s). ACM ISBN 979-8-4007-2599-9/2026/07 https://doi.org/10.1145/3805712.3808505
+
+ACM Reference Format: 
+
+Ziyang Chen, Renbing Chen, Daowei Li, Jinzhi Liao, Jiashen Sun, Ke Zeng, and Xiang Zhao. 2026. Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation. In Proceedings of the 49th International ACM SIGIR Conference on Research and Development in Information Retrieval (SIGIR ’26), July 20–24, 2026, Melbourne, VIC, Australia. ACM, New York, NY, USA, 5 pages. https://doi.org/10.1145/3805712.3808505 
+
+1 Introduction 
+
+Merchant business diagnosis on large-scale platforms requires an-swering counterfactual questions about operational strategies [ 6 , 11 ,18 , 19 ]. For example, platform operators need to estimate whether adjusting pricing, restructuring menus, or redesigning promotional pages would improve a merchant’s conversion rate before com-mitting to costly changes. Since each merchant serves a distinct user population with heterogeneous preferences, such diagnosis demands accurate simulation of group-level user behavior under hypothetical interventions. Online A/B testing remains the gold standard for causal evaluation [ 22 , 23 ], but it suffers from crit-ical scalability limitations. Deploying unproven strategies risks user experience degradation and financial loss [ 14 , 20 ]. Modern strategies also involve high-dimensional semantic variables such as promotional copywriting and visual layouts [ 7 , 10 ], creating a combinatorial space that physical experiments cannot cover [ 3 ]. These constraints motivate simulation-based counterfactual evalu-ation [ 14 ]. While individual choices are stochastic, the collective preferences of homogeneous user segments exhibit stable regu-larities, making group-level simulation a natural granularity for merchant diagnosis. Building a trustworthy group-level simulator faces two structural challenges. The first is information incompleteness . Real decisions are influenced by unobserved factors such as offline context and im-plicit habits, yet reasoning-based simulators rely on explicit inputs and tend to produce over-rationalized predictions [ 1, 21 ]. User sim-ulation has evolved from rule-based and statistical approaches [ 2 , 8 ]to LLM-driven agents [ 9, 24 ], but these agents often behave as hyper-rational decision-makers that fail to replicate bounded rationality.  
+
+> arXiv:2604.15190v1 [cs.AI] 16 Apr 2026 SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia. Ziyang Chen et al.
+
+Figure 1: Overview of the PGHS framework. Phase A abstracts decision policies through macro-level persona clustering and micro-level rationale refinement. Phase B produces predictions via semantic reasoning and statistical fitting, both conditioned on the abstracted policies. Phase C aggregates dual-process outputs into a group-level estimate via population-aligned sampling. 
+
+The second challenge is mechanism duality . Group behavior simul-taneously reflects interpretable preference structures and implicit statistical regularities [ 12 ], and a single paradigm typically excels at only one end of this spectrum. Fitting-based simulators built on representation learning [ 5 , 13 , 25 ] capture implicit population-level regularities but degrade under long-tail sparsity and semantic shifts. Despite their complementary strengths, effectively bridging the reasoning and fitting paradigms remains an unexplored challenge. Naive ensembling falls short because the two operate with funda-mentally different inductive biases, and unconstrained fusion can easily introduce drift without a shared mechanism to align them. We propose Policy-Guided Hybrid Simulation (PGHS), a dual-process framework for robust group-level counterfactual evaluation. PGHS mines transferable decision policies from behavioral trajecto-ries to form an explicit mechanism alignment layer, grounding both branches with domain-specific empirical logic [ 15 , 17 ]. This layer anchors two complementary branches inspired by dual-process cognition [ 12 ]. A semantic reasoning branch uses policies to con-strain LLM inference and prevent over-rationalization. A statistical fitting branch uses policies as conditional priors to absorb implicit regularities. Predictions from both branches are fused under the shared policy space for complementary correction. Our contributions are threefold. 
+
+• We identify information incompleteness and mechanism duality as two structural barriers to trustworthy group-level user simulation for merchant diagnosis. 
+
+• We propose mining decision policies from behavioral tra-jectories as a shared alignment layer to jointly guide LLM reasoning and statistical fitting. 
+
+• We deploy PGHS on Meituan with 101 merchants and 26k+ trajectories, achieving 8.80% group simulation error with 45.8% and 40.9% improvements over the best reasoning-based and fitting-based baselines. 
+
+2 Method 
+
+Given a merchant scene 𝑆 , an intervention 𝑎 (e.g., a modified price tier or promotional copy), and a user 𝑢 , let 𝑦 (𝑢, 𝑆, 𝑎 ) ∈ { 0, 1} denote the binary purchase outcome. Our goal is to predict the group-level purchase rate E𝑢 [𝑦 (𝑢, 𝑆, 𝑎 )] . As shown in Figure 1, PGHS operates in three phases: (A) policy mining, (B) dual-branch simulation, and (C) group-level fusion. 
+
+2.1 Decision Policy Abstraction 
+
+This phase distills noisy online behavioral logs into a concise set of transferable decision policies that serve as explicit proxies for the latent mechanism 𝑢 mech .
+
+Trajectory Selection. We first construct a high-intent dataset Dchoice =
+
+{( 𝑢 prof  
+
+> 𝑖
+
+, 𝑆 𝑖 , 𝑦 𝑖 )} 𝑁 𝑖 =1 by filtering raw interaction data to retain only sessions where a user actively compares multiple merchants before making a definitive purchase or exit. 
+
+Hierarchical Policy Discovery. We employ a coarse-to-fine pipeline. At the macro level, we serialize each user profile 𝑢 prof into natu-ral language and map it to a dense embedding hprof = Ψenc (𝑢 prof ).K-Means clustering [ 16 ] on these embeddings decomposes the pop-ulation into 𝐾 persona groups P = {𝑃 1, . . . , 𝑃 𝐾 }.Within each persona 𝑃 𝑘 , we leverage an LLM to generate a textual rationale 𝑟 for each high-intent choice instance (𝑢, 𝑆, 𝑦 ):
+
+𝑟 = MLLM (Explain 𝑦 | 𝑆, 𝑢 prof ). (1) Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia. 
+
+We then embed all rationales into a semantic vector space vrationale  
+
+> 𝑖
+
+=
+
+Ψenc (𝑟 𝑖 ) and apply HDBSCAN [4] for micro-level refinement: 
+
+{𝑅 𝑘, 1, . . . , 𝑅 𝑘,𝐽 𝑘 }, N𝑘 = HDBSCAN ({ vrationale  
+
+> 𝑖
+
+| 𝑖 ∈ 𝑃 𝑘 }) , (2) where {𝑅 𝑘,𝑗 } are coherent decision sub-groups and N𝑘 are stochas-tic outliers that we discard. 
+
+Dual-Modal Policy Representation. Each refined cluster 𝑅 𝑘,𝑗 is for-malized into a Decision Policy with two complementary represen-tations. An explicit instruction 𝑇 𝑘,𝑗 is generated by prompting an LLM to summarize the shared decision logic: 
+
+𝑇 𝑘,𝑗 = MLLM (Summarize {𝑟 ∈ 𝑅 𝑘,𝑗 }) . (3) This text contains structured fields including user characteristics, key decision factors, and a decision guide. A dense semantic vec-tor 𝑣 𝑘,𝑗 = Ψenc (𝑇 𝑘,𝑗 ) is obtained by encoding 𝑇 𝑘,𝑗 with the same pre-trained encoder. The explicit instruction guides the reason-ing branch, while the dense vector conditions the statistical fitting branch, ensuring both processes operate in a shared semantic space. 
+
+2.2 Policy-Guided Dual-Process Simulation 
+
+We deploy two parallel branches, both anchored by the shared policy representations: a semantic reasoning branch that leverages explicit decision logic via an LLM, and a statistical fitting branch that captures implicit regularities via a supervised model. 
+
+Semantic Reasoning. Given a scene 𝑆 and a sampled policy instruc-tion 𝑇 𝑘,𝑗 , an LLM-based agent predicts the binary decision: 
+
+ˆ𝑦 reason = 𝑓 LLM (𝑆 | SystemPrompt = 𝑇 𝑘,𝑗 ). (4) The policy text grounds LLM inference in domain-specific trade-off logic, preventing over-rationalization. 
+
+Statistical Fitting. A supervised ML model (i.e., Gradient Boosting) captures implicit environmental regularities such as geographic convenience and offline brand perception. Unlike standard models, ours is policy-conditioned. We concatenate scene features 𝜙 ( ˜𝑆 ),user profile embedding eprof , and the policy vector 𝑣 𝑘,𝑗 :
+
+ˆ𝑦 fit = 𝑓 ML 
+
+ Concat (𝜙 ( ˜𝑆 ), eprof , 𝑣 𝑘,𝑗 ). (5) Injecting the policy vector enables the model to learn 𝑃 (𝑌 | 𝑆, Policy ),capturing interactions between decision mechanisms and scene fea-tures that the text-based reasoning branch cannot observe. 
+
+2.3 Group-Level Aggregation 
+
+We estimate the policy distribution ˆ𝑃 𝑈 (𝑢 | 𝑆 ) for each scene using its historical visitor log. Each visitor is assigned to the most similar policy via cosine similarity between their embedding and the policy vectors {𝑣 𝑘,𝑗 }.We then conduct Monte Carlo simulation with 𝑁 samples. For each step 𝑖 , we draw a policy 𝑢 (𝑖 ) ∼ ˆ𝑃 𝑈 (𝑢 | 𝑆 ) and obtain predictions from both branches. The final group-level estimate fuses the two: 
+
+ˆ𝑌 hybrid (𝑆, 𝑎 ) = 𝜆 · 1
+
+𝑁 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+ˆ𝑦 (𝑖 ) 
+
+> reason
+
++ ( 1 − 𝜆 ) · 1
+
+𝑁 
+
+> 𝑁
+
+∑︁ 
+
+> 𝑖 =1
+
+ˆ𝑦 (𝑖 ) 
+
+> fit
+
+, (6) where 𝜆 ∈ [ 0, 1] balances the two branches. This fusion exploits complementary error structures. The reasoning branch generalizes better under data sparsity while the fitting branch absorbs implicit regularities. Empirically, balanced fusion yields the lowest error. Chinese Fine Dining 
+
+> 25.5%
+> Barbecue
+> 21.5%
+> Hot Pot
+> 21.3%
+> Exotic Cuisine 17.4%
+> Fast Food & Snacks
+> 14.3%
+> (a) Distribution by Merchant Category
+> Head Merchants
+> 53.7%
+> Mid-tier Merchants
+> 33.3%
+> Tail Merchants
+> 13.0%
+> (b) Distribution by Traffic Volume
+
+Figure 2: Statistical distribution of the dataset by merchant category (a) and traffic volume tier (b). 
+
+3 Experiments 3.1 Experimental Setup 
+
+Datasets. We evaluate PGHS on real-world production data from the Meituan platform, sampled from online user interaction logs during October to November 2025. The evaluation set covers 26,461 user decision trajectories across 101 merchants, spanning five culi-nary categories and three traffic tiers. Each trajectory records a complete search-to-purchase sequence with explicit comparison actions. User profiles include demographics, consumption habits, and taste preferences. Merchant profiles include category, price tier, rating, and promotional status. All profiles are encoded into dense embeddings via a pre-trained encoder. We adopt a chronological split where the first 20% of trajectories are used for policy mining, and the remaining 80% serve as the test set. Figure 2 shows the dis-tribution of these trajectories across different merchant categories and traffic volume tiers. 
+
+Baselines. We compare PGHS against two categories of baselines. 
+
+Fitting-based (ML) baselines predict binary purchase decisions from concatenated user and merchant embeddings. We evaluate Logistic Regression , XGBoost , Gradient Boosting , and a 3-layer DNN .
+
+Reasoning-based (LLM) baselines predict purchase decisions from textual descriptions. We evaluate GPT-4o , GPT-4.1 , DeepSeek-V3 ,and Qwen3-32B in both Zero-shot and Few-shot settings. 
+
+Metrics. We evaluate simulation fidelity using Group Simulation Error (GSE), defined as the mean absolute error between predicted and ground-truth per-merchant choice rates. We also report GSE Standard Deviation (GSE-SD) to measure prediction stability across heterogeneous merchant types. Lower values indicate better accu-racy and robustness. 
+
+3.2 Overall Simulation Performance 
+
+Table 1 reports GSE across merchant tiers and categories. Among ML baselines, DNN (Embedding) achieves the lowest error (14.90%) while Gradient Boosting exhibits the most stable cross-tier perfor-mance, though all ML models degrade on Tail merchants due to data sparsity. Among LLM baselines, GPT-4.1 Few-shot achieves the best error (16.25%), but all LLMs exhibit higher variance than ML models due to over-rationalization on implicit-dominant categories such as Snack. PGHS achieves a GSE of 8.80% with a standard deviation of 6.62%, representing relative improvements of 45.8% over the best LLM baseline and 40.9% over the best ML baseline. SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia. Ziyang Chen et al. 
+
+Table 1: Baseline Comparison: Group Simulation Error (GSE%) across merchant tiers and categories. ML models achieve lower variance but struggle with semantic generalization; LLMs exhibit higher variance due to over-rationality. 
+
+Merchant Tiers (GSE %) ↓ Merchant Categories (GSE %) ↓ Overall ↓
+
+Category Model Head Mid Tail Chinese Snack Exotic Hotpot BBQ GSE (%) Std 
+
+> Machine Learning
+
+Logistic Regression 16.20 17.80 19.50 18.20 17.50 15.80 17.60 16.90 17.80 11.20 XGBoost 14.80 14.97 15.86 16.95 15.06 11.10 16.27 15.11 15.21 9.50 DNN (Embedding) 14.20 15.10 16.80 15.80 14.20 12.50 15.30 13.80 14.90 9.80 Gradient Boosting 14.50 14.80 15.60 16.70 14.80 10.80 16.00 14.90 14.98 9.20 Zero-shot LLM  Qwen3-32B 15.80 21.10 20.15 21.45 21.30 17.55 18.20 14.65 18.95 13.20 DeepSeek-V3 15.20 20.45 19.65 20.90 20.75 16.90 17.55 14.05 18.42 12.85 GPT-4o 14.75 20.67 19.41 20.79 20.99 16.61 17.28 13.76 18.27 13.03 GPT-4.1 14.20 19.80 18.90 20.10 19.50 16.20 16.80 13.20 17.65 12.50 Few-shot LLM  Qwen3-32B 14.65 19.20 18.85 19.80 18.65 16.45 17.10 13.95 17.55 12.35 DeepSeek-V3 13.95 18.55 18.15 19.20 17.95 15.80 16.50 13.55 16.98 11.95 GPT-4o 13.80 18.20 17.80 18.90 17.80 15.50 16.20 13.50 16.80 11.80 GPT-4.1 13.35 17.65 17.20 18.35 17.25 15.05 15.75 12.95 16.25 11.45 
+
+Ours PGHS (w/o Policy) 8.32 10.43 11.83 10.13 10.16 10.44 9.68 9.16 9.91 7.37 
+
+PGHS (Full) 7.57 7.99 12.26 8.87 10.29 8.22 8.29 8.24 8.80 6.62 LLM    
+
+> Direct
+> LLM
+> +Policy
+> ML
+> Direct
+> ML
+> +Policy
+> Fusion
+> (No Policy)
+> PGHS
+> (Full)
+> 0
+> 5
+> 10
+> 15
+> 20
+> GSE (%)
+> 18.3
+> 15.4 15.2
+> 13.7
+> 9.9
+> 8.8
+> -15.4%
+> -9.7%
+> -11.2%
+> (a) Group Simulation Error
+> LLM
+> Direct
+> LLM
+> +Policy
+> ML
+> Direct
+> ML
+> +Policy
+> Fusion
+> (No Policy)
+> PGHS
+> (Full)
+> 0.0
+> 2.5
+> 5.0
+> 7.5
+> 10.0
+> 12.5
+> 15.0
+> GSE-SD (%)
+> 13.0
+> 11.8
+> 9.5 8.8
+> 7.4 6.6
+> (b) Simulation Stability
+
+Figure 3: Ablation study on policy guidance and dual-process fusion. 
+
+3.3 Ablation Study 
+
+Figure 3 compares GSE and GSE-SD across six model variants to isolate the contributions of policy guidance and dual-process fusion. Policy guidance reduces GSE by 15.4% for the LLM branch and 9.7% for the ML branch. Dual-process fusion further amplifies the gains. Even without policy guidance, fusion alone already outperforms the best single-branch model. With policy guidance, PGHS (Full) achieves 8.80% by exploiting complementary error structures. We also compare three variants of the policy discovery pipeline. Without clustering, each user is treated as a unique policy, leading to overfitting and a 23% GSE increase. Using K-Means alone captures coarse persona groups but fails to isolate distinct strategies within each group, resulting in a 12% GSE increase. The full hierarchical pipeline (K-Means + HDBSCAN) yields the best results. 
+
+3.4 Expert Evaluation for Business Diagnosis 
+
+PGHS has been developed and piloted within Meituan as a mer-chant diagnostic tool. To validate its practical effectiveness, we conduct an expert evaluation. We select 10 merchants spanning diverse categories and tiers, and define 8 candidate operational strategies (e.g., discount promotions, combo meal additions, deliv-ery fee adjustments, storefront redesign). Three senior operations 
+
+Table 2: Kendall’s 𝜏 between model-predicted and expert strat-egy rankings, averaged over 10 merchants. 
+
+Model Kendall’s 𝜏 ↑
+
+XGBoost 0.45 Gradient Boosting 0.50 GPT-4.1 (Few-shot) 0.52 DeepSeek-V3 (Few-shot) 0.50 PGHS (w/o Policy) 0.62 
+
+PGHS (Full) 0.69 
+
+experts independently rank the strategies per merchant by expected effectiveness, and the consensus ranking serves as gold standard. Each model simulates the 8 strategies per merchant and ranks them by predicted conversion rate. We measure ranking quality using Kendall’s 𝜏 , which quantifies ordinal agreement with expert con-sensus ( 𝜏 ∈ [− 1, 1], higher is better). As shown in Table 2, PGHS (Full) achieves a Kendall’s 𝜏 of 0.69, outperforming the best ML baseline by 38.0% and the best LLM baseline by 32.7%. This confirms that PGHS produces strategy rank-ings well-aligned with expert judgment, validating its utility for real-world merchant diagnosis. 
+
+4 Conclusion 
+
+We presented PGHS, a policy-guided dual-process framework for group-level user simulation. Deployed on Meituan with 101 mer-chants and 26k+ trajectories, PGHS achieves 8.80% group simulation error, improving over the best reasoning-based and fitting-based baselines by 45.8% and 40.9% respectively. While our evaluation focuses on merchant-level diagnosis, the dual-process architecture naturally extends to item-level recommendation scenarios where group behavior prediction is required. Future work includes adap-tive fusion mechanisms, temporal policy dynamics, and validation on public e-commerce benchmarks. Meituan Merchant Business Diagnosis via Policy-Guided Dual-Process User Simulation SIGIR ’26, July 20–24, 2026, Melbourne, VIC, Australia. 
+
+Acknowledgments 
+
+This work was partially supported by National Natural Science Foundation of China (Nos. U25B2047, 62272469, 72301284), and The Science and Technology Innovation Program of Hunan Province (No. 2023RC1007). 
+
+Presenter and Company Bio 
+
+Ziyang Chen is a research intern in the LongCat Interaction Team at Meituan Inc., focusing on social simulation and LLM-based decision-making. He is currently pursuing his PhD at the National University of Defense Technology after receiving his bachelor’s degree in Information and Computing Science. Meituan is China’s leading local services platform, connecting hundreds of millions of consumers with merchants across food delivery, hotel and travel booking, in-store dining, and everyday lifestyle services. 
+
+References 
+
+[1] Carlo Adornetto, Adrian Mora, Kai Hu, Leticia Izquierdo Garcia, Parfait Atchade-Adelomou, Gianluigi Greco, Luis Alberto Alonso Pastor, and Kent Larson. 2025. Generative agents in agent-based modeling: Overview, validation, and emerging challenges. IEEE Transactions on Artificial Intelligence (2025). [2] Krisztian Balog and ChengXiang Zhai. 2025. User simulation in the era of generative ai: User modeling, synthetic data generation, and system evaluation. 
+
+arXiv preprint arXiv:2501.04410 (2025). [3] Guillaume W Basse and Edoardo M Airoldi. 2018. Limitations of design-based causal inference and A/B testing under arbitrary and network interference. Soci-ological Methodology 48, 1 (2018), 136–151. [4] Ricardo JGB Campello, Davoud Moulavi, and Jörg Sander. 2013. Density-based clustering based on hierarchical density estimates. In Pacific-Asia conference on knowledge discovery and data mining . Springer, 160–172. [5] Heng-Tze Cheng, Levent Koc, Jeremiah Harmsen, Tal Shaked, Tushar Chandra, Hrishi Aradhye, Glen Anderson, Greg Corrado, Wei Chai, Mustafa Ispir, et al .2016. Wide & deep learning for recommender systems. In Proceedings of the 1st workshop on deep learning for recommender systems . 7–10. [6] Xuxin Cheng, Ke Zeng, Zhiquan Cao, Linyi Dai, Wenxuan Gao, Fei Han, Ai Jian, Feng Hong, Wenxing Hu, Zihe Huang, Dejian Kong, Jia Leng, Zhuoyuan Liao, Pei Liu, Jiaye Lin, Xing Ma, Jingqing Ruan, Jiaxing Song, Xiaoyu Tan, Ruixuan Xiao, Wenhui Yu, Wenyu Zhan, Haoxing Zhang, Chao Zhou, Hao Zhou, Shaodong Zheng, Ruinian Chen, Siyuan Chen, Ziyang Chen, Yiwen Dong, Yaoyou Fan, Yangyi Fang, Yang Gan, Shiguang Guo, Qi He, Chaowen Hu, Binghui Li, Dailin Li, Xiangyu Li, Yan Li, Chengjian Liu, Xiangfeng Liu, Jiahui Lv, Qiao Ma, Jiang Pan, Cong Qin, Chenxing Sun, Wen Sun, Zhonghui Wang, Abudukelimu Wuerkaixi, Xin Yang, Fangyi Yuan, Yawen Zhu, Tianyi Zhai, Jie Zhang, Runlai Zhang, Yao Xu, Yiran Zhao, Yifan Wang, Xunliang Cai, Yangen Hu, Cao Liu, Lu Pan, Xiaoli Wang, Bo Xiao, Wenyuan Yao, Qianlin Zhou, and Benchang Zhu. 2025. Higher Satisfaction, Lower Cost: A Technical Report on How LLMs Revolutionize Meituan’s Intelligent Interaction Systems. CoRR abs/2510.13291 (2025). [7] Frederick Eberhardt. 2007. Causation and intervention. Unpublished doctoral dissertation, Carnegie Mellon University 93 (2007). [8] Gerhard Fischer. 2001. User modeling in human–computer interaction. User modeling and user-adapted interaction 11, 1 (2001), 65–86. [9] Chen Gao, Xiaochong Lan, Nian Li, Yuan Yuan, Jingtao Ding, Zhilun Zhou, Fengli Xu, and Yong Li. 2024. Large language models empowered agent-based modeling and simulation: A survey and perspectives. Humanities and Social Sciences Communications 11, 1 (2024), 1–24. [10] Sarah Ruth Hoffman, Nilesh Gangan, Xiaoxue Chen, Joseph L Smith, Arlene Tave, Yiling Yang, Christopher L Crowe, Susan dosReis, and Michael Grabner. 2025. A step-by-step guide to causal study design using real-world data. Health Services and Outcomes Research Methodology 25, 2 (2025), 182–196. [11] James M Joyce. 1999. The foundations of causal decision theory . Cambridge University Press. [12] Daniel Kahneman. 2011. Thinking, fast and slow . macmillan. [13] Wang-Cheng Kang and Julian McAuley. 2018. Self-attentive sequential recom-mendation. In 2018 IEEE International Conference on Data Mining (ICDM) . IEEE, 197–206. [14] Akira Kasuga and Ryo Yonetani. 2024. CXSimulator: A User Behavior Simulation using LLM Embeddings for Web-Marketing Campaign Assessment. In Proceed-ings of the 33rd ACM International Conference on Information and Knowledge Management, CIKM 2024, Boise, ID, USA, October 21-25, 2024 , Edoardo Serra and Francesca Spezzano (Eds.). ACM, 3817–3821. [15] Zelong Li, Wenyue Hua, Hao Wang, He Zhu, and Yongfeng Zhang. 2024. Formal-LLM: Integrating Formal Language and Natural Language for Controllable LLM-based Agents. ArXiv abs/2402.00798 (2024). [16] James MacQueen. 1967. Some methods for classification and analysis of multivari-ate observations. In Proceedings of the Fifth Berkeley Symposium on Mathematical Statistics and Probability , Vol. 1. Oakland, CA, USA, 281–297. [17] Xing ming Guo, Darioush Keivan, Usman Ahmed Syed, Lianhui Qin, Huan Zhang, Geir E. Dullerud, Peter J. Seiler, and Bin Hu. 2024. ControlAgent: Automating Con-trol System Design via Novel Integration of LLM Agents and Domain Expertise. 
+
+ArXiv abs/2410.19811 (2024). [18] Judea Pearl. 2009. Causal inference in statistics: An overview. (2009). [19] Isabelle MMJ Reymen, Petra Andries, Hans Berends, Rene Mauer, Ute Stephan, and Elco Van Burg. 2015. Understanding dynamics of strategic decision making in venture creation: a process study of effectuation and causation. Strategic entrepreneurship journal 9, 4 (2015), 351–379. [20] Craig Silverstein, Sergey Brin, Rajeev Motwani, and Jeffrey D. Ullman. 1998. Scalable Techniques for Mining Causal Structures. In VLDB’98, Proceedings of 24rd International Conference on Very Large Data Bases, August 24-27, 1998, New York City, New York, USA , Ashish Gupta, Oded Shmueli, and Jennifer Widom (Eds.). Morgan Kaufmann, 594–605. [21] Wenjie Wang, Fuli Feng, Xiangnan He, Xiang Wang, and Tat-Seng Chua. 2021. Deconfounded recommendation for alleviating bias amplification. In Proceedings of the 27th ACM SIGKDD conference on knowledge discovery & data mining . 1717– 1725. [22] Xuan Yin and Liangjie Hong. 2019. The Identification and Estimation of Direct and Indirect Effects in A/B Tests through Causal Mediation Analysis. In Proceedings of the 25th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining, KDD 2019, Anchorage, AK, USA, August 4-8, 2019 , Ankur Teredesai, Vipin Kumar, Ying Li, Rómer Rosales, Evimaria Terzi, and George Karypis (Eds.). ACM, 2989–2999. [23] Yuan Yuan, Kristen M. Altenburger, and Farshad Kooti. 2021. Causal Network Motifs: Identifying Heterogeneous Spillover Effects in A/B Tests. In WWW ’21: The Web Conference 2021, Virtual Event / Ljubljana, Slovenia, April 19-23, 2021 , Jure Leskovec, Marko Grobelnik, Marc Najork, Jie Tang, and Leila Zia (Eds.). ACM / IW3C2, 3359–3370. [24] Zijian Zhang, Shuchang Liu, Ziru Liu, Rui Zhong, Qingpeng Cai, Xiangyu Zhao, Chunxu Zhang, Qidong Liu, and Peng Jiang. 2025. Llm-powered user simulator for recommender system. In Proceedings of the AAAI Conference on Artificial Intelligence , Vol. 39. 13339–13347. [25] Guorui Zhou, Xiaoqiang Zhu, Chengru Song, Ying Fan, Han Zhu, Xiao Ma, Yanghui Yan, Junqi Jin, Han Li, and Kun Gai. 2018. Deep interest network for click-through rate prediction. In Proceedings of the 24th ACM SIGKDD International Conference on Knowledge Discovery & Data Mining . 1059–1068.
